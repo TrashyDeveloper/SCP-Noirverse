@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_bgcub"]
+
+[resource]
+script = ExtResource("1_bgcub")
+display_name = "9mm Ammo (24)"
+short_name = "AMMO"
+kind = 3
+color = Color(0.3, 0.32, 0.25, 1)

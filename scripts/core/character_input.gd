@@ -18,3 +18,10 @@ var sprint := false
 var jump := false
 var interact := false
 var toggle_flashlight := false
+var use_item := false
+var reload := false
+var drop_item := false
+## Inventory slot to hold (0-based), or -1 for no change.
+var select_slot := -1
+## +1 / -1 to switch to the next / previous item, 0 for no change.
+var cycle_slot := 0

@@ -11,6 +11,14 @@
 [ext_resource type="Material" path="res://resources/materials/lamp.tres" id="9_3f3er"]
 [ext_resource type="Script" path="res://scripts/props/flicker_light.gd" id="10_fs3vf"]
 [ext_resource type="PackedScene" path="res://scenes/props/door.tscn" id="11_6x7lq"]
+[ext_resource type="PackedScene" path="res://scenes/items/item_pickup.tscn" id="12_6x7lq"]
+[ext_resource type="Resource" path="res://resources/items/keycard_level_1.tres" id="14_luvr8"]
+[ext_resource type="Resource" path="res://resources/items/medkit.tres" id="15_c1smh"]
+[ext_resource type="Resource" path="res://resources/items/ammo_9mm.tres" id="16_ahki3"]
+[ext_resource type="Resource" path="res://resources/items/keycard_level_2.tres" id="17_r4382"]
+[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="18_dndq6"]
+[ext_resource type="PackedScene" path="res://scenes/props/training_dummy.tscn" id="19_w8d4u"]
+[ext_resource type="PackedScene" path="res://scenes/props/hazard_wiring.tscn" id="21_l3n31"]
 
 [node name="TestFacility" type="Node3D" unique_id=108702426]
 
@@ -629,16 +637,17 @@ spot_angle_attenuation = 1.4
 
 [node name="Doors" type="Node3D" parent="." unique_id=335630015]
 
-[node name="DoorCellsNorth" type="Node3D" parent="Doors" unique_id=2113114636 instance=ExtResource("11_6x7lq")]
+[node name="DoorCellsNorth" parent="Doors" unique_id=2113114636 instance=ExtResource("11_6x7lq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5.2)
 
-[node name="DoorChamber" type="Node3D" parent="Doors" unique_id=893653318 instance=ExtResource("11_6x7lq")]
+[node name="DoorChamber" parent="Doors" unique_id=893653318 instance=ExtResource("11_6x7lq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -15.8)
+required_clearance = 2
 
-[node name="DoorCellsEast" type="Node3D" parent="Doors" unique_id=369488926 instance=ExtResource("11_6x7lq")]
+[node name="DoorCellsEast" parent="Doors" unique_id=369488926 instance=ExtResource("11_6x7lq")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 6.2, 0, 0)
 
-[node name="DoorStorage" type="Node3D" parent="Doors" unique_id=2065240125 instance=ExtResource("11_6x7lq")]
+[node name="DoorStorage" parent="Doors" unique_id=2065240125 instance=ExtResource("11_6x7lq")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -17.8, 0, 0)
 required_clearance = 1
 
@@ -666,7 +675,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, -29.79)
 shaded = true
 modulate = Color(0.9, 0.9, 0.85, 1)
 text = "CONTAINMENT CHAMBER 01
-- VACANT -"
+VACANT - TEMPORARY FIRING RANGE
+LEVEL 2 CLEARANCE"
 font_size = 40
 outline_size = 0
 
@@ -695,3 +705,47 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 1)
 
 [node name="Spawn3" type="Marker3D" parent="SpawnPoints" unique_id=1408024799]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.1, 1)
+
+[node name="Items" type="Node3D" parent="." unique_id=1336216131]
+
+[node name="KeycardL1" parent="Items" unique_id=282051648 instance=ExtResource("12_6x7lq")]
+transform = Transform3D(0.921061, 0, 0.38941833, 0, 1, 0, -0.38941833, 0, 0.921061, 0.1, 1, 3.6)
+item_data = ExtResource("14_luvr8")
+
+[node name="Medkit" parent="Items" unique_id=735562885 instance=ExtResource("12_6x7lq")]
+transform = Transform3D(0.9800666, 0, 0.19866933, 0, 1, 0, -0.19866933, 0, 0.9800666, 24.4, 0.95, -2.1)
+item_data = ExtResource("15_c1smh")
+
+[node name="AmmoOffice" parent="Items" unique_id=1694573032 instance=ExtResource("12_6x7lq")]
+transform = Transform3D(0.9553365, 0, -0.29552022, 0, 1, 0, 0.29552022, 0, 0.9553365, 25.7, 0.92, -2)
+item_data = ExtResource("16_ahki3")
+
+[node name="KeycardL2" parent="Items" unique_id=92132409 instance=ExtResource("12_6x7lq")]
+transform = Transform3D(0.3623577, 0, 0.9320391, 0, 1, 0, -0.9320391, 0, 0.3623577, -23.1, 1.3, 2.2)
+item_data = ExtResource("17_r4382")
+
+[node name="Pistol" parent="Items" unique_id=1286538257 instance=ExtResource("12_6x7lq")]
+transform = Transform3D(0.8253356, 0, 0.5646425, 0, 1, 0, -0.5646425, 0, 0.8253356, -23.9, 1.35, 2.6)
+item_data = ExtResource("18_dndq6")
+
+[node name="AmmoStorage" parent="Items" unique_id=61404500 instance=ExtResource("12_6x7lq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 0.15, -3)
+item_data = ExtResource("16_ahki3")
+
+[node name="MedkitStorage" parent="Items" unique_id=1190445135 instance=ExtResource("12_6x7lq")]
+transform = Transform3D(0.5403023, 0, 0.84147096, 0, 1, 0, -0.84147096, 0, 0.5403023, -20, 0.2, 3)
+item_data = ExtResource("15_c1smh")
+
+[node name="Dummies" type="Node3D" parent="." unique_id=1364951686]
+
+[node name="Dummy1" parent="Dummies" unique_id=26174659 instance=ExtResource("19_w8d4u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -27)
+
+[node name="Dummy2" parent="Dummies" unique_id=127170449 instance=ExtResource("19_w8d4u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -25)
+
+[node name="Dummy3" parent="Dummies" unique_id=2059572357 instance=ExtResource("19_w8d4u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -27)
+
+[node name="ExposedWiring" parent="." unique_id=1605138397 instance=ExtResource("21_l3n31")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 19.6, 0, 4.1)

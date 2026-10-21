@@ -15,11 +15,13 @@ and is committed + pushed once it works. `[x]` = done.
 - [x] Credits screen with CC BY-SA 3.0 attribution
 - [x] Pause menu (**Esc**)
 
-## Step 2 — Items & inventory
-- [ ] Item pickups lying in the world (keycards, medkit, pistol)
-- [ ] Inventory (small slot bar) and item use
-- [ ] Keycard levels open matching doors
-- [ ] Health, damage and death; medkit heals
+## Step 2 — Items & inventory ✅
+- [x] Item pickups lying in the world (keycards L1–L3, medkit, pistol, ammo)
+- [x] Inventory (6 slots + spare ammo), select with 1–6 / mouse wheel, drop with Q
+- [x] Keycard levels open matching doors (carried cards count)
+- [x] Health, damage and death screen; medkit heals
+- [x] Pistol: hitscan shots, magazine + reload, muzzle flash, recoil, bullet holes, hit marker
+- [x] Training dummies (firing range) and an electrical hazard for testing
 
 ## Step 3 — Classes & rounds
 - [ ] Class definitions (Class-D, Scientist, Facility Guard) with spawn points, starting items and colours

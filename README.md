@@ -28,19 +28,37 @@ noir look. Built with **Godot 4** and **GDScript**.
 | Mouse | Look |
 | Shift | Sprint |
 | Space | Jump |
-| E | Interact (open/close doors) |
+| E | Interact: open/close doors, pick up items |
+| 1–6 / mouse wheel | Choose which item to hold |
+| Left click | Use held item (shoot pistol, use medkit) |
+| R | Reload |
+| Q | Drop held item |
 | F | Flashlight |
 | Esc | Pause menu (frees the mouse) |
 
-### What to try (Step 1)
+### What to try
 
-- Walk to a door, look at it: you'll see **[E] Open door**. Press E.
-- The door to *Storage* (west corridor) has a **red** light: it needs a
-  level-1 keycard, which arrives in Step 2.
-- Turn on the flashlight (**F**) in a dark corner.
-- Watch the lights flicker.
+1. In the Class-D room, a **Level 1 Keycard** lies on the middle bunk. Look at
+   it and press **E**.
+2. Go through the west corridor. The *Storage* door has a **red** light (it
+   needs Level 1); with the card you can now open it.
+3. In Storage, grab the **pistol**, the **Level 2 Keycard**, ammo and a
+   medkit.
+4. Open the north *Containment Chamber* (Level 2): it's a temporary firing
+   range. Press the pistol's number key, **left click** to shoot the dummies,
+   **R** to reload.
+5. In the *Research Office* (east), careful with the sparking **exposed
+   wiring** in the corner: it hurts! Hold a medkit and left click to heal.
+   Stay in the sparks too long and you'll see the death screen.
 
 ## Handy Godot tips for beginners
+
+- **Place an item in a level:** open `scenes/levels/test_facility.tscn`, drag
+  `scenes/items/item_pickup.tscn` from the FileSystem dock into the 3D view,
+  then drag an item from `resources/items/` onto its **Item Data** field in
+  the Inspector. (Its model appears when you run the game.)
+- **Change a door's lock:** select a door under `Doors` and set
+  **Required Clearance** (0 = no keycard needed).
 
 - **F5** runs the whole game. **F6** runs only the scene you have open —
   great for testing one piece. **F8** (or the ■ button) stops.
@@ -63,12 +81,14 @@ scenes/
   game/game.tscn         The in-game scene: loads a level, spawns the player
   player/character.tscn  A first-person humanoid
   levels/                Facility maps
-  props/                 Doors and other reusable objects
+  props/                 Doors, training dummy, hazards
+  items/item_pickup.tscn An item lying in the world
   effects/               The noir full-screen filter
 scripts/                 GDScript code, mirroring the scenes folders
   core/                  Shared building blocks (CharacterInput, InputSource)
 shaders/noir_post.gdshader   Black & white, grain, vignette, scratches
 resources/               Materials, environment (fog, lighting), UI theme
+  items/                 Item definitions (.tres) — double-click to edit damage, heal amount...
 ```
 
 ## How the code is organised (ready for bots & multiplayer)
@@ -86,5 +106,8 @@ NetworkInput (later)┘
 - Each physics tick the character asks its input source for a
   `CharacterInput` snapshot and acts on it. Bots and online players will just
   be different input sources driving the same character code.
+- Items work the same way: the `ItemHandler` uses the held item when the
+  `CharacterInput` says `use_item`, so bots will be able to shoot and heal too.
+  `Health` and `Inventory` are small reusable nodes you can add to anything.
 - There are no global singletons (autoloads) holding game state; the match
   lives inside `game.tscn`, so a server can later run the same logic.

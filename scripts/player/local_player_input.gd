@@ -9,11 +9,9 @@ extends InputSource
 
 var _yaw := 0.0
 var _pitch := 0.0
-# One-shot presses are remembered until the next physics tick picks them up,
-# so a quick tap between two ticks is never lost.
-var _jump_queued := false
-var _interact_queued := false
-var _flashlight_queued := false
+# One-shot presses are collected here until the next physics tick picks them
+# up, so a quick tap between two ticks is never lost.
+var _pending := CharacterInput.new()
 
 
 func set_view_angles(yaw: float, pitch: float) -> void:
@@ -24,32 +22,44 @@ func set_view_angles(yaw: float, pitch: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not enabled:
 		return
-	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		_yaw -= event.relative.x * mouse_sensitivity
-		_pitch -= event.relative.y * mouse_sensitivity
-		_pitch = clampf(_pitch, -deg_to_rad(max_pitch_degrees), deg_to_rad(max_pitch_degrees))
-		_yaw = wrapf(_yaw, -PI, PI)
-	elif event.is_action_pressed("jump"):
-		_jump_queued = true
+	if event is InputEventMouseMotion:
+		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			_yaw = wrapf(_yaw - event.relative.x * mouse_sensitivity, -PI, PI)
+			_pitch -= event.relative.y * mouse_sensitivity
+			_pitch = clampf(_pitch, -deg_to_rad(max_pitch_degrees), deg_to_rad(max_pitch_degrees))
+		return
+	if event.is_action_pressed("jump"):
+		_pending.jump = true
 	elif event.is_action_pressed("interact"):
-		_interact_queued = true
+		_pending.interact = true
 	elif event.is_action_pressed("toggle_flashlight"):
-		_flashlight_queued = true
+		_pending.toggle_flashlight = true
+	elif event.is_action_pressed("use_item") and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		_pending.use_item = true
+	elif event.is_action_pressed("reload"):
+		_pending.reload = true
+	elif event.is_action_pressed("drop_item"):
+		_pending.drop_item = true
+	elif event.is_action_pressed("slot_next"):
+		_pending.cycle_slot = 1
+	elif event.is_action_pressed("slot_prev"):
+		_pending.cycle_slot = -1
+	else:
+		for i in Inventory.SLOT_COUNT:
+			if event.is_action_pressed("slot_%d" % (i + 1)):
+				_pending.select_slot = i
 
 
 func sample() -> CharacterInput:
-	var input := CharacterInput.new()
+	var input := _pending
+	_pending = CharacterInput.new()
+	if not enabled:
+		input = CharacterInput.new()
 	input.yaw = _yaw
 	input.pitch = _pitch
 	if enabled:
 		input.move = Input.get_vector("move_left", "move_right", "move_back", "move_forward")
 		input.sprint = Input.is_action_pressed("sprint")
-		input.jump = _jump_queued
-		input.interact = _interact_queued
-		input.toggle_flashlight = _flashlight_queued
-	_jump_queued = false
-	_interact_queued = false
-	_flashlight_queued = false
 	return input
 
 

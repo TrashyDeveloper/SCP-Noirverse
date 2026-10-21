@@ -3,7 +3,7 @@ extends Node3D
 ## A sliding facility door. Look at it and press E to open/close.
 ##
 ## `required_clearance` is the keycard level needed (0 = anyone can open).
-## Keycards arrive in a later step; for now any level above 0 is simply locked.
+## A character opens it if they carry a keycard of that level or higher.
 
 signal opened
 signal closed
@@ -29,14 +29,19 @@ func _ready() -> void:
 	_update_indicator()
 
 
-## Can this actor operate the door? (Keycard checks will go here.)
-func can_operate(_actor: Node) -> bool:
-	return required_clearance == 0
+## Can this actor operate the door?
+func can_operate(actor: Node) -> bool:
+	if required_clearance == 0:
+		return true
+	return actor != null and actor.has_method("get_clearance") \
+		and actor.get_clearance() >= required_clearance
 
 
 func get_interaction_prompt(actor: Node) -> String:
 	if not can_operate(actor):
-		return "Locked (clearance %d required)" % required_clearance
+		return "Locked - Level %d keycard required" % required_clearance
+	if required_clearance > 0 and not is_open:
+		return "[E] Open door (Level %d)" % required_clearance
 	return "[E] Close door" if is_open else "[E] Open door"
 
 
@@ -73,10 +78,9 @@ func _update_indicator() -> void:
 	var mat := indicator.get_surface_override_material(0) as StandardMaterial3D
 	if mat == null:
 		return
+	# Green = open, red = closed and needs a keycard, yellow = closed.
 	var color := Color(0.3, 1.0, 0.3)
-	if not can_operate(null):
-		color = Color(1.0, 0.2, 0.2)
-	elif not is_open:
-		color = Color(1.0, 0.85, 0.3)
+	if not is_open:
+		color = Color(1.0, 0.2, 0.2) if required_clearance > 0 else Color(1.0, 0.85, 0.3)
 	mat.emission = color
 	mat.albedo_color = color

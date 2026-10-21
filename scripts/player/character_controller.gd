@@ -8,6 +8,7 @@ extends CharacterBody3D
 
 ## Emitted when the thing under the crosshair changes. Empty text = nothing.
 signal interaction_prompt_changed(text: String)
+signal died(source: Node)
 
 @export var walk_speed := 3.5
 @export var sprint_speed := 6.0
@@ -19,6 +20,7 @@ signal interaction_prompt_changed(text: String)
 @export var head_bob_amount := 0.04
 
 var input_source: InputSource
+var is_alive := true
 
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var _bob_time := 0.0
@@ -30,10 +32,16 @@ var _head_base_height := 0.0
 @onready var interact_ray: RayCast3D = $Head/Camera3D/InteractRay
 @onready var flashlight: SpotLight3D = $Head/Camera3D/Flashlight
 @onready var body_mesh: MeshInstance3D = $Body
+@onready var view_model: Node3D = $Head/Camera3D/ViewModel
+@onready var view_model_rest: Vector3 = view_model.position
+@onready var health: Health = $Health
+@onready var inventory: Inventory = $Inventory
+@onready var items: ItemHandler = $ItemHandler
 
 
 func _ready() -> void:
 	_head_base_height = head.position.y
+	health.died.connect(_on_died)
 
 
 ## Gives this character a controller. `first_person` = true when the local
@@ -48,7 +56,7 @@ func possess(source: InputSource, first_person: bool) -> void:
 
 
 func _process(delta: float) -> void:
-	if input_source == null:
+	if input_source == null or not is_alive:
 		return
 	# Apply the view every frame for smooth mouse look.
 	var view := input_source.get_view_angles()
@@ -61,12 +69,33 @@ func _physics_process(delta: float) -> void:
 	if input_source == null:
 		return
 	var input := input_source.sample()
+	if not is_alive:
+		# Dead bodies still fall, but ignore all commands.
+		input = CharacterInput.new()
+		_apply_movement(input, delta)
+		return
 	rotation.y = input.yaw
 	head.rotation.x = input.pitch
 	_apply_movement(input, delta)
 	_update_interaction(input)
+	items.tick(input, delta)
 	if input.toggle_flashlight:
 		flashlight.visible = not flashlight.visible
+
+
+# --- Things other objects ask the character (doors, pickups...) ---
+
+## The highest keycard level this character carries.
+func get_clearance() -> int:
+	return inventory.get_clearance()
+
+
+func can_take_item(item: ItemInstance) -> bool:
+	return is_alive and inventory.can_add(item)
+
+
+func give_item(item: ItemInstance) -> bool:
+	return is_alive and inventory.add_item(item)
 
 
 func _apply_movement(input: CharacterInput, delta: float) -> void:
@@ -113,6 +142,19 @@ func _find_interactable() -> Node:
 			return node
 		node = node.get_parent()
 	return null
+
+
+func _on_died(source: Node) -> void:
+	is_alive = false
+	items.equip(-1)
+	interaction_prompt_changed.emit("")
+	velocity.x = 0.0
+	velocity.z = 0.0
+	# Simple death "animation": the camera drops to the floor and tilts.
+	var tween := create_tween().set_parallel().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(head, "position:y", 0.25, 0.6)
+	tween.tween_property(head, "rotation:z", deg_to_rad(75.0), 0.6)
+	died.emit(source)
 
 
 func _update_head_bob(delta: float) -> void:
