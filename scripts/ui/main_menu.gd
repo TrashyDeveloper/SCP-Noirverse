@@ -1,8 +1,11 @@
 extends Control
-## Title screen. Behind the buttons, a camera slowly looks around the facility.
+## Title screen. Behind the buttons, a camera slowly looks around a
+## facility built from a fixed map seed.
 
 const GAME_PATH := "res://scenes/game/game.tscn"
 const CREDITS_PATH := "res://scenes/ui/credits.tscn"
+## Always the same backdrop map.
+const BACKDROP_SEED := 1947
 
 var _time := 0.0
 var _camera_base_yaw := 0.0
@@ -12,6 +15,9 @@ var _camera_base_yaw := 0.0
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	var facility := FacilityGenerator.new().generate(BACKDROP_SEED)
+	$Backdrop.add_child(facility)
+	camera.transform = facility.get_meta("showcase")
 	_camera_base_yaw = camera.rotation.y
 	%Play.pressed.connect(_on_play_pressed)
 	%Credits.pressed.connect(_on_credits_pressed)

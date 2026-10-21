@@ -31,6 +31,15 @@ const SIDE_NAMES := {
 ## Name of the group under the level's "SpawnPoints" node to spawn at.
 @export var spawn_group := ""
 
+## Special abilities, e.g. &"medic" (faster, stronger healing),
+## &"fast_barricade", &"demolitions" (throws further, more grenades),
+## &"intercom_priority", &"terminal_access". See CharacterClass.PERKS.
+@export var perks: Array[StringName] = []
+## Walking/sprinting speed multiplier (heavy gunners are slower).
+@export var speed_multiplier := 1.0
+## Extra carry limits per item category: {ItemData.Category: +amount}.
+@export var limit_bonuses: Dictionary[ItemData.Category, int] = {}
+
 ## Notes for later steps (e.g. which weapon this class will get).
 @export_multiline var notes := ""
 
@@ -46,6 +55,25 @@ const SIDE_NAMES := {
 @export var escape_class: CharacterClass
 ## The class you become if you escape while disarmed (you switch sides).
 @export var escape_class_disarmed: CharacterClass
+
+
+## What each perk does (shown when you spawn).
+const PERKS := {
+	&"medic": "Medical items work twice as fast and heal more",
+	&"fast_barricade": "Builds and tears down barricades twice as fast",
+	&"demolitions": "Throws grenades further and carries more of them",
+	&"heavy": "Tough but slower; carries extra ammo",
+	&"intercom_priority": "Intercom priority (short cooldown, can cut in)",
+	&"terminal_access": "Full access to facility terminals",
+}
+
+
+## One line per perk, for the HUD.
+func describe_perks() -> String:
+	var lines := PackedStringArray()
+	for perk in perks:
+		lines.append("• " + PERKS.get(perk, String(perk)))
+	return "\n".join(lines)
 
 
 static func side_name(value: Side) -> String:

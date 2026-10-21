@@ -20,7 +20,8 @@ const UNLIMITED_AMMO := 1 << 30
 
 @export_group("Round")
 ## Who spawns, in order: D = Class-D, S = Scientist, G = Facility Guard,
-## C = Containment Captain. The first `player_count` letters are used (the
+## C = Containment Captain, J = Janitor, Z = Zone Manager,
+## X = Containment Specialist. The first `player_count` letters are used (the
 ## queue repeats if shorter).
 @export var spawn_queue := "DSDGDSCDGDSD"
 ## Characters per round (you + bots).
@@ -31,6 +32,15 @@ const UNLIMITED_AMMO := 1 << 30
 @export var friendly_fire := false
 ## Seconds between the end of a round and the next one.
 @export var restart_delay_seconds := 15.0
+## Chance (0-1) that a Scientist slot becomes a minor role instead
+## (Janitor, Zone Manager or Containment Specialist).
+@export_range(0.0, 1.0) var minor_role_chance := 0.35
+## Seconds between reinforcement waves (dead players come back as MTF or
+## Chaos). 0 = no respawns.
+@export var respawn_wave_seconds := 180.0
+## Map layout seed. 0 = a new random layout every round; any other number
+## always builds the same map.
+@export var map_seed := 0
 
 @export_group("Item limits (0-8, 0 = can't be picked up)")
 @export_range(0, 8) var scp_items := 3
@@ -58,6 +68,7 @@ const UNLIMITED_AMMO := 1 << 30
 
 const _ROUND_KEYS: Array[String] = [
 	"spawn_queue", "player_count", "round_time_limit_minutes", "friendly_fire", "restart_delay_seconds",
+	"minor_role_chance", "respawn_wave_seconds", "map_seed",
 ]
 
 const _CATEGORY_KEYS := {
@@ -106,6 +117,9 @@ static func load_with_overrides(defaults: GameplayConfig, path := FILE_PATH) -> 
 		config.round_time_limit_minutes = maxf(float(file.get_value("round", "round_time_limit_minutes", config.round_time_limit_minutes)), 0.0)
 		config.friendly_fire = bool(file.get_value("round", "friendly_fire", config.friendly_fire))
 		config.restart_delay_seconds = maxf(float(file.get_value("round", "restart_delay_seconds", config.restart_delay_seconds)), 1.0)
+		config.minor_role_chance = clampf(float(file.get_value("round", "minor_role_chance", config.minor_role_chance)), 0.0, 1.0)
+		config.respawn_wave_seconds = maxf(float(file.get_value("round", "respawn_wave_seconds", config.respawn_wave_seconds)), 0.0)
+		config.map_seed = int(file.get_value("round", "map_seed", config.map_seed))
 		for key in _CATEGORY_KEYS.values():
 			var value := int(file.get_value("item_limits", key, config.get(key)))
 			config.set(key, clampi(value, 0, MAX_SLOTS))

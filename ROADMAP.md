@@ -86,6 +86,18 @@ and is committed + pushed once it works. `[x]` = done.
 - [x] SCP-914 room redesign (raised booths with ramps and railings, hazard zones, shelves)
 - [x] Blue-lit screens on card readers; HCZ archive and testing room
 
+## Step 3.8 — A living, changing facility ✅
+- [x] Procedural map every round (seeded; `map_seed` in the config to repeat one): irregular zone shapes, winding corridors, dead ends, loops, key rooms in new places each round
+- [x] Fast building: static geometry merged into chunked meshes + one collision shape per floor
+- [x] Living spaces: offices, meeting rooms, restrooms, break rooms, cafeteria (two storeys), janitor's closets, medical bays, storage
+- [x] Zone flavour: LCZ research (labs, experimental items, SCP-999 pen, SCP-055 display); HCZ industrial (containment pit with ramp, pump stations with steam vents); Surface watchtowers, staging areas, vehicles, barriers
+- [x] Terminals with limited info (more with the right keycard or perk), the intercom (Zone Manager priority), locked lockers with random loot, breakable crates, barricade kits
+- [x] Minor roles: Janitor, Zone Manager, Containment Specialist
+- [x] MTF & Chaos subclasses: Medic, Combat Engineer, Explosives Specialist, Heavy Gunner (with perks)
+- [x] Respawn waves (dead players return as MTF or Chaos) and influence/XP: tiers improve escapee ranks and waves, personal XP gives small bonuses
+- [x] Tests: 200 seeds plan correctly; flood-fill check that every door, lift and the exit can be reached on foot
+- [ ] Later: SCP-914 refining, SCPs that move (Step 5), more vehicle use, decontamination timer
+
 ## Step 4 — AI bots
 - [ ] `BotInput` (an `InputSource` driven by AI) using navigation meshes
 - [ ] Simple behaviours: wander, flee, follow, open doors
@@ -99,10 +111,10 @@ and is committed + pushed once it works. `[x]` = done.
 
 ## Step 6 — Facility variety
 - [x] Zones, checkpoints, gate elevators, surface escape (done early in Step 3.5)
-- [ ] Modular room pieces so the layout can vary each round
+- [x] Modular room pieces so the layout can vary each round (done in Step 3.8)
 
 ## Step 7 — Reinforcements
-- [ ] Respawn waves on the Surface using the MTF / Chaos ranks and the round's unit/cell
+- [x] Respawn waves on the Surface using the MTF / Chaos ranks and the round's unit/cell (Step 3.8)
 - [ ] Their goals: MTF contain SCPs and escort scientists, Chaos help Class-D
 - [ ] New weapons for the ranks (SMG, rifles, shotgun, machine guns)
 

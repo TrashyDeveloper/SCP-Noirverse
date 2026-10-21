@@ -36,6 +36,8 @@ const ACCESS_NAMES := {
 @export var open_time := 0.6
 
 var is_open := false
+## Planks nailed across the door (it can't open while this exists).
+var barricade: Barricade
 var _tween: Tween
 var _denied_time := 0.0
 var _indicator_materials: Array[StandardMaterial3D] = []
@@ -82,9 +84,30 @@ func card_opens(card: ItemData) -> bool:
 	return card != null and card.grants_access(access, required_level)
 
 
+func is_barricaded() -> bool:
+	return is_instance_valid(barricade)
+
+
+## Can a barricade be nailed across this door right now?
+func can_barricade() -> bool:
+	return not is_open and not remote_controlled and not is_barricaded() \
+			and (_tween == null or not _tween.is_running())
+
+
+func add_barricade(_builder: Node) -> Barricade:
+	barricade = Barricade.new()
+	barricade.name = "Barricade"
+	barricade.door = self
+	barricade.position = Vector3(0, 1.3, 0)
+	add_child(barricade)
+	return barricade
+
+
 ## Can this actor operate the door right now?
 func can_operate(actor: Node) -> bool:
 	if actor != null and actor.has_method("is_disarmed") and actor.is_disarmed():
+		return false
+	if is_barricaded():
 		return false
 	if not requires_keycard():
 		return true
@@ -101,6 +124,8 @@ func get_interaction_prompt(actor: Node) -> String:
 		return "You are disarmed"
 	if remote_controlled:
 		return remote_prompt
+	if is_barricaded():
+		return "Barricaded - hold E on the planks to tear them down"
 	if not can_operate(actor):
 		return "Requires %s keycard  (hold a keycard: Ctrl)" % get_access_text()
 	return "[E] Close door" if is_open else "[E] Open door"
@@ -119,7 +144,7 @@ func interact(actor: Node) -> void:
 
 ## Called by a card reader when a thrown keycard hits it.
 func on_card_swiped(card: ItemData) -> void:
-	if remote_controlled:
+	if remote_controlled or is_barricaded():
 		return
 	if card_opens(card):
 		set_open(not is_open)
@@ -128,7 +153,7 @@ func on_card_swiped(card: ItemData) -> void:
 
 
 func set_open(value: bool) -> void:
-	if value == is_open:
+	if value == is_open or (value and is_barricaded()):
 		return
 	is_open = value
 	if _tween:

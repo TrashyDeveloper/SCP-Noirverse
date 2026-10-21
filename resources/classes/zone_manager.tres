@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterClass" format=3]
+
+[ext_resource type="Resource" path="res://resources/classes/mtf_recruit.tres" id="1_il4tv"]
+[ext_resource type="Resource" path="res://resources/classes/chaos_recruit.tres" id="2_aivjl"]
+[ext_resource type="Script" path="res://scripts/game/character_class.gd" id="3_u1hjd"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="4_obplk"]
+[ext_resource type="Resource" path="res://resources/items/keycard_zone_manager.tres" id="5_7w2lb"]
+[ext_resource type="Resource" path="res://resources/items/painkillers.tres" id="6_tbift"]
+
+[resource]
+script = ExtResource("3_u1hjd")
+id = &"zone_manager"
+display_name = "Zone Manager"
+objective = "Coordinate Light Containment over the intercom, then escape to the Surface."
+color = Color(0.78, 0.74, 0.6, 1)
+spawn_group = "ZoneManager"
+perks = Array[StringName]([&"intercom_priority", &"terminal_access"])
+starting_items = Array[ExtResource("4_obplk")]([ExtResource("5_7w2lb"), ExtResource("6_tbift")])
+can_escape = true
+escape_class = ExtResource("1_il4tv")
+escape_class_disarmed = ExtResource("2_aivjl")

@@ -14,6 +14,17 @@ signal round_ended(result: Dictionary)
 signal announcement(text: String)
 ## A warhead started, was cancelled or detonated. `state` is a WarheadState.
 signal warhead_changed(warhead: int, state: int, time_left: float)
+## Someone used a terminal; `text` is what it shows them.
+signal terminal_report(actor: Node, text: String)
+## Someone may speak on the intercom now (Game asks the local player what
+## to say and calls broadcast_intercom).
+signal intercom_requested(actor: Node)
+## A character earned influence for their side (and XP for themselves).
+signal influence_earned(character: CharacterController, amount: int, reason: String)
+## A side's influence changed (tier = 0..3).
+signal influence_changed(side: int, total: int, tier: int)
+## A reinforcement wave arrived on the Surface.
+signal wave_spawned(side: int, unit_name: String, count: int)
 
 enum State { WAITING, RUNNING, ENDED }
 enum WarheadState { IDLE, COUNTDOWN, DETONATED }
@@ -32,6 +43,44 @@ const WARHEADS := {
 	WarheadConsole.Warhead.DELTA: {"name": "Delta Warhead", "admin": 2, "countdown": 90.0, "cancel_until": 10.0},
 	WarheadConsole.Warhead.GAMMA: {"name": "Gamma Warhead", "admin": 3, "countdown": 120.0, "cancel_until": -1.0},
 }
+
+## Influence a side needs for each tier (tier 0 = start).
+const INFLUENCE_TIERS: Array[int] = [0, 20, 50, 90]
+const TIER_NAMES: Array[String] = ["Standard", "Reinforced", "Elite", "Spearhead"]
+## Personal XP needed for each personal rank, and the rank names.
+const XP_RANKS: Array[int] = [0, 10, 25, 45]
+const XP_RANK_NAMES: Array[String] = ["Personnel", "Commended", "Decorated", "Veteran"]
+## Influence rewards.
+const INFLUENCE := {
+	"escape": 10, "escape_disarmed": 15, "escort": 5, "disarm": 3, "kill": 2,
+}
+## Allies within this distance of an escapee count as escorts.
+const ESCORT_RANGE := 15.0
+## Class ids for reinforcement waves, per side: the squad leader and the
+## troopers depend on the side's influence tier; specialists are handed
+## out first (to the players with the most XP), one more per tier.
+const WAVES := {
+	CharacterClass.Side.FOUNDATION: {
+		"leader": ["mtf_sergeant", "mtf_sergeant", "mtf_commander", "mtf_commander"],
+		"trooper": ["mtf_recruit", "mtf_cadet", "mtf_rifleman", "mtf_rifleman"],
+		"specialists": ["mtf_medic", "mtf_engineer", "mtf_explosives", "mtf_heavy_gunner"],
+	},
+	CharacterClass.Side.INSURGENCY: {
+		"leader": ["chaos_rifleman", "chaos_vanguard", "chaos_vanguard", "chaos_operations_director"],
+		"trooper": ["chaos_recruit", "chaos_recruit", "chaos_rifleman", "chaos_rifleman"],
+		"specialists": ["chaos_medic", "chaos_engineer", "chaos_explosives", "chaos_heavy_gunner"],
+	},
+}
+## Escapees become a better rank when their new side has more influence.
+const ESCAPE_LADDERS := {
+	&"mtf_recruit": ["mtf_recruit", "mtf_cadet", "mtf_rifleman", "mtf_sergeant"],
+	&"chaos_recruit": ["chaos_recruit", "chaos_rifleman", "chaos_rifleman", "chaos_vanguard"],
+}
+## Minor starting roles that can replace a Scientist (see minor_role_chance).
+const MINOR_ROLES: Array[String] = ["janitor", "zone_manager", "containment_specialist"]
+const INTERCOM_COOLDOWN := 60.0
+const INTERCOM_PRIORITY_COOLDOWN := 15.0
+const INTERCOM_MAX_LENGTH := 120
 
 ## Spawn queue letters and the class each one spawns.
 @export var queue_classes: Dictionary = {}
@@ -60,7 +109,18 @@ var chaos_cell: Dictionary = {}
 var warhead_state := {WarheadConsole.Warhead.DELTA: WarheadState.IDLE, WarheadConsole.Warhead.GAMMA: WarheadState.IDLE}
 var warhead_time_left := {WarheadConsole.Warhead.DELTA: 0.0, WarheadConsole.Warhead.GAMMA: 0.0}
 
+## Influence per side, and XP per player/bot (keyed by their InputSource so
+## it survives escapes and respawns).
+var influence := {CharacterClass.Side.FOUNDATION: 0, CharacterClass.Side.INSURGENCY: 0}
+var personal_xp := {}
+## Round time (elapsed) of the next reinforcement wave (-1 = none).
+var next_wave_at := -1.0
+var waves_spawned := 0
+
 var _consoles: Array[WarheadConsole] = []
+var _intercoms: Array[Intercom] = []
+var _intercom_ready_at := 0.0
+var _last_wave_side := CharacterClass.Side.INSURGENCY
 var _cells_opened := false
 var _elimination_possible := false
 var _spawn_points := {}  # group name -> Array[Node3D] (shuffled)
@@ -78,6 +138,12 @@ func setup(level_node: Node3D, actors_node: Node3D, match_config: GameplayConfig
 		console.use_requested.connect(_on_warhead_console_used)
 		console.prompt_provider = _warhead_prompt
 	_update_consoles()
+	for terminal in level.find_children("*", "Terminal", true, false):
+		terminal.use_requested.connect(_on_terminal_used)
+	for intercom in level.find_children("*", "Intercom", true, false):
+		_intercoms.append(intercom)
+		intercom.use_requested.connect(_on_intercom_used)
+		intercom.prompt_provider = _intercom_prompt
 
 
 ## Starts the round. `player_inputs` are the human players (here: just the
@@ -97,6 +163,7 @@ func start_round(player_inputs: Array[InputSource]) -> void:
 	# With only one side present nobody can "win by elimination".
 	_elimination_possible = sides.size() > 1
 	elapsed = 0.0
+	next_wave_at = config.respawn_wave_seconds if config.respawn_wave_seconds > 0.0 else -1.0
 	state = State.RUNNING
 	announcement.emit("Class-D cell doors open in %d seconds..." % int(CELL_DOORS_OPEN_AFTER))
 
@@ -109,8 +176,16 @@ func build_class_list() -> Array[CharacterClass]:
 	var list: Array[CharacterClass] = []
 	for i in config.player_count:
 		var letter := queue[i % queue.length()]
-		list.append(queue_classes.get(letter, fallback_class))
+		var character_class: CharacterClass = queue_classes.get(letter, fallback_class)
+		# Some Scientists are replaced by a minor role.
+		if letter == "S" and randf() < config.minor_role_chance:
+			character_class = load_class(MINOR_ROLES.pick_random())
+		list.append(character_class)
 	return list
+
+
+static func load_class(id: String) -> CharacterClass:
+	return load("res://resources/classes/%s.tres" % id)
 
 
 func spawn_character(character_class: CharacterClass, input: InputSource, is_player: bool) -> CharacterController:
@@ -128,6 +203,7 @@ func spawn_character(character_class: CharacterClass, input: InputSource, is_pla
 	character.possess(input, input is LocalPlayerInput)
 	character.apply_class(character_class)
 	character.died.connect(_on_character_died.bind(character))
+	character.disarm_changed.connect(_on_disarm_changed.bind(character))
 	characters.append(character)
 	character_spawned.emit(character, is_player)
 	return character
@@ -156,6 +232,11 @@ func _physics_process(delta: float) -> void:
 	elapsed += delta
 	if not _cells_opened and elapsed >= CELL_DOORS_OPEN_AFTER:
 		_open_class_d_cells()
+	if next_wave_at >= 0.0 and elapsed >= next_wave_at:
+		_spawn_wave()
+		next_wave_at += config.respawn_wave_seconds
+	if Engine.get_physics_frames() % 30 == 0:
+		_update_intercoms()
 	_update_warheads(delta)
 	if state == State.RUNNING:
 		_check_round_end()
@@ -196,6 +277,12 @@ func _end_round(winner: int, reason: String) -> void:
 	state = State.ENDED
 	var scores := get_escape_scores()
 	round_ended.emit({
+		"influence": influence.duplicate(),
+		"tiers": {
+			CharacterClass.Side.FOUNDATION: get_tier(CharacterClass.Side.FOUNDATION),
+			CharacterClass.Side.INSURGENCY: get_tier(CharacterClass.Side.INSURGENCY),
+		},
+		"waves": waves_spawned,
 		"winner": winner,
 		"reason": reason,
 		"duration": elapsed,
@@ -211,16 +298,29 @@ func _on_escape_zone_entered(character: CharacterController) -> void:
 	if old_class == null or not old_class.can_escape:
 		return
 	var disarmed := character.is_disarmed()
+	var captor := character.disarmed_by
 	var new_class := old_class.escape_class_disarmed if disarmed else old_class.escape_class
-	match old_class.id:
-		&"class_d":
-			stats.class_d_escaped_disarmed += 1 if disarmed else 0
-			stats.class_d_escaped += 0 if disarmed else 1
-		&"scientist":
-			stats.scientists_escaped_disarmed += 1 if disarmed else 0
-			stats.scientists_escaped += 0 if disarmed else 1
+	if new_class != null and ESCAPE_LADDERS.has(new_class.id):
+		var ladder: Array = ESCAPE_LADDERS[new_class.id]
+		new_class = load_class(ladder[mini(get_tier(new_class.side), ladder.size() - 1)])
+	# Janitors, Zone Managers etc. count as scientists (facility staff).
+	if old_class.side == CharacterClass.Side.INSURGENCY:
+		stats.class_d_escaped_disarmed += 1 if disarmed else 0
+		stats.class_d_escaped += 0 if disarmed else 1
+	else:
+		stats.scientists_escaped_disarmed += 1 if disarmed else 0
+		stats.scientists_escaped += 0 if disarmed else 1
 	if new_class == null:
 		return
+	# Influence: the escapee, whoever disarmed them, and allies escorting them.
+	if disarmed and is_instance_valid(captor):
+		award(captor, new_class.side, INFLUENCE.escape_disarmed, "Captive escaped")
+	else:
+		award(character, new_class.side, INFLUENCE.escape, "Escaped")
+		for ally in characters:
+			if ally != character and ally.is_alive and ally.get_side() == new_class.side \
+					and ally.global_position.distance_to(character.global_position) < ESCORT_RANGE:
+				award(ally, new_class.side, INFLUENCE.escort, "Escort")
 	var spawn := _take_spawn_transform(new_class.spawn_group)
 	character.global_position = spawn.origin
 	character.velocity = Vector3.ZERO
@@ -234,6 +334,112 @@ func _on_character_died(source: Node, victim: CharacterController) -> void:
 	if attacker != null and attacker != victim and not attacker.is_ally_of(victim):
 		var side := attacker.get_side()
 		stats.kills[side] = stats.kills.get(side, 0) + 1
+		award(attacker, side, INFLUENCE.kill, "Kill")
+
+
+func _on_disarm_changed(disarmed: bool, character: CharacterController) -> void:
+	if disarmed and character.disarmed_by != null:
+		award(character.disarmed_by, character.disarmed_by.get_side(), INFLUENCE.disarm, "Disarmed an enemy")
+
+
+# --- Influence and XP ---------------------------------------------------
+
+## Gives `amount` influence to `side` and the same XP to `character`.
+func award(character: CharacterController, side: int, amount: int, reason: String) -> void:
+	if state != State.RUNNING or not influence.has(side):
+		return
+	var old_tier := get_tier(side)
+	influence[side] += amount
+	if character != null and character.input_source != null:
+		personal_xp[character.input_source] = get_xp(character.input_source) + amount
+	influence_earned.emit(character, amount, reason)
+	var tier := get_tier(side)
+	influence_changed.emit(side, influence[side], tier)
+	if tier > old_tier:
+		var who := "Foundation" if side == CharacterClass.Side.FOUNDATION else "Chaos Insurgency"
+		announcement.emit("%s influence: %s. Their reinforcements and escapees are better equipped." % [who, TIER_NAMES[tier].to_upper()])
+
+
+func get_tier(side: int) -> int:
+	var tier := 0
+	for i in INFLUENCE_TIERS.size():
+		if influence.get(side, 0) >= INFLUENCE_TIERS[i]:
+			tier = i
+	return tier
+
+
+func get_xp(input: InputSource) -> int:
+	return personal_xp.get(input, 0)
+
+
+static func xp_rank(xp: int) -> int:
+	var rank := 0
+	for i in XP_RANKS.size():
+		if xp >= XP_RANKS[i]:
+			rank = i
+	return rank
+
+
+# --- Reinforcement waves --------------------------------------------------
+
+func get_wave_time_left() -> float:
+	return maxf(next_wave_at - elapsed, 0.0) if next_wave_at >= 0.0 else -1.0
+
+
+## The side the next wave will be for: the one with more influence (on a tie
+## the sides take turns).
+func get_next_wave_side() -> int:
+	var f: int = influence[CharacterClass.Side.FOUNDATION]
+	var c: int = influence[CharacterClass.Side.INSURGENCY]
+	if f != c:
+		return CharacterClass.Side.FOUNDATION if f > c else CharacterClass.Side.INSURGENCY
+	return CharacterClass.Side.FOUNDATION if _last_wave_side == CharacterClass.Side.INSURGENCY else CharacterClass.Side.INSURGENCY
+
+
+## Brings dead players and bots back as an MTF or Chaos squad.
+func _spawn_wave() -> void:
+	var dead: Array[CharacterController] = []
+	for character in characters:
+		if not character.is_alive and character.input_source != null:
+			dead.append(character)
+	if dead.is_empty():
+		return
+	var side := get_next_wave_side()
+	_last_wave_side = side
+	var tier := get_tier(side)
+	var plan: Dictionary = WAVES[side]
+	# Most XP first: they get the leader slot and the specialist roles.
+	dead.sort_custom(func(a, b): return get_xp(a.input_source) > get_xp(b.input_source))
+	var specialists := mini(1 + tier, plan.specialists.size())
+	for i in dead.size():
+		var id: String
+		if i == 0:
+			id = plan.leader[tier]
+		elif i <= specialists:
+			id = plan.specialists[i - 1]
+		else:
+			id = plan.trooper[tier]
+		_respawn(dead[i], load_class(id))
+	waves_spawned += 1
+	var unit := get_unit_name(load_class(plan.trooper[0]))
+	announcement.emit(("MTF unit %s has entered the facility." if side == CharacterClass.Side.FOUNDATION
+		else "Chaos Insurgency cell %s has breached the Surface.") % unit)
+	wave_spawned.emit(side, unit, dead.size())
+
+
+## Moves a dead character's controller into a fresh character of `new_class`.
+func _respawn(old: CharacterController, new_class: CharacterClass) -> void:
+	var input := old.input_source
+	old.remove_child(input)
+	old.input_source = null
+	var is_player := input is LocalPlayerInput
+	var character := spawn_character(new_class, input, is_player)
+	# Personal rank bonuses: a spare medkit, then a shield.
+	var rank := xp_rank(get_xp(input))
+	if rank >= 1:
+		character.give_item(ItemInstance.new(load("res://resources/items/first_aid_kit.tres")))
+	if rank >= 3:
+		character.health.add_shield(25.0)
 
 
 ## A position + facing for a new character of a spawn group. Markers are
@@ -265,6 +471,112 @@ func _open_class_d_cells() -> void:
 		if level.is_ancestor_of(door):
 			door.set_open(true)
 	announcement.emit("FACILITY ANNOUNCEMENT: Containment breach. Class-D cell doors are open.")
+
+
+# --- Terminals and the intercom -------------------------------------------
+
+## Which zone a position is in ("LCZ", "HCZ", "EZ" or "Surface").
+func zone_at(character: CharacterController) -> String:
+	if is_on_surface(character):
+		return "Surface"
+	var p := character.global_position
+	if p.y > FacilityGenerator.LOWER_Y / 2:
+		return "LCZ"
+	return "HCZ" if p.x < FacilityGenerator.EZ_ORIGIN.x * FacilityGenerator.C - FacilityGenerator.C / 2 else "EZ"
+
+
+## Full terminal access: the perk, or holding a keycard with Admin access or
+## Containment level 2+.
+func has_terminal_access(actor: Node) -> bool:
+	if actor is CharacterController and actor.has_perk(&"terminal_access"):
+		return true
+	var card := PropBuilder.held_card(actor)
+	return card != null and (card.admin_level >= 1 or card.containment_level >= 2)
+
+
+func _on_terminal_used(terminal: Terminal, actor: Node) -> void:
+	terminal_report.emit(actor, get_terminal_text(terminal, actor))
+
+
+func get_terminal_text(terminal: Terminal, actor: Node) -> String:
+	match terminal.kind:
+		"scp055":
+			return "SCP-055 - Object Class: KETER\nDescription: SCP-055 is a\n\n...\n\n[You read the entry twice. You can't remember a word of it.]"
+		"scp999":
+			return "SCP-999 - Object Class: SAFE\nA friendly, orange, gelatinous organism. Contact is reported to be soothing.\nStaff may visit the pen to recover (it slowly heals people near it)."
+	var lines := PackedStringArray(["SITE-NET TERMINAL", ""])
+	var t := elapsed
+	lines.append("Round time: %d:%02d" % [int(t) / 60, int(t) % 60])
+	lines.append("Class-D cells: %s" % ("OPEN" if _cells_opened else "LOCKED"))
+	for warhead in warhead_state:
+		var w_state: int = warhead_state[warhead]
+		lines.append("%s: %s" % [WARHEADS[warhead].name, ["STANDBY", "COUNTDOWN %ds" % int(warhead_time_left[warhead]), "DETONATED"][w_state]])
+	var full := terminal.kind == "personnel" or has_terminal_access(actor)
+	if not full:
+		lines.append("")
+		lines.append("[ACCESS LIMITED] Personnel tracking needs a Containment 2 / Admin keycard in hand.")
+		return "\n".join(lines)
+	var counts := {}
+	for character in characters:
+		if character.is_alive:
+			var key := "%s|%d" % [zone_at(character), character.get_side()]
+			counts[key] = counts.get(key, 0) + 1
+	lines.append("")
+	lines.append("LIFE SIGNS      Foundation / Class-D & Chaos")
+	for zone in ["LCZ", "HCZ", "EZ", "Surface"]:
+		lines.append("  %-8s      %d / %d" % [zone, counts.get("%s|0" % zone, 0), counts.get("%s|1" % zone, 0)])
+	lines.append("")
+	lines.append("Influence: Foundation %d (%s), Chaos %d (%s)" % [
+		influence[CharacterClass.Side.FOUNDATION], TIER_NAMES[get_tier(CharacterClass.Side.FOUNDATION)],
+		influence[CharacterClass.Side.INSURGENCY], TIER_NAMES[get_tier(CharacterClass.Side.INSURGENCY)]])
+	var wave := get_wave_time_left()
+	if wave >= 0.0:
+		lines.append("Next reinforcements (%s) in %d:%02d" % [
+			"MTF" if get_next_wave_side() == CharacterClass.Side.FOUNDATION else "Chaos", int(wave) / 60, int(wave) % 60])
+	return "\n".join(lines)
+
+
+func can_use_intercom(actor: Node) -> bool:
+	if state != State.RUNNING:
+		return false
+	if actor is CharacterController and actor.has_perk(&"intercom_priority"):
+		return true
+	return elapsed >= _intercom_ready_at
+
+
+func _intercom_prompt(_intercom: Intercom, actor: Node) -> String:
+	if state != State.RUNNING:
+		return ""
+	if not can_use_intercom(actor):
+		return "Intercom cooling down (%ds)" % ceili(_intercom_ready_at - elapsed)
+	if actor is CharacterController and actor.has_perk(&"intercom_priority") and elapsed < _intercom_ready_at:
+		return "[E] Cut in on the intercom (priority)"
+	return "[E] Speak on the intercom"
+
+
+func _on_intercom_used(_intercom: Intercom, actor: Node) -> void:
+	if can_use_intercom(actor):
+		intercom_requested.emit(actor)
+
+
+## Says `text` over the facility speakers on behalf of `actor`.
+func broadcast_intercom(actor: Node, text: String) -> void:
+	text = text.strip_edges().left(INTERCOM_MAX_LENGTH)
+	if text.is_empty() or not can_use_intercom(actor):
+		return
+	var priority: bool = actor is CharacterController and actor.has_perk(&"intercom_priority")
+	_intercom_ready_at = elapsed + (INTERCOM_PRIORITY_COOLDOWN if priority else INTERCOM_COOLDOWN)
+	var who := "UNKNOWN"
+	if actor is CharacterController and actor.character_class != null:
+		who = actor.character_class.display_name.to_upper()
+	announcement.emit("[INTERCOM - %s] %s" % [who, text])
+	_update_intercoms()
+
+
+func _update_intercoms() -> void:
+	var left := _intercom_ready_at - elapsed
+	for intercom in _intercoms:
+		intercom.set_status("READY" if left <= 0.0 else "WAIT %ds" % ceili(left))
 
 
 ## Is this character on the Surface (outside the facility)? Uses the level's

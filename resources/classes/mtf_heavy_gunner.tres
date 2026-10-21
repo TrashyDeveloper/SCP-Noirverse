@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CharacterClass" format=3]
+
+[ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_maulv"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_po5qv"]
+[ext_resource type="Resource" path="res://resources/items/keycard_mtf_private.tres" id="3_gns1x"]
+[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_lacxf"]
+[ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_salp5"]
+[ext_resource type="Resource" path="res://resources/items/armor_heavy.tres" id="6_1ewue"]
+
+[resource]
+script = ExtResource("1_maulv")
+id = &"mtf_heavy_gunner"
+display_name = "MTF Heavy Gunner"
+objective = "Slow but tough. Hold the line and carry the ammo."
+unit = 1
+color = Color(0.14400001, 0.176, 0.28800002, 1)
+max_health = 150.0
+spawn_group = "MTF"
+perks = Array[StringName]([&"heavy"])
+speed_multiplier = 0.88
+starting_items = Array[ExtResource("2_po5qv")]([ExtResource("3_gns1x"), ExtResource("4_lacxf"), ExtResource("5_salp5"), ExtResource("6_1ewue")])
+starting_ammo = Dictionary[StringName, int]({
+&"9x19mm": 300
+})

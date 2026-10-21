@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterClass" format=3]
+
+[ext_resource type="Resource" path="res://resources/classes/mtf_recruit.tres" id="1_lbwk7"]
+[ext_resource type="Resource" path="res://resources/classes/chaos_recruit.tres" id="2_164o1"]
+[ext_resource type="Script" path="res://scripts/game/character_class.gd" id="3_8qr7n"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="4_37bmn"]
+[ext_resource type="Resource" path="res://resources/items/keycard_research_supervisor.tres" id="5_b4qhl"]
+[ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="6_nthuk"]
+
+[resource]
+script = ExtResource("3_8qr7n")
+id = &"containment_specialist"
+display_name = "Containment Specialist"
+objective = "Keep Heavy Containment secure and get out alive."
+color = Color(0.82, 0.8, 0.66, 1)
+spawn_group = "Specialist"
+perks = Array[StringName]([&"terminal_access"])
+starting_items = Array[ExtResource("4_37bmn")]([ExtResource("5_b4qhl"), ExtResource("6_nthuk")])
+can_escape = true
+escape_class = ExtResource("1_lbwk7")
+escape_class_disarmed = ExtResource("2_164o1")

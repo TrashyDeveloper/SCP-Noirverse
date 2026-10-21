@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CharacterClass" format=3]
+
+[ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_c1ev6"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_rvb5k"]
+[ext_resource type="Resource" path="res://resources/items/keycard_chaos_device.tres" id="3_ox067"]
+[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_5sn32"]
+[ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_drfgs"]
+[ext_resource type="Resource" path="res://resources/items/armor_heavy.tres" id="6_nkhpf"]
+
+[resource]
+script = ExtResource("1_c1ev6")
+id = &"chaos_heavy_gunner"
+display_name = "Chaos Heavy Gunner"
+objective = "Slow but tough. Hold the line and carry the ammo."
+side = 1
+unit = 2
+color = Color(0.20799999, 0.24800001, 0.136, 1)
+max_health = 150.0
+spawn_group = "Chaos"
+perks = Array[StringName]([&"heavy"])
+speed_multiplier = 0.88
+starting_items = Array[ExtResource("2_rvb5k")]([ExtResource("3_ox067"), ExtResource("4_5sn32"), ExtResource("5_drfgs"), ExtResource("6_nkhpf")])
+starting_ammo = Dictionary[StringName, int]({
+&"9x19mm": 300
+})

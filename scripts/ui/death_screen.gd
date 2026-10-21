@@ -12,8 +12,12 @@ func _ready() -> void:
 	%MainMenu.pressed.connect(main_menu_requested.emit)
 
 
-func show_death(cause: String) -> void:
+## `respawns` = reinforcement waves are on (the player will come back).
+func show_death(cause: String, respawns := false) -> void:
 	%Cause.text = cause
+	if respawns:
+		%Cause.text += "\n\nYou will return with the next reinforcement wave\n(the timer is in the top right)."
+	%Restart.text = "Skip to a new round" if respawns else "New round"
 	visible = true
 	# Fade in.
 	var panel: Control = $Panel

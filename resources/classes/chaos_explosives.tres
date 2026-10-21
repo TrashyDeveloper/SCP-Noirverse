@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CharacterClass" format=3]
+
+[ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_t6ixh"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_2fksi"]
+[ext_resource type="Resource" path="res://resources/items/keycard_chaos_device.tres" id="3_tdr4o"]
+[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_uph4e"]
+[ext_resource type="Resource" path="res://resources/items/grenade_he.tres" id="5_5s50d"]
+[ext_resource type="Resource" path="res://resources/items/grenade_flashbang.tres" id="6_jegq7"]
+[ext_resource type="Resource" path="res://resources/items/armor_combat.tres" id="7_wkqvw"]
+
+[resource]
+script = ExtResource("1_t6ixh")
+id = &"chaos_explosives"
+display_name = "Chaos Explosives Specialist"
+objective = "Clear rooms and choke points with grenades."
+side = 1
+unit = 2
+color = Color(0.26, 0.31, 0.17, 1)
+spawn_group = "Chaos"
+perks = Array[StringName]([&"demolitions"])
+starting_items = Array[ExtResource("2_2fksi")]([ExtResource("3_tdr4o"), ExtResource("4_uph4e"), ExtResource("5_5s50d"), ExtResource("5_5s50d"), ExtResource("5_5s50d"), ExtResource("6_jegq7"), ExtResource("7_wkqvw")])
+limit_bonuses = Dictionary[int, int]({
+4: 2
+})
+starting_ammo = Dictionary[StringName, int]({
+&"9x19mm": 80
+})

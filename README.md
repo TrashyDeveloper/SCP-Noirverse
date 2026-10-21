@@ -42,64 +42,54 @@ noir look. Built with **Godot 4** and **GDScript**.
 | F | Flashlight |
 | Esc | Pause menu (frees the mouse) |
 
-### The map
+### The map — a new layout every round
 
-The site has two underground floors and the Surface.
+The site is **built by code at the start of every round** from a random
+seed (`scripts/level/facility_generator.gd`), so you can't rely on muscle
+memory: zone shapes, corridors, dead ends, loops and where the rooms are all
+change. (Set `map_seed` in the config to replay one layout.) Every map
+always has the same *parts* and is always escapable:
 
-**Upper floor — Light Containment (LCZ):**
+- **Upper floor — Light Containment (LCZ, research):** the Class-D cell
+  block (16 cells), SCP-914, the SCP-173 chamber, the Tertiary Server Room,
+  test chamber, armory, locker room, a lockroom, labs, offices, the
+  **SCP-999 pen** (a friendly blob that slowly heals people near it) and the
+  **SCP-055 display**, plus living spaces: restrooms, break rooms, meeting
+  rooms, a medical bay, storage and janitor's closets.
+- **Lower floor (20 m below) — Heavy Containment (HCZ, industrial and
+  dangerous):** SCP-096 and SCP-049 chambers, a 2x2 **Containment Pit**
+  (walkway around a deep pit, ramp down to the containment unit),
+  **pump stations** with steam vents that burst every few seconds (they
+  hurt!), generator room (exposed wiring), archive, testing room, armory.
+- **Lower floor — Entrance Zone (EZ, offices):** Gates A, B and C (lifts up
+  to the Surface), security office, facility manager, the **intercom
+  room**, a two-storey **cafeteria** with a balcony, offices, meeting rooms,
+  medical bay, break rooms, restrooms.
+- **Surface:** a night-time yard with the gate buildings, the MTF helipad,
+  Chaos trucks, Warhead Control, **watchtowers** with ramps, sandbag
+  **staging areas**, parked **vehicles** (trucks, jeeps, an APC), concrete
+  **barriers** for cover and the **EXIT road** (escape zone). Their places
+  change every round too.
 
-```
-   D D D # L # S S      D = Class-D cell block     L = laboratory
-   . W O # . # # a      S = Tertiary Server Room   W = restrooms   O = office
-   b # # # X # . .      a = CHECKPOINT A (lift)    b = CHECKPOINT B (lift)
-   K # Z # . # 7 7      X = lockroom   K = lockers  Z = storage    7 = SCP-173
-   A # # 9 9 # T .      A = LCZ armory  9 = SCP-914  T = test chamber
-```
+How the zones connect never changes:
 
-**Lower floor (20 m below) — Heavy Containment (HCZ) and Entrance Zone (EZ):**
+- **Light → Heavy Containment only by lift:** Checkpoint A (east edge) and
+  Checkpoint B (west edge). The checkpoint doors need **Admin 1**. HCZ → EZ
+  is a checkpoint door (Admin 1) on the boundary between them.
+- **Lifts:** press **CALL** next to the doors, step in and use the panel on
+  the cabin wall. The sign above the doors shows where the cabin is.
+- **Class-D** start locked in their cells; the doors open 6 s into the round.
 
-```
-   HEAVY CONTAINMENT              ENTRANCE ZONE
-   . 2 . . R . . . .            A # O . B .
-   . # # # # # # a .            # # # # # .
-   b # . G # . # . .            # S . M # .
-   . 3 # # # H # # =  checkpoint # # # # # .
-   . . . E # . . . .            C . O F . .
-   2/3 = SCP-096 / SCP-049, R = archive, G = generators, H = HCZ armory,
-   E = testing room, a/b = the lifts up to Light Containment.
-   A/B/C = Gates A, B, C (lifts up to the Surface), S = security office,
-   M = facility manager, O = offices, F = cafeteria
-```
+### Things to use in the facility
 
-- **Light → Heavy Containment only by lift:** Checkpoint A (east side) and
-  Checkpoint B (west side) each have a lift. The checkpoint doors need
-  **Admin 1**. HCZ → EZ is a normal checkpoint door (Admin 1).
-- **Lifts:** press **CALL** next to the lift doors to bring the cabin, step
-  in and use the panel on the cabin wall to go up or down. The sign above
-  the doors shows where the lift is.
-- **Class-D cell block:** 16 numbered cells (D-01 … D-16); Class-D start
-  locked in and the doors open 6 s into the round.
-- **SCP-173:** wide entrance with striped pillars and a "SCP-173 / EUCLID"
-  placard, white antechamber with a viewing window, then the containment
-  door (Containment 3) into the chamber (high observation window, vent fan).
-- **Tertiary Server Room:** lit control room behind a glass wall, dark
-  server clusters with frosted glass heat shafts and blue neon floor lights.
-- **SCP-914:** intake and output booths on raised platforms with ramps and
-  railings, hazard zones, the dial, shelves with supplies.
-- Sprinting from a Class-D cell to the Surface exit takes about a minute.
-
-**Surface** (reached by the Gate A/B/C lifts from the Entrance Zone): a night-time yard with
-the Gate A/B/C buildings, the **MTF helipad**, the **Chaos Insurgency trucks**,
-the **Warhead Control** building and, to the north, the **EXIT road — the
-escape zone**.
-
-**Door access** (hold the keycard, Ctrl): Class-D cells open by themselves;
-locker room Containment 1; test chamber and SCP-914 Containment 2; SCP
-chamber doors Containment 3; LCZ armory Armory 1, HCZ armory Armory 2;
-archive and testing room Containment 2; generator room Admin 1; security
-office Armory 1; facility manager Admin 2; **Checkpoints A/B and the HCZ→EZ
-checkpoint Admin 1**; **Gates A and B Admin 2, Gate C (emergency exit)
-Admin 1**.
+| Thing | What it does |
+|---|---|
+| **Terminals** (blue screens on stands) | Press E: site status (round time, cell doors, warheads). With a Containment 2 / Admin keycard **in hand** (or the *terminal access* perk) you also see how many people of each side are in each zone, both sides' influence and when the next reinforcements arrive. |
+| **Intercom** (EZ intercom room) | Press E, type a message, Enter: everyone sees it. 60 s cooldown for everyone; a **Zone Manager** waits only 15 s and can cut in anytime. |
+| **Lockers** | Random loot. Some are locked (the tag on the door says e.g. *C1* = Containment 1, *A2* = Armory 2): hold a matching keycard and press E. Lab lockers can hold **experimental items** (Experimental Serum EX-7: strong healing over time; Prototype Flashbang: bigger, longer flash). |
+| **Crates** | Shoot them or blow them up; some have something inside. They're also cover. |
+| **Barricade Kit** | Hold it, look at a **closed** door and left-click (3 s): planks are nailed across and the door can't be opened. Others tear it down by **holding E** on it (5 s) or destroy it (shooting, grenades). Janitors and Engineers do both twice as fast. |
+| **Steam vents** (pump stations) | Burst every few seconds — time your run. |
 
 ### How a round works
 
@@ -112,6 +102,12 @@ Every round you spawn as a **random class**; the other characters are bots
 | Scientist | Foundation | LCZ labs & offices | Scientist keycard, First Aid Kit |
 | Facility Guard | Foundation | EZ security office & offices | Guard keycard, pistol + 60, First Aid Kit, Flashbang, Light Armor |
 | Containment Captain | Foundation | EZ security office | Containment Captain keycard, pistol + 120, First Aid Kit, Adrenaline, Flashbang, Combat Armor |
+| Janitor *(minor role)* | Foundation | LCZ janitor's closets | Janitor keycard, Barricade Kit — barricades twice as fast |
+| Zone Manager *(minor role)* | Foundation | LCZ offices | Zone Manager keycard, Painkillers — intercom priority, full terminal access |
+| Containment Specialist *(minor role)* | Foundation | HCZ (pit, archive, testing) | Research Supervisor keycard, First Aid Kit — full terminal access |
+
+Each Scientist slot has a 35 % chance (`minor_role_chance`) to become one of
+the minor roles instead. Minor roles escape like Scientists.
 
 - **Escaping:** reach the Surface and walk into the **EXIT road**. A Class-D
   becomes a **Chaos Insurgency Recruit**, a Scientist an **MTF Recruit**;
@@ -134,34 +130,67 @@ Every round you spawn as a **random class**; the other characters are bots
 During a countdown the facility lights turn red and a warning shows at the
 top of the screen.
 
-### Teams (for reinforcements in Step 7)
+### Reinforcements, subclasses and influence
 
-**Mobile Task Force:** MTF Recruit, Cadet, Rifleman, Breacher, Heavy,
+**Respawn waves:** every 3 minutes (`respawn_wave_seconds`) everyone who is
+dead comes back on the Surface as an **MTF** squad (at the helipad) or a
+**Chaos Insurgency** squad (at the trucks) of this round's unit/cell. While
+dead you see the countdown in the top right.
+
+**Influence (soft progression):** good play earns influence for your side
+and the same amount of personal **XP**:
+
+| Action | Points |
+|---|---|
+| Escape | +10 |
+| A captive you disarmed escapes (to your side) | +15 |
+| Escorting: being within 15 m of an ally who escapes | +5 |
+| Disarming an enemy | +3 |
+| Killing an enemy | +2 |
+
+Side tiers: **Standard** (0), **Reinforced** (20), **Elite** (50),
+**Spearhead** (90), shown as ■□□ in the top right. A higher tier means:
+
+- **Escapees** become a better rank (MTF Recruit → Cadet → Rifleman →
+  Sergeant; Chaos Recruit → Rifleman → Vanguard).
+- **Waves** go to the side with more influence (ties alternate) and get a
+  better leader and troopers, plus one more **specialist** per tier.
+- **Personal XP** ranks: *Commended* (10) respawn with a spare First Aid
+  Kit; *Decorated* (25) — the most experienced players get the leader and
+  specialist slots first; *Veteran* (45) also respawn with a 25-point shield.
+
+**Subclasses** (MTF and Chaos each have all four):
+
+| Subclass | Perk | Gear |
+|---|---|---|
+| Medic | Medical items twice as fast, +25 % healing | 2 First Aid Kits, Adrenaline, Combat Armor |
+| Combat Engineer | Barricades twice as fast, full terminal access | 2 Barricade Kits, Combat Armor |
+| Explosives Specialist | Throws grenades 40 % further, carries 2 more | 3 HE grenades, Flashbang, Combat Armor |
+| Heavy Gunner | 150 HP, double ammo limits, but 12 % slower | Heavy Armor, 300 rounds |
+
+**Mobile Task Force ranks:** Recruit, Cadet, Rifleman, Breacher, Heavy,
 Sergeant, Suppressor, Omega Operative, Commander. Units: Epsilon-11
 "Nine-Tailed Fox", Nu-7 "Hammer Down", Beta-7 "Maz Hatters", Alpha-1 "Red
 Right Hand", Eta-10 "See No Evil", Delta-4 "Minutemen", Zeta-9 "Mole Rats".
-
-**Chaos Insurgency:** Chaos Recruit, Rifleman, Breacher, Heavy, Saboteur,
-Infiltrator, Vanguard, Operations Director. Groups: Military Cells, R&D
-Cells, Delta Command. Cells: CI-01 Iron Fist … CI-10 Black Crown (see
-`scripts/game/factions.gd`).
-
-All of them already exist as classes in `resources/classes/` with their own
-health, keycards, armor and grenades. Right now only the Recruits appear (by
-escaping); the others will arrive with respawn waves. Their planned weapons
-(rifles, shotguns, machine guns) are written in each class's **Notes** — for
-now everyone carries the pistol.
+**Chaos Insurgency ranks:** Recruit, Rifleman, Breacher, Heavy, Saboteur,
+Infiltrator, Vanguard, Operations Director; cells CI-01 Iron Fist … CI-10
+Black Crown (see `scripts/game/factions.gd`). Planned weapons (rifles,
+shotguns, machine guns) are in each class's **Notes** — for now everyone
+carries the pistol.
 
 ### What to try
 
-1. **Class-D:** grab a Janitor or Zone Manager keycard in the LCZ offices /
-   locker room, pass the checkpoint (Admin 1), cross HCZ, reach Gate C
-   (Admin 1) in the south-west of the Entrance Zone, ride up and run to the
-   EXIT road.
-2. **Scientist:** same route; look for a Zone Manager card first.
-3. **Guard / Containment Captain:** start in the Entrance Zone; head into
-   the facility, or up to the Surface to try the Delta Warhead (the Captain's
+1. **Class-D:** search offices, the locker room and lockers for a Janitor or
+   Zone Manager keycard, find a checkpoint lift (east or west edge of LCZ,
+   Admin 1), cross HCZ to the EZ checkpoint, reach a Gate (Gate C needs only
+   Admin 1), ride up and run to the EXIT road.
+2. **Scientist / minor roles:** same idea; a Zone Manager can read terminals
+   to see where the hostiles are and warn everyone over the intercom.
+3. **Guard / Containment Captain:** start in the Entrance Zone; barricade
+   doors, check terminals, or go up and try the Delta Warhead (the Captain's
    card has Admin 2).
+4. **Die** (e.g. in a steam vent) and come back with the next
+   reinforcement wave as MTF or Chaos.
 
 ## Items
 
@@ -258,9 +287,12 @@ a carry limit (shown on the Tab screen):
   - item limits: 0–8, **0 = that item type can't be picked up**;
   - ammo limits (one section per armor type): 0–65535, **0 = unlimited**;
   - `[round]`: `spawn_queue` (D = Class-D, S = Scientist, G = Guard,
-    C = Containment Captain, e.g. `"DSDGDSCDGDSD"`), `player_count` (you +
-    bots, default 10), `round_time_limit_minutes`
-    (0 = none), `friendly_fire`, `restart_delay_seconds`.
+    C = Containment Captain, J = Janitor, Z = Zone Manager, X = Containment
+    Specialist, e.g. `"DSDGDSCDGDSD"`), `player_count` (you + bots, default
+    10), `round_time_limit_minutes` (0 = none), `friendly_fire`,
+    `restart_delay_seconds`, `minor_role_chance` (0–1),
+    `respawn_wave_seconds` (0 = no respawns), `map_seed` (0 = random map
+    every round, any other number = always that map).
 
   See `gameplay_config.example.cfg`. The built-in defaults are in
   `resources/gameplay_config.tres`; the armor carry bonuses are on each
@@ -268,18 +300,15 @@ a carry limit (shown on the Tab screen):
 
 ## Handy Godot tips for beginners
 
-- **Place an item in a level:** open `scenes/levels/test_facility.tscn`, drag
-  `scenes/items/item_pickup.tscn` from the FileSystem dock into the 3D view,
-  then drag an item from `resources/items/` onto its **Item Data** field in
-  the Inspector. (Its model appears when you run the game.)
-- **Change a door's lock:** select a door under `Doors` and set
-  **Required Clearance** (0 = no keycard needed).
+- **Add loot to rooms:** the map is made by code, so items are listed in
+  `scripts/level/facility_generator.gd`: `ROOM_LOOT` (loose items per room
+  type), `LOCKER_LOOT` (locker tables) and `GUARANTEED` (always somewhere in
+  a zone). Item ids are the file names in `resources/items/`.
 
 - **F5** runs the whole game. **F6** runs only the scene you have open —
   great for testing one piece. **F8** (or the ■ button) stops.
 - Scenes (`.tscn`) open from the **FileSystem** dock (bottom-left).
-  Double-click `scenes/levels/test_facility.tscn` to see the facility in 3D.
-  Hold the **right mouse button** + **WASD** to fly around in the editor.
+  Hold the **right mouse button** + **WASD** to fly around in the 3D editor.
 - Click any node in the **Scene** dock (top-left) to edit it in the
   **Inspector** (right). Example: select a lamp's `Light` node and change
   `Light Energy`.
@@ -287,12 +316,14 @@ a carry limit (shown on the Tab screen):
   (e.g. "HCZ" / "HEAVY CONTAINMENT ZONE").
 - **Wall look:** open `resources/materials/concrete_wall.tres` and change the
   shader parameters (panel width, colours, trim height…).
-- **The map** is `scenes/levels/facility.tscn`. It was generated from the
-  grid above, but it's a normal scene: open it and move, add or delete
-  anything. Each zone is a folder under `Zones/`; doors, lights, items,
-  signs, elevators, the Surface and spawn points have their own folders.
-- The facility is built from `CSGBox3D` blocks — select one and drag the
-  orange handles to resize, or **Ctrl+D** to duplicate.
+- **The map** is generated by `scripts/level/facility_generator.gd` (rooms,
+  furniture, surface) using `scripts/level/layout_generator.gd` (zone shapes,
+  room placement, corridors). To see a map, press F5 and walk around, or
+  change `map_seed` to compare layouts. Room furniture is in the `_furnish`
+  functions — each `box(...)` line is one block (centre, size, material).
+- Static walls and furniture are merged into a few big meshes per 12 m
+  "chunk" (`scripts/level/mesh_batch.gd`), which is why building a map only
+  takes a fraction of a second.
 - Errors show in the **Debugger** panel at the bottom while the game runs.
 
 ## Project structure
@@ -303,12 +334,13 @@ scenes/
   ui/                    Main menu, credits, HUD, pause menu
   game/game.tscn         The in-game scene: loads a level, spawns the player
   player/character.tscn  A first-person humanoid
-  levels/                Facility maps
-  props/                 Doors, training dummy, hazards
+  props/                 Doors, training dummy, hazards (terminals, lockers, crates,
+                         barricades, the intercom and steam vents are made in code)
   items/item_pickup.tscn An item lying in the world
   effects/               The noir full-screen filter
 scripts/                 GDScript code, mirroring the scenes folders
   core/                  Shared building blocks (CharacterInput, InputSource)
+  level/                 The procedural map: layout planner, generator, mesh batching
 shaders/noir_post.gdshader         Black & white, grain, vignette, scratches
 shaders/facility_surface.gdshader  Wall panels, floor and ceiling tiles
 assets/textures/         Our own SVG artwork (SCP emblem, hazard stripes)

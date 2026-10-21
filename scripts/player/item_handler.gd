@@ -32,6 +32,10 @@ var equipped_slot := -1
 var reload_time_left := 0.0
 var use_time_left := 0.0
 
+## How long the current use takes (medical items, barricade kits).
+var _use_duration := 1.0
+## The door a barricade kit is being used on.
+var _barricade_door: Door
 var _cooldown := 0.0
 var _kick := 0.0
 var _last_medical_id := &""
@@ -74,9 +78,12 @@ func tick(input: CharacterInput, delta: float) -> void:
 	if is_using():
 		use_time_left -= delta
 		var item_in_use := get_equipped()
-		use_progress_changed.emit(1.0 - use_time_left / item_in_use.data.use_time, item_in_use.data.display_name)
+		use_progress_changed.emit(1.0 - use_time_left / _use_duration, item_in_use.data.display_name)
 		if use_time_left <= 0.0:
-			_finish_medical()
+			if item_in_use.data.kind == ItemData.Kind.BARRICADE:
+				_finish_barricade()
+			else:
+				_finish_medical()
 
 	var item := get_equipped()
 	if item == null:
@@ -95,6 +102,8 @@ func tick(input: CharacterInput, delta: float) -> void:
 				_start_medical(item)
 			ItemData.Kind.GRENADE:
 				_throw_grenade()
+			ItemData.Kind.BARRICADE:
+				_start_barricade()
 
 
 ## Takes the item in `slot` into the hands (-1 = empty hands). Armor is worn
@@ -316,7 +325,8 @@ func _start_medical(item: ItemInstance) -> void:
 	var heals := item.data.medical_effect != ItemData.MedicalEffect.ADRENALINE
 	if heals and health.current >= health.max_health:
 		return
-	use_time_left = item.data.use_time
+	_use_duration = item.data.use_time * (0.5 if character.has_perk(&"medic") else 1.0)
+	use_time_left = _use_duration
 	use_progress_changed.emit(0.0, item.data.display_name)
 
 
@@ -325,15 +335,51 @@ func _finish_medical() -> void:
 	use_progress_changed.emit(-1.0, "")
 	var item := get_equipped()
 	var data := item.data
+	var bonus := 1.25 if character.has_perk(&"medic") else 1.0
 	match data.medical_effect:
 		ItemData.MedicalEffect.HEAL_INSTANT:
-			character.health.heal(data.heal_amount)
+			character.health.heal(data.heal_amount * bonus)
 		ItemData.MedicalEffect.HEAL_OVER_TIME:
-			character.health.heal_over_time(data.heal_amount, data.heal_duration)
+			character.health.heal_over_time(data.heal_amount * bonus, data.heal_duration)
 		ItemData.MedicalEffect.ADRENALINE:
 			character.health.add_shield(data.shield_amount)
 			character.apply_speed_boost(data.speed_boost, data.speed_boost_duration)
 	_last_medical_id = data.id
+	_remove_from_inventory(equipped_slot)
+
+
+# --- Barricades ---
+
+## The closed door the character is looking at that could be barricaded.
+func find_barricade_target() -> Door:
+	var node: Node = character.interact_ray.get_collider() if character.interact_ray.is_colliding() else null
+	while node != null and not node is Door:
+		node = node.get_parent()
+	var door := node as Door
+	return door if door != null and door.can_barricade() else null
+
+
+func _start_barricade() -> void:
+	if is_using():
+		return
+	_barricade_door = find_barricade_target()
+	if _barricade_door == null:
+		return
+	var item := get_equipped()
+	_use_duration = item.data.use_time * (0.5 if character.has_perk(&"fast_barricade") else 1.0)
+	use_time_left = _use_duration
+	use_progress_changed.emit(0.0, item.data.display_name)
+
+
+func _finish_barricade() -> void:
+	use_time_left = 0.0
+	use_progress_changed.emit(-1.0, "")
+	var door := _barricade_door
+	_barricade_door = null
+	# The door must still be closed and in front of us.
+	if door == null or not is_instance_valid(door) or find_barricade_target() != door:
+		return
+	door.add_barricade(character)
 	_remove_from_inventory(equipped_slot)
 
 
@@ -351,7 +397,8 @@ func _throw_grenade() -> void:
 	character.get_parent().add_child(grenade)
 	grenade.global_position = _safe_spawn_point(0.5)
 	var forward := -character.camera.global_basis.z
-	grenade.linear_velocity = forward * 11.0 + Vector3.UP * 2.0 + character.velocity
+	var strength := 1.4 if character.has_perk(&"demolitions") else 1.0
+	grenade.linear_velocity = (forward * 11.0 + Vector3.UP * 2.0) * strength + character.velocity
 
 
 func _raycast(from: Vector3, to: Vector3, mask: int) -> Dictionary:

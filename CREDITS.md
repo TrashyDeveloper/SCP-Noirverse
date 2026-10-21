@@ -15,13 +15,15 @@ SCP Foundation content is licensed under
 | SCP-096 | Dr Dan | <https://scp-wiki.wikidot.com/scp-096> |
 | SCP-049 | Gabriel Jade | <https://scp-wiki.wikidot.com/scp-049> |
 | SCP-914 | Dr Gears | <https://scp-wiki.wikidot.com/scp-914> |
+| SCP-999 | ProfSnider | <https://scp-wiki.wikidot.com/scp-999> |
+| SCP-055 | qntm | <https://scp-wiki.wikidot.com/scp-055> |
 | SCP Foundation, O5 Council, Class-D, Mobile Task Forces (Epsilon-11 "Nine-Tailed Fox", Nu-7 "Hammer Down", Beta-7 "Maz Hatters", Alpha-1 "Red Right Hand", Eta-10 "See No Evil", Zeta-9 "Mole Rats"), Chaos Insurgency, Delta Command | SCP Wiki contributors | <https://scp-wiki.wikidot.com> |
 
 - The SCP Foundation emblem on doors (`assets/textures/scp_emblem.svg`) is our
   own redrawing of the SCP Wiki logo, originally by Aelanna, CC BY-SA 3.0
   (see <https://scp-wiki.wikidot.com/licensing-guide>).
-- The map layout and rooms (Class-D cell block, SCP-914 room, lockroom...)
-  are our own designs, inspired by classic SCP games; no level data, models
+- The map layout and rooms (Class-D cell block, SCP-914 room, lockroom,
+  containment pit, pump stations, the procedural map generator...) are our own designs, inspired by classic SCP games; no level data, models
   or textures from other games are used.
 - The look of SCP-173 in this game is an original design. We do **not** use the
   sculpture "Untitled 2004" by Izumi Kato, which is not under CC BY-SA.

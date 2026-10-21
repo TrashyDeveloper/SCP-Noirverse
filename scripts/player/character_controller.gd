@@ -48,6 +48,7 @@ var _head_base_height := 0.0
 var _hold_target: Node
 var _hold_time := 0.0
 var _speed_multiplier := 1.0
+var _class_speed := 1.0
 var _speed_boost_left := 0.0
 var _body_material: StandardMaterial3D
 
@@ -65,6 +66,7 @@ var _body_material: StandardMaterial3D
 
 
 func _ready() -> void:
+	add_to_group(&"characters")
 	_head_base_height = head.position.y
 	health.died.connect(_on_died)
 	health.damage_modifier = _modify_damage
@@ -132,6 +134,9 @@ func apply_class(new_class: CharacterClass, keep_items := false) -> void:
 	set_disarmed(null)
 	health.max_health = new_class.max_health
 	health.reset()
+	inventory.extra_limits = new_class.limit_bonuses.duplicate()
+	_class_speed = new_class.speed_multiplier
+	inventory.ammo_multiplier = 2.0 if new_class.perks.has(&"heavy") else 1.0
 	_body_material.albedo_color = new_class.color
 	if not keep_items:
 		items.equip(-1)
@@ -145,6 +150,10 @@ func apply_class(new_class: CharacterClass, keep_items := false) -> void:
 	for ammo_type in new_class.starting_ammo:
 		inventory.give_ammo(ammo_type, new_class.starting_ammo[ammo_type])
 	class_changed.emit(new_class)
+
+
+func has_perk(perk: StringName) -> bool:
+	return character_class != null and character_class.perks.has(perk)
 
 
 func get_side() -> int:
@@ -301,7 +310,7 @@ func _apply_movement(input: CharacterInput, delta: float) -> void:
 		velocity.y = jump_velocity
 
 	var speed := sprint_speed if input.sprint and input.move.y > 0.0 else walk_speed
-	speed *= _speed_multiplier
+	speed *= _speed_multiplier * _class_speed
 	# Turn the 2D stick/keys direction into a 3D direction relative to where
 	# the body is facing. Forward in Godot is -Z.
 	var wish := (transform.basis * Vector3(input.move.x, 0.0, -input.move.y))

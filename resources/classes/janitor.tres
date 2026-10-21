@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterClass" format=3]
+
+[ext_resource type="Resource" path="res://resources/classes/mtf_recruit.tres" id="1_8u7on"]
+[ext_resource type="Resource" path="res://resources/classes/chaos_recruit.tres" id="2_imind"]
+[ext_resource type="Script" path="res://scripts/game/character_class.gd" id="3_vfseg"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="4_pj4mg"]
+[ext_resource type="Resource" path="res://resources/items/keycard_janitor.tres" id="5_k6yy2"]
+[ext_resource type="Resource" path="res://resources/items/barricade_kit.tres" id="6_numg6"]
+
+[resource]
+script = ExtResource("3_vfseg")
+id = &"janitor"
+display_name = "Janitor"
+objective = "Keep the place running. Barricade doors to slow threats down, and escape to the Surface."
+color = Color(0.48, 0.52, 0.58, 1)
+spawn_group = "Janitor"
+perks = Array[StringName]([&"fast_barricade"])
+starting_items = Array[ExtResource("4_pj4mg")]([ExtResource("5_k6yy2"), ExtResource("6_numg6")])
+can_escape = true
+escape_class = ExtResource("1_8u7on")
+escape_class_disarmed = ExtResource("2_imind")

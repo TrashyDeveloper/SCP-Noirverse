@@ -1,7 +1,6 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/game/game.gd" id="1_game"]
-[ext_resource type="PackedScene" path="res://scenes/levels/facility.tscn" id="2_level"]
 [ext_resource type="Environment" path="res://resources/noir_environment.tres" id="3_env"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="4_hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="5_pause"]
@@ -15,11 +14,13 @@
 [ext_resource type="Resource" path="res://resources/classes/scientist.tres" id="13_scientist"]
 [ext_resource type="Resource" path="res://resources/classes/facility_guard.tres" id="14_guard"]
 [ext_resource type="Resource" path="res://resources/classes/containment_captain.tres" id="15_captain"]
+[ext_resource type="Resource" path="res://resources/classes/janitor.tres" id="16_janitor"]
+[ext_resource type="Resource" path="res://resources/classes/zone_manager.tres" id="17_zone_manager"]
+[ext_resource type="Resource" path="res://resources/classes/containment_specialist.tres" id="18_specialist"]
 
 [node name="Game" type="Node3D"]
 process_mode = 3
 script = ExtResource("1_game")
-level_scene = ExtResource("2_level")
 gameplay_config = ExtResource("9_config")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
@@ -38,7 +39,10 @@ queue_classes = {
 "C": ExtResource("15_captain"),
 "D": ExtResource("12_class_d"),
 "G": ExtResource("14_guard"),
-"S": ExtResource("13_scientist")
+"S": ExtResource("13_scientist"),
+"J": ExtResource("16_janitor"),
+"Z": ExtResource("17_zone_manager"),
+"X": ExtResource("18_specialist")
 }
 fallback_class = ExtResource("12_class_d")
 

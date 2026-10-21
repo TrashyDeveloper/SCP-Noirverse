@@ -1,6 +1,6 @@
 extends Node3D
-## The in-game scene: loads the level, lets the RoundManager run a round, and
-## connects the local player to the HUD and menus.
+## The in-game scene: builds a new facility layout, lets the RoundManager run
+## a round, and connects the local player to the HUD and menus.
 ##
 ## Everything about the match lives on this node and its children (no global
 ## singletons), so later a server can run the same logic for many players.
@@ -9,7 +9,6 @@ const MAIN_MENU_PATH := "res://scenes/ui/main_menu.tscn"
 ## Explosions closer than this bring the colours back on screen.
 const COLOR_BURST_RANGE := 30.0
 
-@export var level_scene: PackedScene
 ## Default rules for this match (round, carry and ammo limits). Values from
 ## user://gameplay_config.cfg are applied on top when the match starts.
 @export var gameplay_config: GameplayConfig
@@ -36,8 +35,11 @@ var local_input: LocalPlayerInput
 
 func _ready() -> void:
 	config = GameplayConfig.load_with_overrides(gameplay_config)
-	level = level_scene.instantiate()
+	# A new map every round (unless the config fixes the seed).
+	var map_seed := config.map_seed if config.map_seed != 0 else randi_range(1, 2147483646)
+	level = FacilityGenerator.new().generate(map_seed)
 	level_root.add_child(level)
+	print("Map seed: %d" % map_seed)
 	actors.child_entered_tree.connect(_on_actor_added)
 
 	pause_menu.resume_requested.connect(set_paused.bind(false))
@@ -57,6 +59,15 @@ func _ready() -> void:
 	round_manager.round_ended.connect(_on_round_ended)
 	round_manager.warhead_changed.connect(_on_warhead_changed)
 	round_manager.announcement.connect(func(text: String): hud.show_message(text, 5.0))
+	round_manager.terminal_report.connect(func(actor: Node, text: String):
+		if actor == local_character:
+			hud.show_terminal(text))
+	round_manager.intercom_requested.connect(_on_intercom_requested)
+	round_manager.influence_earned.connect(func(character: CharacterController, amount: int, reason: String):
+		if character == local_character:
+			hud.show_message("+%d INFLUENCE  -  %s" % [amount, reason], 2.5))
+	hud.intercom_submitted.connect(_on_intercom_submitted)
+	hud.player_input = local_input
 	round_manager.setup(level, actors, config)
 	var players: Array[InputSource] = [local_input]
 	round_manager.start_round(players)
@@ -68,6 +79,11 @@ func _on_character_spawned(character: CharacterController, is_player: bool) -> v
 	if not is_player:
 		return
 	local_character = character
+	if death_screen.visible:
+		# Back with a reinforcement wave.
+		death_screen.visible = false
+		local_input.enabled = true
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	character.died.connect(_on_local_player_died)
 	character.disarm_changed.connect(func(disarmed: bool):
 		if disarmed and inventory_menu.visible:
@@ -91,6 +107,7 @@ func _on_round_ended(result: Dictionary) -> void:
 	local_input.enabled = false
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	var player_side := local_character.get_side() if local_character != null else -1
+	result.player_xp = round_manager.get_xp(local_input)
 	round_end_screen.show_result(result, player_side, config.restart_delay_seconds)
 
 
@@ -144,8 +161,23 @@ func _on_grenade_detonated(origin: Vector3, _grenade: ItemData) -> void:
 		noir_overlay.color_burst(clampf(1.2 - distance / COLOR_BURST_RANGE, 0.35, 1.0))
 
 
+func _on_intercom_requested(actor: Node) -> void:
+	if actor != local_character or hud.is_intercom_open():
+		return
+	local_input.enabled = false
+	hud.open_intercom()
+
+
+func _on_intercom_submitted(text: String) -> void:
+	local_input.enabled = not get_tree().paused and local_character != null and local_character.is_alive
+	if text.strip_edges() != "":
+		round_manager.broadcast_intercom(local_character, text)
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if local_character == null or not local_character.is_alive or round_end_screen.visible:
+		return
+	if hud.is_intercom_open():
 		return
 	if event.is_action_pressed("pause"):
 		if inventory_menu.visible:
@@ -186,7 +218,7 @@ func _on_local_player_died(source: Node) -> void:
 	local_input.enabled = false
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if not round_end_screen.visible:
-		death_screen.show_death(_describe_cause_of_death(source))
+		death_screen.show_death(_describe_cause_of_death(source), config.respawn_wave_seconds > 0.0)
 
 
 func _describe_cause_of_death(source: Node) -> String:

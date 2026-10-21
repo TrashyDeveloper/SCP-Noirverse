@@ -7,7 +7,7 @@ extends Resource
 ## carry are ItemInstances that point at one of these.
 
 ## What the item does when used.
-enum Kind { KEYCARD, MEDICAL, FIREARM, AMMO, ARMOR, GRENADE }
+enum Kind { KEYCARD, MEDICAL, FIREARM, AMMO, ARMOR, GRENADE, BARRICADE }
 
 ## Which carry limit the item counts towards (see GameplayConfig).
 ## UNLIMITED items (e.g. coins) are only limited by the 8 inventory slots.
@@ -67,7 +67,8 @@ const CATEGORY_NAMES := {
 
 @export_group("Medical")
 @export var medical_effect := MedicalEffect.HEAL_INSTANT
-## Seconds the item takes to use. Switching items cancels it.
+## Seconds the item takes to use (medical items and barricade kits).
+## Switching items cancels it.
 @export var use_time := 1.0
 @export var heal_amount := 65.0
 ## For heal-over-time items, how long the healing lasts.

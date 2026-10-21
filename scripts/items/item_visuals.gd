@@ -59,6 +59,12 @@ static func build(data: ItemData) -> Node3D:
 			_box(root, Vector3(0.08, 0.04, 0.3), Vector3(-0.13, 0.23, 0.1), data.color.darkened(0.3))
 			_box(root, Vector3(0.08, 0.04, 0.3), Vector3(0.13, 0.23, 0.1), data.color.darkened(0.3))
 			_box(root, Vector3(0.3, 0.12, bulk + 0.02), Vector3(0, -0.08, 0), data.color.darkened(0.5))
+		ItemData.Kind.BARRICADE:
+			# A bundle of planks with a strap and a small toolbox.
+			for i in 3:
+				_box(root, Vector3(0.5, 0.03, 0.09), Vector3(0, -0.04 + i * 0.035, 0), data.color)
+			_box(root, Vector3(0.03, 0.12, 0.1), Vector3(0.12, 0, 0), Color(0.15, 0.15, 0.15))
+			_box(root, Vector3(0.14, 0.07, 0.07), Vector3(-0.12, 0.09, 0), Color(0.5, 0.15, 0.1), 0.4)
 		ItemData.Kind.AMMO:
 			var size := get_pickup_size(data)
 			_box(root, size, Vector3.ZERO, data.color)
@@ -87,6 +93,8 @@ static func get_pickup_size(data: ItemData) -> Vector3:
 			return Vector3(0.12, 0.16, 0.12)
 		ItemData.Kind.ARMOR:
 			return Vector3(0.44, 0.52, 0.16)
+		ItemData.Kind.BARRICADE:
+			return Vector3(0.52, 0.16, 0.14)
 		ItemData.Kind.AMMO:
 			match data.ammo_type:
 				AmmoTypes.BUCKSHOT:

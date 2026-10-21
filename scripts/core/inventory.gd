@@ -14,6 +14,11 @@ const SLOT_COUNT := 8
 ## The rules to follow. Set by the match when the character spawns; a
 ## default config is used if nobody sets one.
 var config: GameplayConfig = GameplayConfig.new()
+## Extra carry limits from the character's class (e.g. an Explosives
+## Specialist carries more grenades): {Category: +amount}.
+var extra_limits: Dictionary = {}
+## Multiplies the ammo limits (e.g. 2 for a Heavy Gunner).
+var ammo_multiplier := 1.0
 ## Fixed-size list; empty slots are null.
 var slots: Array[ItemInstance] = []
 ## Spare rounds per ammo type, e.g. {&"9x19mm": 24}.
@@ -60,6 +65,7 @@ func get_limit(category: ItemData.Category) -> int:
 	var armor := get_armor()
 	if armor != null:
 		limit += armor.limit_bonuses.get(category, 0)
+	limit += extra_limits.get(category, 0)
 	return clampi(limit, 0, SLOT_COUNT)
 
 
@@ -68,7 +74,10 @@ func get_ammo(ammo_type: StringName) -> int:
 
 
 func get_ammo_limit(ammo_type: StringName) -> int:
-	return config.get_ammo_limit(ammo_type, get_armor_tier())
+	var limit := config.get_ammo_limit(ammo_type, get_armor_tier())
+	if limit >= GameplayConfig.UNLIMITED_AMMO:
+		return limit
+	return int(limit * ammo_multiplier)
 
 
 ## Why `item` can't be picked up, or "" if it can.

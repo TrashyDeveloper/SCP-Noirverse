@@ -1,8 +1,7 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
 [ext_resource type="Theme" path="res://resources/noir_theme.tres" id="2_theme"]
-[ext_resource type="PackedScene" path="res://scenes/levels/facility.tscn" id="3_level"]
 [ext_resource type="Environment" path="res://resources/noir_environment.tres" id="4_env"]
 [ext_resource type="PackedScene" path="res://scenes/effects/noir_overlay.tscn" id="5_noir"]
 
@@ -20,8 +19,6 @@ script = ExtResource("1_menu")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="Backdrop"]
 environment = ExtResource("4_env")
-
-[node name="TestFacility" parent="Backdrop" instance=ExtResource("3_level")]
 
 [node name="Camera3D" type="Camera3D" parent="Backdrop"]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 27.5, 1.7, 0)

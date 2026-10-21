@@ -50,6 +50,11 @@ func show_result(result: Dictionary, player_side: int, restart_delay: float) -> 
 		"Kills by the Foundation  %d" % kills.get(CharacterClass.Side.FOUNDATION, 0),
 		"Kills by Class-D & Chaos  %d" % kills.get(CharacterClass.Side.INSURGENCY, 0),
 		"Deaths  %d" % stats.deaths,
+		"Influence  Foundation %d (%s)  /  Chaos %d (%s)" % [
+			result.influence[CharacterClass.Side.FOUNDATION], RoundManager.TIER_NAMES[result.tiers[CharacterClass.Side.FOUNDATION]],
+			result.influence[CharacterClass.Side.INSURGENCY], RoundManager.TIER_NAMES[result.tiers[CharacterClass.Side.INSURGENCY]]],
+		"Reinforcement waves  %d" % result.waves,
+		"Your XP  %d  (%s)" % [result.get("player_xp", 0), RoundManager.XP_RANK_NAMES[RoundManager.xp_rank(result.get("player_xp", 0))]],
 	]))
 	_countdown = restart_delay
 	visible = true
