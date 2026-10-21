@@ -1,19 +1,28 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="ShaderMaterial" format=3]
 
-[sub_resource type="Gradient" id="Gradient_a6qxd"]
-colors = PackedColorArray(0.7, 0.7, 0.7, 1, 1, 1, 1, 1)
+[ext_resource type="Shader" path="res://shaders/facility_surface.gdshader" id="1_v3xtd"]
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_v3xtd"]
-frequency = 0.05
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_faar1"]
+frequency = 0.03
 
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_faar1"]
-noise = SubResource("FastNoiseLite_v3xtd")
-color_ramp = SubResource("Gradient_a6qxd")
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_kyp22"]
+noise = SubResource("FastNoiseLite_faar1")
 seamless = true
 
 [resource]
-albedo_color = Color(0.3, 0.3, 0.3, 1)
-albedo_texture = SubResource("NoiseTexture2D_faar1")
-uv1_scale = Vector3(0.2777778, 0.2777778, 0.2777778)
-uv1_triplanar = true
-uv1_world_triplanar = true
+render_priority = 0
+shader = ExtResource("1_v3xtd")
+shader_parameter/base_color = Color(0.2, 0.2, 0.21, 1)
+shader_parameter/seam_color = null
+shader_parameter/trim_color = null
+shader_parameter/panel_width = null
+shader_parameter/seam_width = null
+shader_parameter/kick_height = null
+shader_parameter/trim_height = null
+shader_parameter/tile_size = 1.2
+shader_parameter/metallic_amount = 0.1
+shader_parameter/roughness_min = null
+shader_parameter/roughness_max = null
+shader_parameter/grime = SubResource("NoiseTexture2D_kyp22")
+shader_parameter/grime_scale = null
+shader_parameter/grime_strength = null

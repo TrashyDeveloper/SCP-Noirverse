@@ -16,6 +16,9 @@ SCP Foundation content is licensed under
 | SCP-049 | Gabriel Jade | <https://scp-wiki.wikidot.com/scp-049> |
 | SCP Foundation, O5 Council, Class-D, Mobile Task Forces (MTF Epsilon-11 "Nine-Tailed Fox"), Chaos Insurgency | SCP Wiki contributors | <https://scp-wiki.wikidot.com> |
 
+- The SCP Foundation emblem on doors (`assets/textures/scp_emblem.svg`) is our
+  own redrawing of the SCP Wiki logo, originally by Aelanna, CC BY-SA 3.0
+  (see <https://scp-wiki.wikidot.com/licensing-guide>).
 - The look of SCP-173 in this game is an original design. We do **not** use the
   sculpture "Untitled 2004" by Izumi Kato, which is not under CC BY-SA.
 - Because the game adapts CC BY-SA 3.0 material, its SCP-derived content is

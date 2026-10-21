@@ -30,7 +30,7 @@ noir look. Built with **Godot 4** and **GDScript**.
 | Space | Jump |
 | E | Interact: doors, card readers, pick up items |
 | Hold E | Disarm someone (while holding a firearm) / release them |
-| Tab | Inventory (left click = hold item, right click = drop) |
+| Tab | Inventory wheel (left click = hold item, right click = drop) |
 | Left click | Use held item (shoot, heal, throw grenade) |
 | R | Reload |
 | Q | Drop held item |
@@ -65,7 +65,8 @@ noir look. Built with **Godot 4** and **GDScript**.
    (e.g. a gun).
 7. Throw a grenade at the dummies (**G**, then left click): High-Explosive
    damages everything in range that isn't behind a wall; a Flashbang blinds
-   whoever looks at it.
+   whoever looks at it. When a grenade goes off nearby, the colours come
+   back for a moment.
 
 ## Items
 
@@ -176,6 +177,10 @@ a carry limit (shown on the Tab screen):
 - Click any node in the **Scene** dock (top-left) to edit it in the
   **Inspector** (right). Example: select a lamp's `Light` node and change
   `Light Energy`.
+- **Door text:** select a door and change **Zone Code** / **Zone Name**
+  (e.g. "HCZ" / "HEAVY CONTAINMENT ZONE").
+- **Wall look:** open `resources/materials/concrete_wall.tres` and change the
+  shader parameters (panel width, colours, trim height…).
 - The facility is built from `CSGBox3D` blocks — select one and drag the
   orange handles to resize, or **Ctrl+D** to duplicate.
 - Errors show in the **Debugger** panel at the bottom while the game runs.
@@ -194,7 +199,9 @@ scenes/
   effects/               The noir full-screen filter
 scripts/                 GDScript code, mirroring the scenes folders
   core/                  Shared building blocks (CharacterInput, InputSource)
-shaders/noir_post.gdshader   Black & white, grain, vignette, scratches
+shaders/noir_post.gdshader         Black & white, grain, vignette, scratches
+shaders/facility_surface.gdshader  Wall panels, floor and ceiling tiles
+assets/textures/         Our own SVG artwork (SCP emblem, hazard stripes)
 resources/               Materials, environment (fog, lighting), UI theme
   items/                 Item definitions (.tres) — double-click to edit damage, heal amount...
 ```

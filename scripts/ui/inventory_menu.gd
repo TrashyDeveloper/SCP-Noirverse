@@ -1,6 +1,7 @@
 class_name InventoryMenu
 extends CanvasLayer
-## The inventory screen (Tab). Shows the 8 slots, carry limits and ammo.
+## The inventory screen (Tab): a wheel with the 8 slots, plus carry limits and
+## ammo on the side.
 ##
 ## Left click a slot to hold that item (click again to put it away), right
 ## click to drop it. Like other menus it only *asks*: the requests go to the
@@ -11,39 +12,15 @@ signal select_requested(slot: int)
 signal drop_requested(slot: int)
 
 var _character: CharacterController
-var _buttons: Array[Button] = []
-var _style_normal := StyleBoxFlat.new()
-var _style_held := StyleBoxFlat.new()
-var _style_hover := StyleBoxFlat.new()
 
-@onready var grid: GridContainer = %Grid
+@onready var wheel: InventoryWheel = %Wheel
 @onready var limits_label: RichTextLabel = %Limits
-@onready var held_label: Label = %Held
 
 
 func _ready() -> void:
 	visible = false
-	_style_normal.bg_color = Color(0.06, 0.06, 0.06, 0.85)
-	_style_normal.set_border_width_all(1)
-	_style_normal.border_color = Color(0.45, 0.45, 0.42)
-	_style_normal.set_content_margin_all(8)
-	_style_hover = _style_normal.duplicate()
-	_style_hover.bg_color = Color(0.16, 0.16, 0.15, 0.9)
-	_style_held = _style_normal.duplicate()
-	_style_held.set_border_width_all(3)
-	_style_held.border_color = Color(0.95, 0.95, 0.9)
-	_style_held.bg_color = Color(0.2, 0.2, 0.19, 0.95)
-	for slot in Inventory.SLOT_COUNT:
-		var button := Button.new()
-		button.custom_minimum_size = Vector2(150, 96)
-		button.focus_mode = Control.FOCUS_NONE
-		button.add_theme_font_size_override("font_size", 15)
-		button.add_theme_stylebox_override("hover", _style_hover)
-		button.add_theme_stylebox_override("pressed", _style_hover)
-		button.pressed.connect(func(): select_requested.emit(slot))
-		button.gui_input.connect(_on_slot_gui_input.bind(slot))
-		grid.add_child(button)
-		_buttons.append(button)
+	wheel.slot_clicked.connect(_on_slot_clicked)
+	wheel.hovered_changed.connect(func(_slot: int): _update_center())
 
 
 func bind_character(character: CharacterController) -> void:
@@ -57,26 +34,44 @@ func refresh() -> void:
 	if _character == null:
 		return
 	var inventory := _character.inventory
-	var held := _character.items.equipped_slot
+	var info: Array[Dictionary] = []
 	for slot in Inventory.SLOT_COUNT:
 		var item := inventory.get_item(slot)
-		var button := _buttons[slot]
 		if item == null:
-			button.text = "- empty -"
-			button.disabled = true
+			info.append({})
 		else:
-			var note := ItemData.category_name(item.data.category)
-			if item.data.kind == ItemData.Kind.ARMOR:
-				note = "WORN"
-			elif item.data.kind == ItemData.Kind.FIREARM:
-				note = "%s  ·  %d/%d" % [note, item.ammo, item.data.magazine_size]
-			button.text = "%s\n%s" % [item.data.display_name, note]
-			button.disabled = false
-		button.add_theme_stylebox_override("normal", _style_held if slot == held else _style_normal)
-		button.add_theme_stylebox_override("disabled", _style_normal)
-	var held_item := _character.items.get_equipped()
-	held_label.text = "Holding: %s" % (held_item.data.display_name if held_item else "nothing")
+			info.append({"title": _short_title(item.data), "subtitle": _subtitle(item)})
+	wheel.set_slots(info, _character.items.equipped_slot)
 	limits_label.text = _limits_text(inventory)
+	_update_center()
+
+
+func _update_center() -> void:
+	if _character == null:
+		return
+	var slot := wheel.hovered_slot
+	var item := _character.inventory.get_item(slot) if slot != -1 else null
+	if item != null:
+		var action := "Left click: put away" if slot == _character.items.equipped_slot else "Left click: hold"
+		wheel.center_lines = [item.data.display_name, _subtitle(item), action, "Right click: drop"]
+	else:
+		var held := _character.items.get_equipped()
+		wheel.center_lines = ["INVENTORY", "Holding: %s" % (held.data.display_name if held else "nothing"), "Tab: close"]
+
+
+func _short_title(data: ItemData) -> String:
+	return data.display_name.replace(" Keycard", "").replace(" Grenade", "")
+
+
+func _subtitle(item: ItemInstance) -> String:
+	match item.data.kind:
+		ItemData.Kind.ARMOR:
+			return "Worn"
+		ItemData.Kind.FIREARM:
+			return "%d / %d" % [item.ammo, item.data.magazine_size]
+		ItemData.Kind.KEYCARD:
+			return "Keycard"
+	return ItemData.category_name(item.data.category)
 
 
 func _limits_text(inventory: Inventory) -> String:
@@ -104,7 +99,10 @@ func _limits_text(inventory: Inventory) -> String:
 	return "\n".join(lines)
 
 
-func _on_slot_gui_input(event: InputEvent, slot: int) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
-		if _character != null and _character.inventory.get_item(slot) != null:
-			drop_requested.emit(slot)
+func _on_slot_clicked(slot: int, button: MouseButton) -> void:
+	if _character == null or _character.inventory.get_item(slot) == null:
+		return
+	if button == MOUSE_BUTTON_LEFT:
+		select_requested.emit(slot)
+	elif button == MOUSE_BUTTON_RIGHT:
+		drop_requested.emit(slot)

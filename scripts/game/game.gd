@@ -11,6 +11,8 @@ const TEST_NPC_ITEMS: Array[String] = [
 	"res://resources/items/painkillers.tres",
 ]
 const MAIN_MENU_PATH := "res://scenes/ui/main_menu.tscn"
+## Explosions closer than this bring the colours back on screen.
+const COLOR_BURST_RANGE := 30.0
 
 @export var level_scene: PackedScene
 ## Default rules for this match (carry limits, ammo limits). Values from
@@ -29,12 +31,14 @@ var local_input: LocalPlayerInput
 @onready var pause_menu: PauseMenu = $PauseMenu
 @onready var death_screen: DeathScreen = $DeathScreen
 @onready var inventory_menu: InventoryMenu = $InventoryMenu
+@onready var noir_overlay: NoirOverlay = $NoirOverlay
 
 
 func _ready() -> void:
 	config = GameplayConfig.load_with_overrides(gameplay_config)
 	level = level_scene.instantiate()
 	level_root.add_child(level)
+	actors.child_entered_tree.connect(_on_actor_added)
 	_spawn_local_player()
 	_spawn_test_npcs()
 	pause_menu.resume_requested.connect(set_paused.bind(false))
@@ -85,6 +89,19 @@ func _spawn_test_npcs() -> void:
 		for path in TEST_NPC_ITEMS:
 			npc.give_item(ItemInstance.new(load(path)))
 		npc.items.equip(0)
+
+
+func _on_actor_added(node: Node) -> void:
+	if node is LiveGrenade:
+		node.detonated.connect(_on_grenade_detonated)
+
+
+## Presentation only: the colours come back for a moment when a grenade goes
+## off near the local player (stronger when closer).
+func _on_grenade_detonated(origin: Vector3, _grenade: ItemData) -> void:
+	var distance := origin.distance_to(local_character.camera.global_position)
+	if distance < COLOR_BURST_RANGE:
+		noir_overlay.color_burst(clampf(1.2 - distance / COLOR_BURST_RANGE, 0.35, 1.0))
 
 
 func _pick_spawn_point() -> Node3D:

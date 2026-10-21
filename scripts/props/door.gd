@@ -16,6 +16,9 @@ const ACCESS_NAMES := {
 	Access.NONE: "None", Access.CONTAINMENT: "Containment", Access.ARMORY: "Armory", Access.ADMIN: "Admin",
 }
 
+## Text stenciled on both sides of the door.
+@export var zone_code := "LCZ"
+@export var zone_name := "LIGHT CONTAINMENT ZONE"
 ## Which kind of keycard access opens this door (None = anyone).
 @export var access := Access.NONE
 ## Access level needed (1-3).
@@ -36,7 +39,10 @@ var _indicator_materials: Array[StandardMaterial3D] = []
 
 func _ready() -> void:
 	add_to_group(KEYCARD_DOOR_GROUP)
-	for path in ["Panel/Indicator", "ReaderFront/Light", "ReaderBack/Light"]:
+	for face in [$Panel/FaceFront, $Panel/FaceBack]:
+		face.get_node("ZoneCode").text = zone_code
+		face.get_node("ZoneName").text = zone_name
+	for path in ["ReaderFront/Light", "ReaderBack/Light"]:
 		var mesh: MeshInstance3D = get_node(path)
 		var mat := mesh.get_active_material(0).duplicate() as StandardMaterial3D
 		mesh.material_override = mat

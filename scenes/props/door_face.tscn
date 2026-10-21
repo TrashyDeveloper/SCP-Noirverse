@@ -1,0 +1,170 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/hazard_stripes.svg" id="1_stripes"]
+[ext_resource type="Texture2D" path="res://assets/textures/scp_emblem.svg" id="2_emblem"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_frame"]
+albedo_color = Color(0.15, 0.15, 0.16, 1)
+metallic = 0.25
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="Mat_recess"]
+albedo_color = Color(0.04, 0.04, 0.045, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Mesh_side_frame"]
+material = SubResource("Mat_frame")
+size = Vector3(0.34, 2.45, 0.04)
+
+[sub_resource type="BoxMesh" id="Mesh_slot"]
+material = SubResource("Mat_recess")
+size = Vector3(0.11, 1.05, 0.05)
+
+[sub_resource type="BoxMesh" id="Mesh_vent"]
+material = SubResource("Mat_recess")
+size = Vector3(0.24, 0.022, 0.05)
+
+[sub_resource type="BoxMesh" id="Mesh_top_band"]
+material = SubResource("Mat_frame")
+size = Vector3(1.38, 0.06, 0.03)
+
+[sub_resource type="StandardMaterial3D" id="Mat_stripes"]
+albedo_texture = ExtResource("1_stripes")
+roughness = 0.7
+uv1_scale = Vector3(4, 1, 1)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="Mesh_stripes"]
+material = SubResource("Mat_stripes")
+size = Vector2(1.36, 0.15)
+
+[sub_resource type="StandardMaterial3D" id="Mat_seam"]
+albedo_color = Color(0.02, 0.02, 0.025, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_seam"]
+material = SubResource("Mat_seam")
+size = Vector3(0.012, 2.5, 0.01)
+
+[node name="DoorFace" type="Node3D"]
+
+[node name="SideFrameLeft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.86, 0, 0.02)
+mesh = SubResource("Mesh_side_frame")
+
+[node name="SideFrameRight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.86, 0, 0.02)
+mesh = SubResource("Mesh_side_frame")
+
+[node name="SlotLeft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.88, -0.05, 0.03)
+mesh = SubResource("Mesh_slot")
+
+[node name="SlotRight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.88, -0.05, 0.03)
+mesh = SubResource("Mesh_slot")
+
+[node name="VentsLeftTop" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.86, 0.82, 0.03)
+
+[node name="Vent1" type="MeshInstance3D" parent="VentsLeftTop"]
+mesh = SubResource("Mesh_vent")
+
+[node name="Vent2" type="MeshInstance3D" parent="VentsLeftTop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.045, 0)
+mesh = SubResource("Mesh_vent")
+
+[node name="Vent3" type="MeshInstance3D" parent="VentsLeftTop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.09, 0)
+mesh = SubResource("Mesh_vent")
+
+[node name="Vent4" type="MeshInstance3D" parent="VentsLeftTop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.135, 0)
+mesh = SubResource("Mesh_vent")
+
+[node name="VentsRightTop" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.86, 0.82, 0.03)
+
+[node name="Vent1" type="MeshInstance3D" parent="VentsRightTop"]
+mesh = SubResource("Mesh_vent")
+
+[node name="Vent2" type="MeshInstance3D" parent="VentsRightTop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.045, 0)
+mesh = SubResource("Mesh_vent")
+
+[node name="Vent3" type="MeshInstance3D" parent="VentsRightTop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.09, 0)
+mesh = SubResource("Mesh_vent")
+
+[node name="Vent4" type="MeshInstance3D" parent="VentsRightTop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.135, 0)
+mesh = SubResource("Mesh_vent")
+
+[node name="VentsLeftBottom" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.86, -0.98, 0.03)
+
+[node name="Vent1" type="MeshInstance3D" parent="VentsLeftBottom"]
+mesh = SubResource("Mesh_vent")
+
+[node name="Vent2" type="MeshInstance3D" parent="VentsLeftBottom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.045, 0)
+mesh = SubResource("Mesh_vent")
+
+[node name="Vent3" type="MeshInstance3D" parent="VentsLeftBottom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.09, 0)
+mesh = SubResource("Mesh_vent")
+
+[node name="VentsRightBottom" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.86, -0.98, 0.03)
+
+[node name="Vent1" type="MeshInstance3D" parent="VentsRightBottom"]
+mesh = SubResource("Mesh_vent")
+
+[node name="Vent2" type="MeshInstance3D" parent="VentsRightBottom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.045, 0)
+mesh = SubResource("Mesh_vent")
+
+[node name="Vent3" type="MeshInstance3D" parent="VentsRightBottom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.09, 0)
+mesh = SubResource("Mesh_vent")
+
+[node name="SeamLeft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.68, 0, 0.003)
+mesh = SubResource("Mesh_seam")
+
+[node name="SeamRight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.68, 0, 0.003)
+mesh = SubResource("Mesh_seam")
+
+[node name="TopBand" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0.015)
+mesh = SubResource("Mesh_top_band")
+
+[node name="ZoneCode" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0.006)
+pixel_size = 0.0022
+shaded = true
+modulate = Color(0.78, 0.78, 0.76, 1)
+outline_size = 0
+text = "LCZ"
+font_size = 140
+
+[node name="ZoneName" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.73, 0.006)
+pixel_size = 0.0016
+shaded = true
+modulate = Color(0.72, 0.72, 0.7, 1)
+outline_size = 0
+text = "LIGHT CONTAINMENT ZONE"
+font_size = 36
+
+[node name="HazardStripe" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0.004)
+mesh = SubResource("Mesh_stripes")
+
+[node name="Emblem" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0.006)
+modulate = Color(0.7, 0.7, 0.68, 1)
+pixel_size = 0.0016
+shaded = true
+texture_filter = 5
+texture = ExtResource("2_emblem")

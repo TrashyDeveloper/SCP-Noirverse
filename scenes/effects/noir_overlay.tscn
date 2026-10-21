@@ -1,8 +1,10 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Shader" path="res://shaders/noir_post.gdshader" id="1_noir"]
+[ext_resource type="Script" path="res://scripts/effects/noir_overlay.gd" id="2_script"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_noir"]
+resource_local_to_scene = true
 shader = ExtResource("1_noir")
 shader_parameter/saturation = 0.06
 shader_parameter/contrast = 1.35
@@ -15,6 +17,7 @@ shader_parameter/scratch_amount = 0.35
 
 [node name="NoirOverlay" type="CanvasLayer"]
 layer = 100
+script = ExtResource("2_script")
 
 [node name="Filter" type="ColorRect" parent="."]
 material = SubResource("ShaderMaterial_noir")

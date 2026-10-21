@@ -44,6 +44,12 @@ and is committed + pushed once it works. `[x]` = done.
 - [x] Test NPC (idle) to practise disarming
 - [ ] Later: custom hotkeys in a settings menu, glass that breaks from thrown items, disarm effects on escape (Step 3), third-person held items
 
+## Step 2.7 — Look & feel ✅
+- [x] Round inventory wheel (8 segments, metal rims, item info in the centre)
+- [x] Grenade explosions bring the colours back for a moment (stronger when closer)
+- [x] Light Containment Zone style: dark metal wall panels with seams, trim and kick plates; tiled floors; LCZ doors with frames, vents, hazard stripe and SCP emblem
+- [ ] Later: per-zone door/wall styles for Heavy Containment, Entrance and Surface
+
 ## Step 3 — Classes & rounds
 - [ ] Class definitions (Class-D, Scientist, Facility Guard) with spawn points, starting items and colours
 - [ ] Round manager: assign random classes, start/end a round, round-end screen
