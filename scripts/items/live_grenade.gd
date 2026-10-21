@@ -39,6 +39,7 @@ func _detonate() -> void:
 
 
 func _explode(origin: Vector3) -> void:
+	Sfx.play_3d(self, "explosion", origin, 6.0, randf_range(0.9, 1.05), null, 90.0)
 	# Damage everything with Health in range that isn't behind a wall.
 	var hit_healths: Array[Health] = []
 	for body in _bodies_in_radius(origin, data.blast_radius):
@@ -54,6 +55,7 @@ func _explode(origin: Vector3) -> void:
 
 
 func _flash(origin: Vector3) -> void:
+	Sfx.play_3d(self, "flashbang", origin, 4.0, 1.0, null, 70.0)
 	for body in _bodies_in_radius(origin, data.blast_radius):
 		if body.has_method("apply_flash") and _has_line_of_sight(origin, body):
 			body.apply_flash(origin, data.blind_duration)

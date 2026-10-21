@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_n5a4v"]
+
+[resource]
+script = ExtResource("1_n5a4v")
+id = &"ak47"
+display_name = "AK-47"
+kind = 2
+category = 3
+tiers = 2
+color = Color(0.36, 0.2, 0.1, 1)
+weight = 3.6
+damage = 28.0
+magazine_size = 30
+fire_interval = 0.11
+reload_time = 2.6
+max_range = 85.0
+automatic = true
+spread_degrees = 1.9
+recoil = 1.05
+zoom_fov = 55.0
+move_speed = 0.95
+shot_sound = &"rifle"
+ammo_type = &"762x39mm"

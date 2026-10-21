@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_4ehdi"]
+
+[resource]
+script = ExtResource("1_4ehdi")
+id = &"mg60"
+display_name = "MG-60"
+kind = 2
+category = 3
+tiers = 6
+color = Color(0.1, 0.1, 0.1, 1)
+weight = 9.0
+damage = 30.0
+magazine_size = 100
+fire_interval = 0.1
+reload_time = 6.0
+max_range = 90.0
+automatic = true
+spread_degrees = 3.2
+recoil = 1.0
+zoom_fov = 55.0
+move_speed = 0.8
+shot_sound = &"heavy"
+ammo_type = &"762x39mm"

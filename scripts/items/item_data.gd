@@ -86,6 +86,18 @@ const CATEGORY_NAMES := {
 @export var fire_interval := 0.18
 @export var reload_time := 1.6
 @export var max_range := 60.0
+## Keeps firing while the button is held.
+@export var automatic := false
+## Random spread of each shot, in degrees (aiming cuts it to a third).
+@export var spread_degrees := 0.6
+## How hard each shot kicks the view up (degrees).
+@export var recoil := 0.8
+## Camera field of view while aiming (right mouse button). 0 = no zoom.
+@export var zoom_fov := 60.0
+## Movement speed multiplier while holding this weapon.
+@export var move_speed := 1.0
+## Which sound family the shot uses: &"light", &"rifle", &"heavy", &"sniper".
+@export var shot_sound := &"light"
 
 @export_group("Ammo")
 ## Which ammo a firearm loads, or which ammo a box contains.

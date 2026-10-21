@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_1fbyb"]
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_cajpb"]
 [ext_resource type="Resource" path="res://resources/items/keycard_mtf_private.tres" id="3_1fqvb"]
-[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_jr1fc"]
+[ext_resource type="Resource" path="res://resources/items/smg.tres" id="4_1fbyb"]
 [ext_resource type="Resource" path="res://resources/items/grenade_he.tres" id="5_2j1mh"]
 [ext_resource type="Resource" path="res://resources/items/grenade_flashbang.tres" id="6_ohtc3"]
 [ext_resource type="Resource" path="res://resources/items/armor_combat.tres" id="7_ge08f"]
@@ -17,10 +17,10 @@ unit = 1
 color = Color(0.18, 0.22, 0.36, 1)
 spawn_group = "MTF"
 perks = Array[StringName]([&"demolitions"])
-starting_items = Array[ExtResource("2_cajpb")]([ExtResource("3_1fqvb"), ExtResource("4_jr1fc"), ExtResource("5_2j1mh"), ExtResource("5_2j1mh"), ExtResource("5_2j1mh"), ExtResource("6_ohtc3"), ExtResource("7_ge08f")])
 limit_bonuses = Dictionary[int, int]({
 4: 2
 })
+starting_items = Array[ExtResource("2_cajpb")]([ExtResource("3_1fqvb"), ExtResource("4_1fbyb"), ExtResource("5_2j1mh"), ExtResource("5_2j1mh"), ExtResource("5_2j1mh"), ExtResource("6_ohtc3"), ExtResource("7_ge08f")])
 starting_ammo = Dictionary[StringName, int]({
-&"9x19mm": 80
+&"9x19mm": 90
 })

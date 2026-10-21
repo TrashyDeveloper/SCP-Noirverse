@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_rlypu"]
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_argt6"]
 [ext_resource type="Resource" path="res://resources/items/keycard_chaos_device.tres" id="3_hav6j"]
+[ext_resource type="Resource" path="res://resources/items/sniper.tres" id="4_argt6"]
 [ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_rphuj"]
 [ext_resource type="Resource" path="res://resources/items/painkillers.tres" id="5_68fie"]
 [ext_resource type="Resource" path="res://resources/items/adrenaline.tres" id="6_1e78m"]
@@ -18,7 +19,8 @@ unit = 2
 color = Color(0.24, 0.29, 0.16, 1)
 spawn_group = "Chaos"
 notes = "Planned: quieter footsteps, silenced weapon."
-starting_items = Array[ExtResource("2_argt6")]([ExtResource("3_hav6j"), ExtResource("4_rphuj"), ExtResource("5_68fie"), ExtResource("6_1e78m"), ExtResource("7_6jbku")])
+starting_items = Array[ExtResource("2_argt6")]([ExtResource("3_hav6j"), ExtResource("4_argt6"), ExtResource("5_68fie"), ExtResource("6_1e78m"), ExtResource("7_6jbku"), ExtResource("4_rphuj")])
 starting_ammo = Dictionary[StringName, int]({
-&"9x19mm": 70
+&"762x39mm": 30,
+&"9x19mm": 48
 })

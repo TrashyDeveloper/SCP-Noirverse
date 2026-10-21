@@ -137,6 +137,8 @@ func interact(actor: Node) -> void:
 			use_requested.emit(actor)
 		return
 	if can_operate(actor):
+		if requires_keycard():
+			Sfx.play_3d(self, "card_accept", global_position + Vector3.UP * 1.3, -8.0)
 		set_open(not is_open)
 	else:
 		_deny()
@@ -165,6 +167,7 @@ func set_open(value: bool) -> void:
 	var target := _open_position() if is_open else _closed_position
 	_tween.tween_property(panel, "position", target, open_time)
 	_update_indicator()
+	Sfx.play_3d(self, "door_open" if is_open else "door_close", global_position + Vector3.UP * 1.3, -4.0, randf_range(0.95, 1.05))
 	if is_open:
 		opened.emit()
 	else:
@@ -176,6 +179,8 @@ func _open_position() -> Vector3:
 
 
 func _deny() -> void:
+	if _denied_time <= 0.0:
+		Sfx.play_3d(self, "card_deny", global_position + Vector3.UP * 1.3, -6.0)
 	_denied_time = 0.6
 	_set_indicator_color(Color(1.0, 0.1, 0.1))
 

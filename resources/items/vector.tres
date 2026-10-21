@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_o8sn3"]
+
+[resource]
+script = ExtResource("1_o8sn3")
+id = &"vector"
+display_name = "Vector"
+kind = 2
+category = 3
+tiers = 6
+color = Color(0.08, 0.08, 0.09, 1)
+weight = 2.6
+damage = 14.0
+magazine_size = 25
+fire_interval = 0.055
+reload_time = 1.9
+max_range = 55.0
+automatic = true
+spread_degrees = 1.6
+recoil = 0.45
+move_speed = 0.98
+shot_sound = &"suppressed"

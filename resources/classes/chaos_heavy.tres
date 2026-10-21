@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_bubd8"]
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_lkqcm"]
 [ext_resource type="Resource" path="res://resources/items/keycard_chaos_device.tres" id="3_efsf4"]
-[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_nhvcy"]
+[ext_resource type="Resource" path="res://resources/items/lmg.tres" id="4_bubd8"]
 [ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_uv876"]
 [ext_resource type="Resource" path="res://resources/items/grenade_he.tres" id="6_k64p2"]
 [ext_resource type="Resource" path="res://resources/items/armor_heavy.tres" id="7_sg6ns"]
@@ -18,8 +18,7 @@ unit = 2
 color = Color(0.24, 0.29, 0.16, 1)
 max_health = 120.0
 spawn_group = "Chaos"
-notes = "Planned weapon: light machine gun."
-starting_items = Array[ExtResource("2_lkqcm")]([ExtResource("3_efsf4"), ExtResource("4_nhvcy"), ExtResource("5_uv876"), ExtResource("6_k64p2"), ExtResource("6_k64p2"), ExtResource("7_sg6ns")])
+starting_items = Array[ExtResource("2_lkqcm")]([ExtResource("3_efsf4"), ExtResource("4_bubd8"), ExtResource("5_uv876"), ExtResource("6_k64p2"), ExtResource("6_k64p2"), ExtResource("7_sg6ns")])
 starting_ammo = Dictionary[StringName, int]({
-&"9x19mm": 180
+&"762x39mm": 225
 })

@@ -16,6 +16,10 @@ var pitch := 0.0
 var sprint := false
 ## True while the interact key is held (for hold actions like disarming).
 var interact_held := false
+## True while the use/fire button is held (automatic weapons).
+var use_held := false
+## True while aiming down the sights (right mouse button).
+var aim := false
 ## One-shot actions (true only on the tick they were pressed).
 var jump := false
 var interact := false

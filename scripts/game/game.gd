@@ -16,6 +16,7 @@ const COLOR_BURST_RANGE := 30.0
 ## Normal colour of every light, remembered while the alarm turns them red.
 var _light_colors := {}
 var _alarm_on := false
+var _alarm_sound: AudioStreamPlayer
 
 var config: GameplayConfig
 var level: Node3D
@@ -58,7 +59,11 @@ func _ready() -> void:
 	round_manager.character_escaped.connect(_on_character_escaped)
 	round_manager.round_ended.connect(_on_round_ended)
 	round_manager.warhead_changed.connect(_on_warhead_changed)
-	round_manager.announcement.connect(func(text: String): hud.show_message(text, 5.0))
+	round_manager.announcement.connect(func(text: String):
+		hud.show_message(text, 5.0)
+		Sfx.play_2d(self, "intercom_chime", -12.0))
+	# Low facility hum in the background.
+	Sfx.play_2d(self, "ambience_loop", -20.0)
 	round_manager.terminal_report.connect(func(actor: Node, text: String):
 		if actor == local_character:
 			hud.show_terminal(text))
@@ -137,6 +142,11 @@ func _set_alarm(on: bool) -> void:
 	if on == _alarm_on:
 		return
 	_alarm_on = on
+	if on:
+		_alarm_sound = Sfx.play_2d(self, "alarm_loop", -14.0)
+	elif _alarm_sound != null:
+		_alarm_sound.queue_free()
+		_alarm_sound = null
 	for light: Light3D in get_tree().get_nodes_in_group("facility_lights"):
 		if on:
 			_light_colors[light] = light.light_color

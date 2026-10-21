@@ -21,3 +21,9 @@ func sample() -> CharacterInput:
 ## monitors faster than the physics tick rate.
 func get_view_angles() -> Vector2:
 	return Vector2.ZERO
+
+
+## Weapon recoil kicks the view up (radians). Sources that have no view of
+## their own (bots) can ignore it.
+func add_recoil(_pitch: float, _yaw: float) -> void:
+	pass

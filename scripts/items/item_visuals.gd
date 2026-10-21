@@ -38,10 +38,7 @@ static func build(data: ItemData) -> Node3D:
 					_cylinder(pen, 0.019, 0.04, Vector3(0, -0.08, 0), data.color)
 					_cylinder(pen, 0.019, 0.02, Vector3(0, 0.085, 0), Color(0.2, 0.2, 0.2))
 		ItemData.Kind.FIREARM:
-			var dark := Color(0.12, 0.12, 0.13)
-			_box(root, Vector3(0.035, 0.05, 0.22), Vector3(0, 0.03, -0.03), dark, 0.6)  # slide
-			_box(root, Vector3(0.032, 0.12, 0.05), Vector3(0, -0.05, 0.05), dark, 0.3)  # grip
-			_box(root, Vector3(0.01, 0.03, 0.04), Vector3(0, -0.015, 0.0), dark, 0.6)  # trigger guard
+			root.set_meta("muzzle", WeaponModels.build(data.id, root))
 		ItemData.Kind.GRENADE:
 			if data.grenade_type == ItemData.GrenadeType.HIGH_EXPLOSIVE:
 				var body := _sphere(root, 0.045, Vector3.ZERO, data.color)
@@ -73,6 +70,14 @@ static func build(data: ItemData) -> Node3D:
 	return root
 
 
+## Where the pickup box sits relative to the model (long guns stick out
+## forward from their grip).
+static func get_pickup_center(data: ItemData) -> Vector3:
+	if data.kind == ItemData.Kind.FIREARM:
+		return Vector3(0, 0, -WeaponModels.length_of(data.id) * 0.3)
+	return Vector3.ZERO
+
+
 ## Size of the box used to collide with / aim at the item. A bit bigger than
 ## the model so small things like keycards are easy to pick up.
 static func get_pickup_size(data: ItemData) -> Vector3:
@@ -88,7 +93,7 @@ static func get_pickup_size(data: ItemData) -> Vector3:
 				_:
 					return Vector3(0.1, 0.1, 0.2)
 		ItemData.Kind.FIREARM:
-			return Vector3(0.08, 0.17, 0.26)
+			return Vector3(0.09, 0.2, WeaponModels.length_of(data.id))
 		ItemData.Kind.GRENADE:
 			return Vector3(0.12, 0.16, 0.12)
 		ItemData.Kind.ARMOR:

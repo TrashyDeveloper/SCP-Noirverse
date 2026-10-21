@@ -49,6 +49,9 @@ var _hold_target: Node
 var _hold_time := 0.0
 var _speed_multiplier := 1.0
 var _class_speed := 1.0
+var _step_distance := 0.0
+## True when someone looks through these eyes (the gun in hand is drawn).
+var view_model_visible := false
 var _speed_boost_left := 0.0
 var _body_material: StandardMaterial3D
 
@@ -85,6 +88,7 @@ func possess(source: InputSource, first_person: bool) -> void:
 	camera.current = first_person
 	# The item-in-hand model is only drawn for the player looking through
 	# these eyes (third-person held items come later).
+	view_model_visible = first_person
 	view_model.visible = first_person
 	if first_person:
 		# Put our own body on render layer 3 and hide that layer from our
@@ -117,6 +121,7 @@ func _physics_process(delta: float) -> void:
 	rotation.y = input.yaw
 	head.rotation.x = input.pitch
 	_apply_movement(input, delta)
+	_update_footsteps(delta)
 	# Items first, so a hotkey-drawn keycard already counts for a door this tick.
 	items.tick(input, delta)
 	_update_interaction(input, delta)
@@ -311,6 +316,9 @@ func _apply_movement(input: CharacterInput, delta: float) -> void:
 
 	var speed := sprint_speed if input.sprint and input.move.y > 0.0 else walk_speed
 	speed *= _speed_multiplier * _class_speed
+	var held := items.get_equipped()
+	if held != null and held.data.kind == ItemData.Kind.FIREARM:
+		speed *= held.data.move_speed
 	# Turn the 2D stick/keys direction into a 3D direction relative to where
 	# the body is facing. Forward in Godot is -Z.
 	var wish := (transform.basis * Vector3(input.move.x, 0.0, -input.move.y))
@@ -384,6 +392,19 @@ func _on_died(source: Node) -> void:
 	tween.tween_property(head, "position:y", 0.25, 0.6)
 	tween.tween_property(head, "rotation:z", deg_to_rad(75.0), 0.6)
 	died.emit(source)
+
+
+## Plays a footstep every stride while walking on the ground.
+func _update_footsteps(delta: float) -> void:
+	var speed := Vector2(velocity.x, velocity.z).length()
+	if not is_on_floor() or speed < 0.5:
+		_step_distance = 0.0
+		return
+	_step_distance += speed * delta
+	var stride := 2.0 if speed > walk_speed + 0.5 else 1.5
+	if _step_distance >= stride:
+		_step_distance = 0.0
+		Sfx.play_3d(self, "footstep", global_position, -8.0 if speed > walk_speed + 0.5 else -13.0, randf_range(0.85, 1.1))
 
 
 func _update_head_bob(delta: float) -> void:

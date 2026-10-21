@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_d1553"]
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_p5p5p"]
 [ext_resource type="Resource" path="res://resources/items/keycard_chaos_device.tres" id="3_ukroo"]
-[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_iylw5"]
+[ext_resource type="Resource" path="res://resources/items/ak47.tres" id="4_d1553"]
 [ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_exglr"]
 [ext_resource type="Resource" path="res://resources/items/armor_combat.tres" id="6_mu4fb"]
 
@@ -16,8 +16,7 @@ side = 1
 unit = 2
 color = Color(0.24, 0.29, 0.16, 1)
 spawn_group = "Chaos"
-notes = "Planned weapon: assault rifle."
-starting_items = Array[ExtResource("2_p5p5p")]([ExtResource("3_ukroo"), ExtResource("4_iylw5"), ExtResource("5_exglr"), ExtResource("6_mu4fb")])
+starting_items = Array[ExtResource("2_p5p5p")]([ExtResource("3_ukroo"), ExtResource("4_d1553"), ExtResource("5_exglr"), ExtResource("6_mu4fb")])
 starting_ammo = Dictionary[StringName, int]({
-&"9x19mm": 120
+&"762x39mm": 150
 })

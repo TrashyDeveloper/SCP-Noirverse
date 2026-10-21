@@ -50,6 +50,7 @@ func request(to_top: bool) -> void:
 		_set_doors(at_top, true)
 		return
 	moving = true
+	Sfx.play_3d(self, "lift_move", car.global_position + Vector3.UP * 1.3, -6.0, 1.0, car)
 	_set_doors(at_top, false)
 	_update_displays()
 	var tween := create_tween()
@@ -82,6 +83,7 @@ func get_prompt(action: int) -> String:
 func _arrive(to_top: bool) -> void:
 	at_top = to_top
 	moving = false
+	Sfx.play_3d(self, "lift_ding", car.global_position + Vector3.UP * 2.3, -8.0, 1.0, car)
 	_set_doors(at_top, true)
 	_update_displays()
 	arrived.emit(at_top)

@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_bkyqr"]
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_2kthh"]
 [ext_resource type="Resource" path="res://resources/items/keycard_mtf_commander.tres" id="3_ljq08"]
+[ext_resource type="Resource" path="res://resources/items/m4.tres" id="4_2kthh"]
 [ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_xg1ki"]
 [ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_u6hpb"]
 [ext_resource type="Resource" path="res://resources/items/adrenaline.tres" id="6_6q0mj"]
@@ -18,8 +19,8 @@ unit = 1
 color = Color(0.16, 0.2, 0.33, 1)
 max_health = 110.0
 spawn_group = "MTF"
-notes = "Planned weapon: battle rifle."
-starting_items = Array[ExtResource("2_2kthh")]([ExtResource("3_ljq08"), ExtResource("4_xg1ki"), ExtResource("5_u6hpb"), ExtResource("6_6q0mj"), ExtResource("7_q6xnh"), ExtResource("8_wapri")])
+starting_items = Array[ExtResource("2_2kthh")]([ExtResource("3_ljq08"), ExtResource("4_2kthh"), ExtResource("5_u6hpb"), ExtResource("6_6q0mj"), ExtResource("7_q6xnh"), ExtResource("8_wapri"), ExtResource("4_xg1ki")])
 starting_ammo = Dictionary[StringName, int]({
-&"9x19mm": 170
+&"556x45mm": 180,
+&"9x19mm": 36
 })

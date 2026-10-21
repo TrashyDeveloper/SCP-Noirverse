@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_ric4r"]
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_psojr"]
 [ext_resource type="Resource" path="res://resources/items/keycard_chaos_device.tres" id="3_vaiae"]
-[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_54ent"]
+[ext_resource type="Resource" path="res://resources/items/smg.tres" id="4_ric4r"]
 [ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_l6a0g"]
 [ext_resource type="Resource" path="res://resources/items/adrenaline.tres" id="6_n3244"]
 [ext_resource type="Resource" path="res://resources/items/armor_combat.tres" id="7_na3a4"]
@@ -18,7 +18,7 @@ unit = 2
 color = Color(0.26, 0.31, 0.17, 1)
 spawn_group = "Chaos"
 perks = Array[StringName]([&"medic"])
-starting_items = Array[ExtResource("2_psojr")]([ExtResource("3_vaiae"), ExtResource("4_54ent"), ExtResource("5_l6a0g"), ExtResource("5_l6a0g"), ExtResource("6_n3244"), ExtResource("7_na3a4")])
+starting_items = Array[ExtResource("2_psojr")]([ExtResource("3_vaiae"), ExtResource("4_ric4r"), ExtResource("5_l6a0g"), ExtResource("5_l6a0g"), ExtResource("6_n3244"), ExtResource("7_na3a4")])
 starting_ammo = Dictionary[StringName, int]({
 &"9x19mm": 120
 })

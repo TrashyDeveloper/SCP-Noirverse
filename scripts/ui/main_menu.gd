@@ -15,6 +15,12 @@ var _camera_base_yaw := 0.0
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	# Menu music: see scripts/core/music.gd for where to put your own track.
+	var music := AudioStreamPlayer.new()
+	music.stream = Music.load_track("menu")
+	music.volume_db = -6.0
+	add_child(music)
+	music.play()
 	var facility := FacilityGenerator.new().generate(BACKDROP_SEED)
 	$Backdrop.add_child(facility)
 	camera.transform = facility.get_meta("showcase")

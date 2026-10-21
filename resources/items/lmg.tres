@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_63xku"]
+
+[resource]
+script = ExtResource("1_63xku")
+id = &"lmg"
+display_name = "Light Machine Gun"
+kind = 2
+category = 3
+tiers = 2
+color = Color(0.26, 0.28, 0.17, 1)
+weight = 7.0
+damage = 24.0
+magazine_size = 75
+fire_interval = 0.085
+reload_time = 5.0
+max_range = 85.0
+automatic = true
+spread_degrees = 2.8
+recoil = 0.85
+zoom_fov = 55.0
+move_speed = 0.85
+shot_sound = &"heavy"
+ammo_type = &"762x39mm"

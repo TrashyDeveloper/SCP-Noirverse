@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_ntbw8"]
 [ext_resource type="Resource" path="res://resources/items/keycard_containment_captain.tres" id="3_souqh"]
 [ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_41m3w"]
+[ext_resource type="Resource" path="res://resources/items/vector.tres" id="4_ntbw8"]
 [ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_f3wpb"]
 [ext_resource type="Resource" path="res://resources/items/adrenaline.tres" id="6_3a1i4"]
 [ext_resource type="Resource" path="res://resources/items/grenade_flashbang.tres" id="7_t2bko"]
@@ -17,7 +18,7 @@ objective = "Lead the Facility Guards. Protect the Scientists and keep the Class
 color = Color(0.3, 0.32, 0.38, 1)
 max_health = 110.0
 spawn_group = "Guard"
-starting_items = Array[ExtResource("2_ntbw8")]([ExtResource("3_souqh"), ExtResource("4_41m3w"), ExtResource("5_f3wpb"), ExtResource("6_3a1i4"), ExtResource("7_t2bko"), ExtResource("8_yyk2h")])
+starting_items = Array[ExtResource("2_ntbw8")]([ExtResource("3_souqh"), ExtResource("4_ntbw8"), ExtResource("5_f3wpb"), ExtResource("6_3a1i4"), ExtResource("7_t2bko"), ExtResource("8_yyk2h"), ExtResource("4_41m3w")])
 starting_ammo = Dictionary[StringName, int]({
-&"9x19mm": 120
+&"9x19mm": 150
 })

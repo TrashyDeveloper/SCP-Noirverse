@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_qxqgy"]
+
+[resource]
+script = ExtResource("1_qxqgy")
+id = &"sniper"
+display_name = "Sniper Rifle"
+kind = 2
+category = 3
+tiers = 6
+color = Color(0.56, 0.48, 0.34, 1)
+weight = 5.0
+damage = 60.0
+magazine_size = 5
+fire_interval = 1.25
+reload_time = 3.2
+max_range = 150.0
+spread_degrees = 4.0
+recoil = 3.5
+zoom_fov = 18.0
+move_speed = 0.92
+shot_sound = &"sniper"
+ammo_type = &"762x39mm"

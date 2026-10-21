@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_3sfmt"]
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_d0i1b"]
 [ext_resource type="Resource" path="res://resources/items/keycard_mtf_private.tres" id="3_gvg3q"]
-[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_qkusw"]
+[ext_resource type="Resource" path="res://resources/items/lmg.tres" id="4_3sfmt"]
 [ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_vaqb3"]
 [ext_resource type="Resource" path="res://resources/items/grenade_flashbang.tres" id="6_gx4im"]
 [ext_resource type="Resource" path="res://resources/items/armor_heavy.tres" id="7_7okia"]
@@ -17,8 +17,7 @@ unit = 1
 color = Color(0.16, 0.2, 0.33, 1)
 max_health = 110.0
 spawn_group = "MTF"
-notes = "Planned weapon: suppressive machine gun."
-starting_items = Array[ExtResource("2_d0i1b")]([ExtResource("3_gvg3q"), ExtResource("4_qkusw"), ExtResource("5_vaqb3"), ExtResource("6_gx4im"), ExtResource("6_gx4im"), ExtResource("7_7okia")])
+starting_items = Array[ExtResource("2_d0i1b")]([ExtResource("3_gvg3q"), ExtResource("4_3sfmt"), ExtResource("5_vaqb3"), ExtResource("6_gx4im"), ExtResource("6_gx4im"), ExtResource("7_7okia")])
 starting_ammo = Dictionary[StringName, int]({
-&"9x19mm": 200
+&"762x39mm": 225
 })

@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_fns1o"]
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_jupp5"]
 [ext_resource type="Resource" path="res://resources/items/keycard_mtf_sergeant.tres" id="3_pv0l1"]
+[ext_resource type="Resource" path="res://resources/items/m4.tres" id="4_jupp5"]
 [ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_q46e7"]
 [ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_mknfn"]
 [ext_resource type="Resource" path="res://resources/items/adrenaline.tres" id="6_fjeyg"]
@@ -17,8 +18,8 @@ objective = "Squad-level leadership. Lead your squad through the facility."
 unit = 1
 color = Color(0.16, 0.2, 0.33, 1)
 spawn_group = "MTF"
-notes = "Planned weapon: assault rifle."
-starting_items = Array[ExtResource("2_jupp5")]([ExtResource("3_pv0l1"), ExtResource("4_q46e7"), ExtResource("5_mknfn"), ExtResource("6_fjeyg"), ExtResource("7_wqgk3"), ExtResource("8_mawgo")])
+starting_items = Array[ExtResource("2_jupp5")]([ExtResource("3_pv0l1"), ExtResource("4_jupp5"), ExtResource("5_mknfn"), ExtResource("6_fjeyg"), ExtResource("7_wqgk3"), ExtResource("8_mawgo"), ExtResource("4_q46e7")])
 starting_ammo = Dictionary[StringName, int]({
-&"9x19mm": 150
+&"556x45mm": 150,
+&"9x19mm": 36
 })

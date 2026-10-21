@@ -36,7 +36,10 @@ var use_time_left := 0.0
 var _use_duration := 1.0
 ## The door a barricade kit is being used on.
 var _barricade_door: Door
+## True while aiming down the sights with a firearm.
+var aiming := false
 var _cooldown := 0.0
+var _base_fov := -1.0
 var _kick := 0.0
 var _last_medical_id := &""
 
@@ -86,6 +89,7 @@ func tick(input: CharacterInput, delta: float) -> void:
 				_finish_medical()
 
 	var item := get_equipped()
+	aiming = input.aim and item != null and item.data.kind == ItemData.Kind.FIREARM and not is_reloading()
 	if item == null:
 		return
 	if input.drop_item:
@@ -104,6 +108,8 @@ func tick(input: CharacterInput, delta: float) -> void:
 				_throw_grenade()
 			ItemData.Kind.BARRICADE:
 				_start_barricade()
+	elif input.use_held and item.data.kind == ItemData.Kind.FIREARM and item.data.automatic:
+		_fire(item)
 
 
 ## Takes the item in `slot` into the hands (-1 = empty hands). Armor is worn
@@ -281,6 +287,9 @@ func _fire(item: ItemInstance) -> void:
 	if is_reloading() or _cooldown > 0.0:
 		return
 	if item.ammo <= 0:
+		if character.inventory.get_ammo(item.data.ammo_type) <= 0 and _cooldown <= 0.0:
+			Sfx.play_3d(character, "dry_fire", character.camera.global_position, -8.0)
+			_cooldown = 0.3
 		_start_reload(item)
 		return
 	item.ammo -= 1
@@ -289,8 +298,16 @@ func _fire(item: ItemInstance) -> void:
 	_show_muzzle_flash()
 	var camera := character.camera
 	var from := camera.global_position
-	var to := from - camera.global_basis.z * item.data.max_range
+	# Random spread inside a cone (tighter while aiming, wider while moving).
+	var spread := deg_to_rad(item.data.spread_degrees) * (0.3 if aiming else 1.0)
+	spread *= 1.0 + clampf(Vector2(character.velocity.x, character.velocity.z).length() / 6.0, 0.0, 1.0)
+	var basis := camera.global_basis
+	var dir := (-basis.z + basis.x * randf_range(-1, 1) * tan(spread) + basis.y * randf_range(-1, 1) * tan(spread)).normalized()
+	var to := from + dir * item.data.max_range
 	var hit := _raycast(from, to, SHOT_MASK)
+	var kick := deg_to_rad(item.data.recoil) * (0.6 if aiming else 1.0)
+	character.input_source.add_recoil(kick, randf_range(-0.3, 0.3) * kick)
+	Sfx.play_3d(character, "shot_" + String(item.data.shot_sound), from, 0.0, randf_range(0.95, 1.05))
 	if hit:
 		var target := Health.find_on(hit.collider)
 		if target != null:
@@ -307,6 +324,7 @@ func _start_reload(item: ItemInstance) -> void:
 	if item.ammo >= item.data.magazine_size or character.inventory.get_ammo(item.data.ammo_type) <= 0:
 		return
 	reload_time_left = item.data.reload_time
+	Sfx.play_3d(character, "reload", character.camera.global_position, -6.0)
 	weapon_state_changed.emit()
 
 
@@ -410,10 +428,23 @@ func _raycast(from: Vector3, to: Vector3, mask: int) -> Dictionary:
 
 func _process(delta: float) -> void:
 	var holder := character.view_model
+	# Aiming: zoom the camera; a sniper scope hides the gun.
+	var camera := character.camera
+	if _base_fov < 0.0:
+		_base_fov = camera.fov
+	var item := get_equipped()
+	var target_fov := _base_fov
+	if aiming and item != null and item.data.zoom_fov > 0.0:
+		target_fov = item.data.zoom_fov
+	camera.fov = lerpf(camera.fov, target_fov, minf(delta * 12.0, 1.0))
+	holder.visible = character.view_model_visible and not (aiming and item != null and item.data.zoom_fov < 30.0)
+	var aim_offset := Vector3(-0.18, 0.08, 0.1) if aiming else Vector3.ZERO
+	holder.position.x = lerpf(holder.position.x, character.view_model_rest.x + aim_offset.x, minf(delta * 14.0, 1.0))
+	holder.position.y = lerpf(holder.position.y, character.view_model_rest.y + aim_offset.y, minf(delta * 14.0, 1.0))
 	_kick = move_toward(_kick, 0.0, delta * 8.0)
 	# Recoil: pull back and up. Reload: tilt down. Using a medical item: raise it.
 	var tilt := -0.6 if is_reloading() else (0.5 if is_using() else 0.0)
-	holder.position.z = lerpf(holder.position.z, character.view_model_rest.z + _kick * 0.06, 0.5)
+	holder.position.z = lerpf(holder.position.z, character.view_model_rest.z + aim_offset.z + _kick * 0.06, 0.5)
 	holder.rotation.x = lerpf(holder.rotation.x, _kick * 0.15 + tilt, minf(delta * 14.0, 1.0))
 
 
@@ -429,17 +460,53 @@ func _rebuild_view_model() -> void:
 	holder.add_child(model)
 	if item.data.kind == ItemData.Kind.KEYCARD:
 		model.rotation = Vector3(deg_to_rad(70), 0, 0)
+	var flash: OmniLight3D = holder.get_node("MuzzleFlash")
+	flash.position = model.get_meta("muzzle", Vector3(0, 0.04, -0.2))
 	for node in model.find_children("*", "GeometryInstance3D", true, false):
 		(node as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 
 func _show_muzzle_flash() -> void:
 	var flash: OmniLight3D = character.view_model.get_node("MuzzleFlash")
+	if not flash.has_node("Burst"):
+		# A small bright star at the muzzle.
+		var burst := MeshInstance3D.new()
+		burst.name = "Burst"
+		var quad := QuadMesh.new()
+		quad.size = Vector2(0.14, 0.14)
+		var m := StandardMaterial3D.new()
+		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		m.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+		m.albedo_texture = _flash_texture()
+		m.albedo_color = Color(1.0, 0.85, 0.55)
+		quad.material = m
+		burst.mesh = quad
+		burst.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		flash.add_child(burst)
+	flash.get_node("Burst").rotation.z = randf() * TAU
 	flash.visible = true
 	get_tree().create_timer(0.05).timeout.connect(func():
 		if is_instance_valid(flash):
 			flash.visible = false
 	)
+
+
+static var _flash_tex: Texture2D
+
+
+## A soft star-shaped glow, drawn once.
+static func _flash_texture() -> Texture2D:
+	if _flash_tex == null:
+		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		for y in 64:
+			for x in 64:
+				var p := Vector2(x - 31.5, y - 31.5) / 32.0
+				var star := maxf(1.0 - absf(p.x) * 6.0 - absf(p.y), 1.0 - absf(p.y) * 6.0 - absf(p.x))
+				var a := clampf(maxf(star, 1.0 - p.length() * 2.2), 0.0, 1.0)
+				img.set_pixel(x, y, Color(1, 1, 1, a))
+		_flash_tex = ImageTexture.create_from_image(img)
+	return _flash_tex
 
 
 func _spawn_bullet_hole(pos: Vector3, normal: Vector3) -> void:

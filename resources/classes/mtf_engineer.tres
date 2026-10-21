@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_rmdd4"]
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_kquhp"]
 [ext_resource type="Resource" path="res://resources/items/keycard_mtf_sergeant.tres" id="3_otay3"]
-[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_h2gwu"]
+[ext_resource type="Resource" path="res://resources/items/m4.tres" id="4_rmdd4"]
 [ext_resource type="Resource" path="res://resources/items/barricade_kit.tres" id="5_cqc14"]
 [ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="6_yhh02"]
 [ext_resource type="Resource" path="res://resources/items/armor_combat.tres" id="7_vxnja"]
@@ -17,7 +17,7 @@ unit = 1
 color = Color(0.18, 0.22, 0.36, 1)
 spawn_group = "MTF"
 perks = Array[StringName]([&"fast_barricade", &"terminal_access"])
-starting_items = Array[ExtResource("2_kquhp")]([ExtResource("3_otay3"), ExtResource("4_h2gwu"), ExtResource("5_cqc14"), ExtResource("5_cqc14"), ExtResource("6_yhh02"), ExtResource("7_vxnja")])
+starting_items = Array[ExtResource("2_kquhp")]([ExtResource("3_otay3"), ExtResource("4_rmdd4"), ExtResource("5_cqc14"), ExtResource("5_cqc14"), ExtResource("6_yhh02"), ExtResource("7_vxnja")])
 starting_ammo = Dictionary[StringName, int]({
-&"9x19mm": 120
+&"556x45mm": 120
 })

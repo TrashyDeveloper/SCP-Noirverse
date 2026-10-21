@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_2x8l1"]
+
+[resource]
+script = ExtResource("1_2x8l1")
+id = &"m4"
+display_name = "M4 Carbine"
+kind = 2
+category = 3
+tiers = 2
+color = Color(0.14, 0.14, 0.15, 1)
+weight = 3.2
+damage = 24.0
+magazine_size = 30
+fire_interval = 0.1
+reload_time = 2.4
+max_range = 90.0
+automatic = true
+spread_degrees = 1.3
+recoil = 0.75
+zoom_fov = 45.0
+move_speed = 0.95
+shot_sound = &"rifle"
+ammo_type = &"556x45mm"

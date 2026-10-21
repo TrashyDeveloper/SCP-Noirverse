@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_rtmd1"]
 [ext_resource type="Resource" path="res://resources/items/keycard_chaos_device.tres" id="3_iljki"]
 [ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_d6v6t"]
+[ext_resource type="Resource" path="res://resources/items/ak47.tres" id="4_rtmd1"]
 [ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_r6tfj"]
 [ext_resource type="Resource" path="res://resources/items/adrenaline.tres" id="6_84kna"]
 [ext_resource type="Resource" path="res://resources/items/grenade_he.tres" id="7_4vuja"]
@@ -20,8 +21,8 @@ unit = 2
 color = Color(0.24, 0.29, 0.16, 1)
 max_health = 120.0
 spawn_group = "Chaos"
-notes = "Planned weapon: battle rifle."
-starting_items = Array[ExtResource("2_rtmd1")]([ExtResource("3_iljki"), ExtResource("4_d6v6t"), ExtResource("5_r6tfj"), ExtResource("6_84kna"), ExtResource("7_4vuja"), ExtResource("8_uff2x"), ExtResource("9_cdyg6")])
+starting_items = Array[ExtResource("2_rtmd1")]([ExtResource("3_iljki"), ExtResource("4_rtmd1"), ExtResource("5_r6tfj"), ExtResource("6_84kna"), ExtResource("7_4vuja"), ExtResource("8_uff2x"), ExtResource("9_cdyg6"), ExtResource("4_d6v6t")])
 starting_ammo = Dictionary[StringName, int]({
-&"9x19mm": 200
+&"762x39mm": 150,
+&"9x19mm": 36
 })

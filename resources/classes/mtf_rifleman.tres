@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_rg7dp"]
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_7il0s"]
 [ext_resource type="Resource" path="res://resources/items/keycard_mtf_private.tres" id="3_l3bhr"]
-[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_kip2r"]
+[ext_resource type="Resource" path="res://resources/items/m4.tres" id="4_rg7dp"]
 [ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_ksum2"]
 [ext_resource type="Resource" path="res://resources/items/grenade_flashbang.tres" id="6_cuf1t"]
 [ext_resource type="Resource" path="res://resources/items/armor_combat.tres" id="7_77dsd"]
@@ -16,8 +16,7 @@ objective = "Standard combat unit. Secure the facility."
 unit = 1
 color = Color(0.16, 0.2, 0.33, 1)
 spawn_group = "MTF"
-notes = "Planned weapon: assault rifle."
-starting_items = Array[ExtResource("2_7il0s")]([ExtResource("3_l3bhr"), ExtResource("4_kip2r"), ExtResource("5_ksum2"), ExtResource("6_cuf1t"), ExtResource("7_77dsd")])
+starting_items = Array[ExtResource("2_7il0s")]([ExtResource("3_l3bhr"), ExtResource("4_rg7dp"), ExtResource("5_ksum2"), ExtResource("6_cuf1t"), ExtResource("7_77dsd")])
 starting_ammo = Dictionary[StringName, int]({
-&"9x19mm": 120
+&"556x45mm": 150
 })

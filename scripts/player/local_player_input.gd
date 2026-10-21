@@ -83,7 +83,15 @@ func sample() -> CharacterInput:
 		input.move = Input.get_vector("move_left", "move_right", "move_back", "move_forward")
 		input.sprint = Input.is_action_pressed("sprint")
 		input.interact_held = look_enabled and Input.is_action_pressed("interact")
+		var captured := Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+		input.use_held = look_enabled and captured and Input.is_action_pressed("use_item")
+		input.aim = look_enabled and captured and Input.is_action_pressed("aim")
 	return input
+
+
+func add_recoil(pitch: float, yaw: float) -> void:
+	_pitch = clampf(_pitch + pitch, -deg_to_rad(max_pitch_degrees), deg_to_rad(max_pitch_degrees))
+	_yaw = wrapf(_yaw + yaw, -PI, PI)
 
 
 func get_view_angles() -> Vector2:

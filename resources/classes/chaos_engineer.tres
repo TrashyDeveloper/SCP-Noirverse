@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_557xw"]
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_d48ix"]
 [ext_resource type="Resource" path="res://resources/items/keycard_chaos_device.tres" id="3_bffh3"]
-[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_4x7k4"]
+[ext_resource type="Resource" path="res://resources/items/ak47.tres" id="4_557xw"]
 [ext_resource type="Resource" path="res://resources/items/barricade_kit.tres" id="5_q3hqf"]
 [ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="6_sbcsr"]
 [ext_resource type="Resource" path="res://resources/items/armor_combat.tres" id="7_limsf"]
@@ -18,7 +18,7 @@ unit = 2
 color = Color(0.26, 0.31, 0.17, 1)
 spawn_group = "Chaos"
 perks = Array[StringName]([&"fast_barricade", &"terminal_access"])
-starting_items = Array[ExtResource("2_d48ix")]([ExtResource("3_bffh3"), ExtResource("4_4x7k4"), ExtResource("5_q3hqf"), ExtResource("5_q3hqf"), ExtResource("6_sbcsr"), ExtResource("7_limsf")])
+starting_items = Array[ExtResource("2_d48ix")]([ExtResource("3_bffh3"), ExtResource("4_557xw"), ExtResource("5_q3hqf"), ExtResource("5_q3hqf"), ExtResource("6_sbcsr"), ExtResource("7_limsf")])
 starting_ammo = Dictionary[StringName, int]({
-&"9x19mm": 120
+&"762x39mm": 120
 })

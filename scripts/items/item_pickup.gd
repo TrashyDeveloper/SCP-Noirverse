@@ -32,6 +32,7 @@ func _ready() -> void:
 	shape.size = ItemVisuals.get_pickup_size(item.data)
 	var collision := CollisionShape3D.new()
 	collision.shape = shape
+	collision.position = ItemVisuals.get_pickup_center(item.data)
 	add_child(collision)
 	mass = maxf(item.data.weight, 0.05)
 	body_entered.connect(_on_body_entered)
@@ -54,6 +55,7 @@ func get_interaction_prompt(actor: Node) -> String:
 
 func interact(actor: Node) -> void:
 	if actor.has_method("give_item") and actor.give_item(item):
+		Sfx.play_3d(self, "pickup", global_position, -6.0, randf_range(0.9, 1.1))
 		queue_free()
 
 

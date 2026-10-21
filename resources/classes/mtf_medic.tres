@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_ywrsg"]
 [ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_30ggc"]
 [ext_resource type="Resource" path="res://resources/items/keycard_mtf_private.tres" id="3_1rgcw"]
-[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_ei8ni"]
+[ext_resource type="Resource" path="res://resources/items/smg.tres" id="4_ywrsg"]
 [ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_ml4w8"]
 [ext_resource type="Resource" path="res://resources/items/adrenaline.tres" id="6_u6dqa"]
 [ext_resource type="Resource" path="res://resources/items/armor_combat.tres" id="7_c8y5v"]
@@ -17,7 +17,7 @@ unit = 1
 color = Color(0.18, 0.22, 0.36, 1)
 spawn_group = "MTF"
 perks = Array[StringName]([&"medic"])
-starting_items = Array[ExtResource("2_30ggc")]([ExtResource("3_1rgcw"), ExtResource("4_ei8ni"), ExtResource("5_ml4w8"), ExtResource("5_ml4w8"), ExtResource("6_u6dqa"), ExtResource("7_c8y5v")])
+starting_items = Array[ExtResource("2_30ggc")]([ExtResource("3_1rgcw"), ExtResource("4_ywrsg"), ExtResource("5_ml4w8"), ExtResource("5_ml4w8"), ExtResource("6_u6dqa"), ExtResource("7_c8y5v")])
 starting_ammo = Dictionary[StringName, int]({
 &"9x19mm": 120
 })
