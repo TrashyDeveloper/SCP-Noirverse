@@ -65,6 +65,7 @@ static func play_3d(context: Node, sound_name: String, pos: Vector3, volume_db :
 	player.pitch_scale = pitch
 	player.max_distance = max_distance
 	player.unit_size = 6.0
+	player.bus = &"SFX"
 	if attach != null:
 		attach.add_child(player)
 		player.global_position = pos
@@ -87,6 +88,7 @@ static func play_2d(context: Node, sound_name: String, volume_db := 0.0, pitch :
 	player.stream = stream
 	player.volume_db = volume_db
 	player.pitch_scale = pitch
+	player.bus = &"SFX"
 	context.add_child(player)
 	player.play()
 	if not sound_name.ends_with("_loop"):

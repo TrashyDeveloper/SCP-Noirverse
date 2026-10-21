@@ -107,6 +107,12 @@ and is committed + pushed once it works. `[x]` = done.
 - [x] Sound effects (generated, original) and menu music (placeholder or your own track)
 - [ ] Later: settings menu with volume sliders, per-weapon reload animations, more SCP-914 recipes
 
+## Step 3.10 — Menus and admin tools ✅
+- [x] Settings menu (mouse, invert, FOV, volumes, fullscreen, V-Sync, shadows, film grain, brightness), saved per player
+- [x] Main menu redesign (emblem, gradient panel, tips, drifting camera); key list and influence removed from the in-game screen
+- [x] Admin menu (N): players list with go to / bring / kill / select, teleport to rooms and zones, item giver, role switch, god mode, noclip (Alt), forced warheads
+- [ ] Later: key rebinding, admin permissions for online servers
+
 ## Step 4 — AI bots
 - [ ] `BotInput` (an `InputSource` driven by AI) using navigation meshes
 - [ ] Simple behaviours: wander, flee, follow, open doors

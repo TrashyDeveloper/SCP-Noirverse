@@ -206,24 +206,13 @@ func _process(delta: float) -> void:
 func _update_influence() -> void:
 	if Engine.get_process_frames() % 10 != 0:
 		return
+	# Only shown while dead: when the next reinforcement wave arrives.
 	var rm := round_manager
-	var f: int = rm.influence[CharacterClass.Side.FOUNDATION]
-	var c: int = rm.influence[CharacterClass.Side.INSURGENCY]
-	var lines := PackedStringArray([
-		"INFLUENCE  Foundation %d %s  |  Chaos %d %s" % [
-			f, _tier_pips(rm.get_tier(CharacterClass.Side.FOUNDATION)), c, _tier_pips(rm.get_tier(CharacterClass.Side.INSURGENCY))],
-	])
-	if player_input != null:
-		var xp := rm.get_xp(player_input)
-		lines.append("YOUR XP  %d  (%s)" % [xp, RoundManager.XP_RANK_NAMES[RoundManager.xp_rank(xp)]])
+	var lines := PackedStringArray()
 	var wave := rm.get_wave_time_left()
 	if wave >= 0.0 and _character != null and not _character.is_alive:
 		lines.append("REINFORCEMENTS IN %d:%02d" % [int(wave) / 60, int(wave) % 60])
 	_influence_label.text = "\n".join(lines)
-
-
-func _tier_pips(tier: int) -> String:
-	return "■".repeat(tier) + "□".repeat(RoundManager.INFLUENCE_TIERS.size() - 1 - tier)
 
 
 ## Big "YOU ARE A ..." text shown for a few seconds at spawn (or escape).

@@ -41,6 +41,8 @@ const UNLIMITED_AMMO := 1 << 30
 ## Map layout seed. 0 = a new random layout every round; any other number
 ## always builds the same map.
 @export var map_seed := 0
+## Can the local player open the admin menu (N) and use noclip (Alt)?
+@export var admin_enabled := true
 
 @export_group("Item limits (0-8, 0 = can't be picked up)")
 @export_range(0, 8) var scp_items := 3
@@ -68,7 +70,7 @@ const UNLIMITED_AMMO := 1 << 30
 
 const _ROUND_KEYS: Array[String] = [
 	"spawn_queue", "player_count", "round_time_limit_minutes", "friendly_fire", "restart_delay_seconds",
-	"minor_role_chance", "respawn_wave_seconds", "map_seed",
+	"minor_role_chance", "respawn_wave_seconds", "map_seed", "admin_enabled",
 ]
 
 const _CATEGORY_KEYS := {
@@ -120,6 +122,7 @@ static func load_with_overrides(defaults: GameplayConfig, path := FILE_PATH) -> 
 		config.minor_role_chance = clampf(float(file.get_value("round", "minor_role_chance", config.minor_role_chance)), 0.0, 1.0)
 		config.respawn_wave_seconds = maxf(float(file.get_value("round", "respawn_wave_seconds", config.respawn_wave_seconds)), 0.0)
 		config.map_seed = int(file.get_value("round", "map_seed", config.map_seed))
+		config.admin_enabled = bool(file.get_value("round", "admin_enabled", config.admin_enabled))
 		for key in _CATEGORY_KEYS.values():
 			var value := int(file.get_value("item_limits", key, config.get(key)))
 			config.set(key, clampi(value, 0, MAX_SLOTS))

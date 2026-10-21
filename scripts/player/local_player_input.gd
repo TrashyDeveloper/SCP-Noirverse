@@ -10,6 +10,8 @@ extends InputSource
 ## False while a menu like the inventory is open: you can still walk, but
 ## mouse look and item use are paused.
 var look_enabled := true
+## Mouse up/down inverted (from the Settings).
+var invert_y := false
 
 var _yaw := 0.0
 var _pitch := 0.0
@@ -47,7 +49,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		if look_enabled and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			_yaw = wrapf(_yaw - event.relative.x * mouse_sensitivity, -PI, PI)
-			_pitch -= event.relative.y * mouse_sensitivity
+			_pitch -= event.relative.y * mouse_sensitivity * (-1.0 if invert_y else 1.0)
 			_pitch = clampf(_pitch, -deg_to_rad(max_pitch_degrees), deg_to_rad(max_pitch_degrees))
 		return
 	if event.is_action_pressed("jump"):

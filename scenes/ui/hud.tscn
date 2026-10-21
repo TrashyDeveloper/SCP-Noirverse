@@ -209,17 +209,6 @@ theme_override_font_sizes/font_size = 26
 text = "12 / 24"
 horizontal_alignment = 2
 
-[node name="Controls" type="Label" parent="."]
-offset_left = 20.0
-offset_top = 16.0
-offset_right = 1200.0
-offset_bottom = 60.0
-theme = ExtResource("2_theme")
-theme_override_colors/font_color = Color(0.7, 0.7, 0.66, 0.8)
-theme_override_font_sizes/font_size = 15
-text = "WASD move · Shift sprint · Space jump · E interact (hold E: disarm) · F flashlight · Esc pause
-Tab inventory · Left click use · R reload · Q drop · T throw · Ctrl keycard · X medical · G grenade · 1/2 weapons"
-
 [node name="FlashOverlay" type="ColorRect" parent="."]
 anchors_preset = 15
 anchor_right = 1.0

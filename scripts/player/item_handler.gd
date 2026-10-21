@@ -39,7 +39,8 @@ var _barricade_door: Door
 ## True while aiming down the sights with a firearm.
 var aiming := false
 var _cooldown := 0.0
-var _base_fov := -1.0
+## Normal camera field of view (from the Settings); -1 = keep the camera's.
+var base_fov := -1.0
 var _kick := 0.0
 var _last_medical_id := &""
 
@@ -430,10 +431,10 @@ func _process(delta: float) -> void:
 	var holder := character.view_model
 	# Aiming: zoom the camera; a sniper scope hides the gun.
 	var camera := character.camera
-	if _base_fov < 0.0:
-		_base_fov = camera.fov
+	if base_fov < 0.0:
+		base_fov = camera.fov
 	var item := get_equipped()
-	var target_fov := _base_fov
+	var target_fov := base_fov
 	if aiming and item != null and item.data.zoom_fov > 0.0:
 		target_fov = item.data.zoom_fov
 	camera.fov = lerpf(camera.fov, target_fov, minf(delta * 12.0, 1.0))

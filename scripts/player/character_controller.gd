@@ -50,6 +50,16 @@ var _hold_time := 0.0
 var _speed_multiplier := 1.0
 var _class_speed := 1.0
 var _step_distance := 0.0
+## Admin: takes no damage.
+var god_mode := false
+## Admin: flies through walls (see _apply_noclip).
+var noclip := false:
+	set(value):
+		noclip = value
+		collision_mask = 0 if value else 3
+		velocity = Vector3.ZERO
+## Name shown in lists (e.g. the admin menu): "You", "Bot 3"...
+var player_name := ""
 ## True when someone looks through these eyes (the gun in hand is drawn).
 var view_model_visible := false
 var _speed_boost_left := 0.0
@@ -188,6 +198,8 @@ static func resolve_attacker(source: Node) -> CharacterController:
 
 
 func _modify_damage(amount: float, source: Node) -> float:
+	if god_mode:
+		return 0.0
 	var attacker := resolve_attacker(source)
 	if attacker != null and attacker != self and not friendly_fire and is_ally_of(attacker):
 		return 0.0
@@ -317,6 +329,9 @@ func _update_timers(delta: float) -> void:
 
 
 func _apply_movement(input: CharacterInput, delta: float) -> void:
+	if noclip and is_alive:
+		_apply_noclip(input, delta)
+		return
 	if not is_on_floor():
 		velocity.y -= _gravity * delta
 	elif input.jump:
@@ -338,6 +353,16 @@ func _apply_movement(input: CharacterInput, delta: float) -> void:
 	velocity.x = horizontal.x
 	velocity.z = horizontal.z
 	move_and_slide()
+
+
+## Noclip: fly where you look, straight through walls (Shift = faster).
+func _apply_noclip(input: CharacterInput, delta: float) -> void:
+	var dir := camera.global_basis * Vector3(input.move.x, 0.0, -input.move.y)
+	if input.jump:
+		dir += Vector3.UP * 4.0
+	var speed := 22.0 if input.sprint else 8.0
+	velocity = velocity.lerp(dir.limit_length(1.0) * speed, clampf(delta * 10.0, 0.0, 1.0))
+	global_position += velocity * delta
 
 
 func _update_interaction(input: CharacterInput, delta: float) -> void:

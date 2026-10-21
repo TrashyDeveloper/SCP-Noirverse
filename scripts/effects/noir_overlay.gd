@@ -38,6 +38,17 @@ func set_base_saturation(value: float) -> void:
 		_set_saturation(value)
 
 
+## Film grain/scratch amount (1 = normal) and brightness offset.
+func set_film(grain: float, bright: float) -> void:
+	var m := _material()
+	if not has_meta("grain_base"):
+		set_meta("grain_base", m.get_shader_parameter("grain_amount"))
+		set_meta("scratch_base", m.get_shader_parameter("scratch_amount"))
+	m.set_shader_parameter("grain_amount", float(get_meta("grain_base")) * grain)
+	m.set_shader_parameter("scratch_amount", clampf(float(get_meta("scratch_base")) * grain, 0.0, 1.0))
+	m.set_shader_parameter("brightness", bright)
+
+
 ## Brings colour back inside a circle on screen (`center` in screen UV,
 ## `radius` in screen heights, `strength` 0..1). strength 0 turns it off.
 func set_color_zone(center: Vector2, radius: float, strength: float) -> void:

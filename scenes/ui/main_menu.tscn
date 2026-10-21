@@ -1,9 +1,19 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
 [ext_resource type="Theme" path="res://resources/noir_theme.tres" id="2_theme"]
 [ext_resource type="Environment" path="res://resources/noir_environment.tres" id="4_env"]
 [ext_resource type="PackedScene" path="res://scenes/effects/noir_overlay.tscn" id="5_noir"]
+[ext_resource type="Texture2D" path="res://assets/textures/scp_emblem.svg" id="6_emblem"]
+
+[sub_resource type="Gradient" id="Gradient_shade"]
+offsets = PackedFloat32Array(0, 0.55, 1)
+colors = PackedColorArray(0, 0, 0, 0.92, 0, 0, 0, 0.7, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_shade"]
+gradient = SubResource("Gradient_shade")
+width = 256
+height = 4
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -21,77 +31,122 @@ script = ExtResource("1_menu")
 environment = ExtResource("4_env")
 
 [node name="Camera3D" type="Camera3D" parent="Backdrop"]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 27.5, 1.7, 0)
 current = true
 fov = 70.0
 
-[node name="Shade" type="ColorRect" parent="."]
+[node name="Shade" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
-offset_right = 520.0
+offset_right = 760.0
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0, 0, 0, 0.55)
+texture = SubResource("GradientTexture2D_shade")
+expand_mode = 1
 
-[node name="Title" type="Label" parent="."]
-layout_mode = 0
-offset_left = 60.0
-offset_top = 90.0
-offset_right = 700.0
-offset_bottom = 170.0
-theme_override_colors/font_color = Color(0.95, 0.94, 0.9, 1)
-theme_override_font_sizes/font_size = 64
+[node name="Side" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 70.0
+offset_top = 70.0
+offset_right = 640.0
+offset_bottom = -40.0
+grow_vertical = 2
+theme_override_constants/separation = 4
+
+[node name="Emblem" type="TextureRect" parent="Side"]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("6_emblem")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="Side"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.95, 0.9, 1)
+theme_override_font_sizes/font_size = 68
 text = "SCP: NOIRVERSE"
 
-[node name="Subtitle" type="Label" parent="."]
-layout_mode = 0
-offset_left = 64.0
-offset_top = 170.0
-offset_right = 700.0
-offset_bottom = 200.0
-theme_override_colors/font_color = Color(0.65, 0.65, 0.6, 1)
+[node name="Subtitle" type="Label" parent="Side"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.62, 0.58, 1)
 theme_override_font_sizes/font_size = 18
 text = "SECURE  ·  CONTAIN  ·  PROTECT"
 
-[node name="Buttons" type="VBoxContainer" parent="."]
-layout_mode = 0
-offset_left = 50.0
-offset_top = 280.0
-offset_right = 400.0
-offset_bottom = 480.0
+[node name="Line" type="ColorRect" parent="Side"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+color = Color(0.9, 0.88, 0.82, 0.35)
+
+[node name="Spacer" type="Control" parent="Side"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+
+[node name="Buttons" type="VBoxContainer" parent="Side"]
+layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="Play" type="Button" parent="Buttons"]
+[node name="Play" type="Button" parent="Side/Buttons"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Play"
+text = "PLAY"
 alignment = 0
 
-[node name="Credits" type="Button" parent="Buttons"]
+[node name="Settings" type="Button" parent="Side/Buttons"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Credits"
+text = "SETTINGS"
 alignment = 0
 
-[node name="Quit" type="Button" parent="Buttons"]
+[node name="Credits" type="Button" parent="Side/Buttons"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Quit"
+text = "CREDITS"
 alignment = 0
 
-[node name="Disclaimer" type="Label" parent="."]
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 60.0
-offset_top = -60.0
-offset_right = 900.0
-offset_bottom = -20.0
-grow_vertical = 0
-theme_override_colors/font_color = Color(0.55, 0.55, 0.52, 1)
-theme_override_font_sizes/font_size = 14
+[node name="Quit" type="Button" parent="Side/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "QUIT"
+alignment = 0
+
+[node name="Fill" type="Control" parent="Side"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Tip" type="Label" parent="Side"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.74, 0.68, 1)
+theme_override_font_sizes/font_size = 16
+text = "TIP"
+autowrap_mode = 3
+
+[node name="Disclaimer" type="Label" parent="Side"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.47, 1)
+theme_override_font_sizes/font_size = 13
 text = "Unofficial fan game based on the SCP Foundation (scp-wiki.wikidot.com), CC BY-SA 3.0. See Credits."
+autowrap_mode = 3
+
+[node name="Version" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -360.0
+offset_top = -46.0
+offset_right = -30.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.5, 0.5, 0.47, 1)
+theme_override_font_sizes/font_size = 14
+text = "PRE-ALPHA  ·  SITE MAP #1947"
+horizontal_alignment = 2
 
 [node name="NoirOverlay" parent="." instance=ExtResource("5_noir")]

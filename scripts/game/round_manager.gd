@@ -198,6 +198,12 @@ static func load_class(id: String) -> CharacterClass:
 func spawn_character(character_class: CharacterClass, input: InputSource, is_player: bool) -> CharacterController:
 	var character: CharacterController = CHARACTER_SCENE.instantiate()
 	character.name = "%s_%d" % [character_class.id, characters.size()]
+	character.player_name = "Player" if is_player else "Bot %d" % (characters.size() + 1)
+	# A respawned controller keeps its name.
+	for old in characters:
+		if old.input_source == null and old.has_meta("input") and old.get_meta("input") == input:
+			character.player_name = old.player_name
+	character.set_meta("input", input)
 	actors.add_child(character)
 	character.inventory.config = config
 	character.friendly_fire = config.friendly_fire
@@ -596,6 +602,49 @@ func is_on_surface(character: CharacterController) -> bool:
 
 
 # --- Warheads ------------------------------------------------------------
+
+## Admin: start, cancel or immediately detonate a warhead, ignoring
+## keycards and the "can't cancel" rule. `action`: "start", "cancel", "detonate".
+func force_warhead(warhead: int, action: String) -> void:
+	if state != State.RUNNING:
+		return
+	match action:
+		"start":
+			if warhead_state[warhead] != WarheadState.IDLE:
+				return
+			warhead_state[warhead] = WarheadState.COUNTDOWN
+			warhead_time_left[warhead] = WARHEADS[warhead].countdown
+		"cancel":
+			if warhead_state[warhead] != WarheadState.COUNTDOWN:
+				return
+			warhead_state[warhead] = WarheadState.IDLE
+		"detonate":
+			if warhead_state[warhead] == WarheadState.DETONATED:
+				return
+			_detonate(warhead)
+			return
+	warhead_changed.emit(warhead, warhead_state[warhead], warhead_time_left[warhead])
+	_update_consoles()
+
+
+## Admin: turns a character into `new_class`. Dead characters come back
+## to life (at the class's spawn point).
+func set_character_class(character: CharacterController, new_class: CharacterClass, at_spawn: bool) -> CharacterController:
+	if not character.is_alive:
+		if character.input_source == null:
+			return character
+		var input := character.input_source
+		_respawn(character, new_class)
+		for c in characters:
+			if c.input_source == input:
+				return c
+		return character
+	character.apply_class(new_class)
+	if at_spawn:
+		var spawn := _take_spawn_transform(new_class.spawn_group)
+		character.global_position = spawn.origin
+		character.velocity = Vector3.ZERO
+	return character
 
 func _held_admin_level(actor: Node) -> int:
 	if not actor is CharacterController:

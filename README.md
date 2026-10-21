@@ -41,7 +41,9 @@ noir look. Built with **Godot 4** and **GDScript**.
 | G | Hotkey: grenade |
 | 1 / 2 | Hotkey: primary / secondary firearm |
 | F | Flashlight |
-| Esc | Pause menu (frees the mouse) |
+| Esc | Pause menu (Resume, **Settings**, Main Menu, Quit) |
+| N | **Admin menu** |
+| Alt | **Noclip** on/off (fly through walls; Space = up, Shift = fast) |
 
 ### The map — a new layout every round
 
@@ -361,6 +363,29 @@ a carry limit (shown on the Tab screen):
   See `gameplay_config.example.cfg`. The built-in defaults are in
   `resources/gameplay_config.tres`; the armor carry bonuses are on each
   armor's `.tres` file in `resources/items/`.
+
+## Settings
+
+Main menu → **Settings** (or Esc → Settings in a match): mouse
+sensitivity, invert mouse, field of view, master / music / effects
+volume, fullscreen, V-Sync, shadows, film grain and brightness. Changes
+apply at once and are saved in `%APPDATA%\SCP-Noirverse\settings.cfg`.
+
+## Admin menu (N)
+
+A basic admin menu for testing and messing around (turn it off with
+`admin_enabled=false` in the gameplay config):
+
+| Tab | What it does |
+|---|---|
+| Players | Everyone in the round (you and the bots) with role, zone and health. **Go to** teleports you to them, **Bring** pulls them to you, **Kill**, and **Select** makes them the target for the other tabs ("Target: me" switches back). |
+| Teleport | Jump to any room of this round's map (every SCP room, the lifts, armories, gates, the Alpha Warhead...) or Surface spot (exit road, Gamma reactor, Warhead Control, helipad, Chaos trucks). You land on free floor next to it. |
+| Items | Give any item to the target (dropped at their feet if it doesn't fit). |
+| Roles | Switch the target to any class — tick the box to also move them to that role's spawn. Works on dead players too (brings them back). |
+| God & Noclip | God mode (no damage at all), noclip, heal, kill. |
+| Warheads | Start, cancel or detonate the Alpha, Delta and Gamma warheads right away (no keycard needed, even Gamma can be cancelled). |
+
+**Alt** toggles noclip any time without opening the menu.
 
 ## Music and sounds
 

@@ -19,6 +19,9 @@ var _alarm_on := false
 var _alarm_sound: AudioStreamPlayer
 
 var _reactor: GammaReactor
+var settings: GameSettings
+var admin_tools: AdminTools
+var admin_menu: AdminMenu
 var config: GameplayConfig
 var level: Node3D
 var local_character: CharacterController
@@ -71,16 +74,48 @@ func _ready() -> void:
 		if actor == local_character:
 			hud.show_terminal(text))
 	round_manager.intercom_requested.connect(_on_intercom_requested)
-	round_manager.influence_earned.connect(func(character: CharacterController, amount: int, reason: String):
-		if character == local_character:
-			hud.show_message("+%d INFLUENCE  -  %s" % [amount, reason], 2.5))
 	hud.intercom_submitted.connect(_on_intercom_submitted)
 	hud.player_input = local_input
 	round_manager.setup(level, actors, config)
+	admin_tools = AdminTools.new()
+	admin_tools.name = "AdminTools"
+	add_child(admin_tools)
+	admin_tools.setup(round_manager, level)
+	admin_menu = AdminMenu.new()
+	admin_menu.tools = admin_tools
+	add_child(admin_menu)
+	pause_menu.settings_requested.connect(_open_settings)
+	settings = GameSettings.load_settings()
 	var players: Array[InputSource] = [local_input]
 	round_manager.start_round(players)
 	hud.round_manager = round_manager
 	set_paused(false)
+	_apply_settings()
+
+
+## Applies the player's Settings (mouse, field of view, film look, shadows).
+func _apply_settings() -> void:
+	settings.apply_global()
+	settings.apply_overlay(noir_overlay)
+	local_input.mouse_sensitivity = GameSettings.BASE_SENSITIVITY * settings.mouse_sensitivity
+	local_input.invert_y = settings.invert_mouse
+	if local_character != null:
+		local_character.camera.fov = settings.fov
+		local_character.items.base_fov = settings.fov
+	for light: Light3D in level.find_children("*", "Light3D", true, false):
+		if not light.has_meta("shadow"):
+			light.set_meta("shadow", light.shadow_enabled)
+		light.shadow_enabled = settings.shadows and light.get_meta("shadow")
+
+
+func _open_settings() -> void:
+	var menu := SettingsMenu.new()
+	add_child(menu)
+	pause_menu.visible = false
+	menu.changed.connect(func(s: GameSettings):
+		settings = s
+		_apply_settings())
+	menu.closed.connect(func(): pause_menu.visible = get_tree().paused)
 
 
 func _on_character_spawned(character: CharacterController, is_player: bool) -> void:
@@ -97,6 +132,12 @@ func _on_character_spawned(character: CharacterController, is_player: bool) -> v
 		if disarmed and inventory_menu.visible:
 			set_inventory_open(false))
 	hud.bind_character(character)
+	admin_menu.admin = character
+	character.class_changed.connect(func(c: CharacterClass):
+		hud.show_role(c, "YOU ARE NOW", round_manager.get_unit_name(c)))
+	if settings != null:
+		character.camera.fov = settings.fov
+		character.items.base_fov = settings.fov
 	inventory_menu.bind_character(character)
 	hud.show_role(character.character_class, "YOU ARE", round_manager.get_unit_name(character.character_class))
 
@@ -217,9 +258,22 @@ func _on_intercom_submitted(text: String) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if local_character == null or not local_character.is_alive or round_end_screen.visible:
+	if hud.is_intercom_open() or round_end_screen.visible:
 		return
-	if hud.is_intercom_open():
+	if config.admin_enabled and event.is_action_pressed("admin_menu") and not get_tree().paused:
+		set_admin_open(not admin_menu.visible)
+		get_viewport().set_input_as_handled()
+		return
+	if admin_menu.visible and event.is_action_pressed("pause"):
+		set_admin_open(false)
+		get_viewport().set_input_as_handled()
+		return
+	if local_character == null or not local_character.is_alive:
+		return
+	if config.admin_enabled and event.is_action_pressed("noclip") and not get_tree().paused:
+		local_character.noclip = not local_character.noclip
+		hud.show_message("NOCLIP %s" % ("ON" if local_character.noclip else "OFF"), 1.5)
+		get_viewport().set_input_as_handled()
 		return
 	if event.is_action_pressed("pause"):
 		if inventory_menu.visible:
@@ -232,9 +286,22 @@ func _unhandled_input(event: InputEvent) -> void:
 		set_inventory_open(not inventory_menu.visible)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.pressed and not get_tree().paused \
-			and not inventory_menu.visible:
+			and not inventory_menu.visible and not admin_menu.visible:
 		# Clicking back into the window grabs the mouse again.
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
+func set_admin_open(open: bool) -> void:
+	if open == admin_menu.visible:
+		return
+	if open:
+		set_inventory_open(false)
+		admin_menu.open(local_character)
+	else:
+		admin_menu.visible = false
+	local_input.look_enabled = not open
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if open or (local_character != null and not local_character.is_alive) \
+		else Input.MOUSE_MODE_CAPTURED
 
 
 func set_inventory_open(open: bool) -> void:
