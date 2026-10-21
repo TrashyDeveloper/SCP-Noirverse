@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/game/game.gd" id="1_game"]
 [ext_resource type="PackedScene" path="res://scenes/levels/test_facility.tscn" id="2_level"]
@@ -9,6 +9,11 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/death_screen.tscn" id="7_death"]
 [ext_resource type="PackedScene" path="res://scenes/ui/inventory_menu.tscn" id="8_inv"]
 [ext_resource type="Resource" path="res://resources/gameplay_config.tres" id="9_config"]
+[ext_resource type="Script" path="res://scripts/game/round_manager.gd" id="10_round"]
+[ext_resource type="PackedScene" path="res://scenes/ui/round_end_screen.tscn" id="11_end"]
+[ext_resource type="Resource" path="res://resources/classes/class_d.tres" id="12_class_d"]
+[ext_resource type="Resource" path="res://resources/classes/scientist.tres" id="13_scientist"]
+[ext_resource type="Resource" path="res://resources/classes/facility_guard.tres" id="14_guard"]
 
 [node name="Game" type="Node3D"]
 process_mode = 3
@@ -25,6 +30,16 @@ process_mode = 1
 [node name="Actors" type="Node3D" parent="."]
 process_mode = 1
 
+[node name="RoundManager" type="Node" parent="."]
+process_mode = 1
+script = ExtResource("10_round")
+queue_classes = {
+"D": ExtResource("12_class_d"),
+"G": ExtResource("14_guard"),
+"S": ExtResource("13_scientist")
+}
+fallback_class = ExtResource("12_class_d")
+
 [node name="HUD" parent="." instance=ExtResource("4_hud")]
 
 [node name="InventoryMenu" parent="." instance=ExtResource("8_inv")]
@@ -32,5 +47,7 @@ process_mode = 1
 [node name="PauseMenu" parent="." instance=ExtResource("5_pause")]
 
 [node name="DeathScreen" parent="." instance=ExtResource("7_death")]
+
+[node name="RoundEndScreen" parent="." instance=ExtResource("11_end")]
 
 [node name="NoirOverlay" parent="." instance=ExtResource("6_noir")]

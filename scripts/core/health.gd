@@ -16,6 +16,9 @@ signal died(source: Node)
 
 var current := 0.0
 var shield := 0.0
+## Optional: func(amount: float, source: Node) -> float, called before damage
+## is applied (e.g. to block friendly fire). Return 0 to ignore the hit.
+var damage_modifier: Callable
 var _regen_per_second := 0.0
 var _regen_time_left := 0.0
 
@@ -42,6 +45,8 @@ func is_dead() -> bool:
 
 ## `source` is whoever caused the damage (a character, a hazard...), or null.
 func take_damage(amount: float, source: Node = null) -> void:
+	if damage_modifier.is_valid():
+		amount = damage_modifier.call(amount, source)
 	if is_dead() or amount <= 0.0:
 		return
 	var absorbed := minf(shield, amount)

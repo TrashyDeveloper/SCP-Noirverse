@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterClass" format=3]
+
+[ext_resource type="Resource" path="res://resources/classes/chaos_conscript.tres" id="1_ix633"]
+[ext_resource type="Resource" path="res://resources/classes/mtf_private.tres" id="2_mg8aw"]
+[ext_resource type="Script" path="res://scripts/game/character_class.gd" id="3_sx5t5"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="4_tcnxc"]
+
+[resource]
+script = ExtResource("3_sx5t5")
+id = &"class_d"
+display_name = "Class-D"
+objective = "Escape the facility through Gate A. Find keycards. Avoid the guards."
+side = 1
+color = Color(0.88, 0.45, 0.12, 1)
+spawn_group = "ClassD"
+can_escape = true
+escape_class = ExtResource("1_ix633")
+escape_class_disarmed = ExtResource("2_mg8aw")

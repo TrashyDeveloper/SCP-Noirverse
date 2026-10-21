@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterClass" format=3]
+
+[ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_txat8"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_aiowg"]
+[ext_resource type="Resource" path="res://resources/items/keycard_guard.tres" id="3_7lpls"]
+[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_ds6x2"]
+[ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_4koox"]
+[ext_resource type="Resource" path="res://resources/items/grenade_flashbang.tres" id="6_11i6s"]
+[ext_resource type="Resource" path="res://resources/items/armor_light.tres" id="7_nveqn"]
+
+[resource]
+script = ExtResource("1_txat8")
+id = &"facility_guard"
+display_name = "Facility Guard"
+objective = "Protect the Scientists and keep the Class-D contained."
+color = Color(0.36, 0.38, 0.43, 1)
+spawn_group = "Guard"
+starting_items = Array[ExtResource("2_aiowg")]([ExtResource("3_7lpls"), ExtResource("4_ds6x2"), ExtResource("5_4koox"), ExtResource("6_11i6s"), ExtResource("7_nveqn")])
+starting_ammo = Dictionary[StringName, int]({
+&"9x19mm": 60
+})

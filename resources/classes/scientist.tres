@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CharacterClass" format=3]
+
+[ext_resource type="Resource" path="res://resources/classes/mtf_private.tres" id="1_es8ex"]
+[ext_resource type="Resource" path="res://resources/classes/chaos_conscript.tres" id="2_43el3"]
+[ext_resource type="Script" path="res://scripts/game/character_class.gd" id="3_i5c6e"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="4_1f7yx"]
+[ext_resource type="Resource" path="res://resources/items/keycard_scientist.tres" id="5_g8vqo"]
+[ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="6_bes4r"]
+
+[resource]
+script = ExtResource("3_i5c6e")
+id = &"scientist"
+display_name = "Scientist"
+objective = "Escape the facility through Gate A. Facility Guards will protect you."
+color = Color(0.92, 0.92, 0.86, 1)
+spawn_group = "Scientist"
+starting_items = Array[ExtResource("4_1f7yx")]([ExtResource("5_g8vqo"), ExtResource("6_bes4r")])
+can_escape = true
+escape_class = ExtResource("1_es8ex")
+escape_class_disarmed = ExtResource("2_43el3")

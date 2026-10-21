@@ -29,6 +29,7 @@
 [ext_resource type="Resource" path="res://resources/items/grenade_he.tres" id="25_jf8bx"]
 [ext_resource type="Resource" path="res://resources/items/grenade_flashbang.tres" id="26_qncl4"]
 [ext_resource type="Resource" path="res://resources/items/armor_combat.tres" id="27_1vo0o"]
+[ext_resource type="PackedScene" path="res://scenes/props/escape_zone.tscn" id="30_vmj75"]
 
 [node name="TestFacility" type="Node3D" unique_id=108702426]
 
@@ -184,12 +185,6 @@ use_collision = true
 size = Vector3(10.8, 3.5, 0.4)
 material = ExtResource("3_2wx2l")
 
-[node name="WallEast" type="CSGBox3D" parent="Geometry/ResearchOffice" unique_id=1285999408]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.2, 1.75, 0)
-use_collision = true
-size = Vector3(0.4, 3.5, 10)
-material = ExtResource("3_2wx2l")
-
 [node name="WallWest1" type="CSGBox3D" parent="Geometry/ResearchOffice" unique_id=881430024]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.8, 1.75, -3.05)
 use_collision = true
@@ -204,6 +199,24 @@ material = ExtResource("3_2wx2l")
 
 [node name="WallWest3" type="CSGBox3D" parent="Geometry/ResearchOffice" unique_id=1291025477]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.8, 1.75, 3.05)
+use_collision = true
+size = Vector3(0.4, 3.5, 3.9)
+material = ExtResource("3_2wx2l")
+
+[node name="WallEast1" type="CSGBox3D" parent="Geometry/ResearchOffice" unique_id=797615474]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.2, 1.75, -3.05)
+use_collision = true
+size = Vector3(0.4, 3.5, 3.9)
+material = ExtResource("3_2wx2l")
+
+[node name="WallEast2" type="CSGBox3D" parent="Geometry/ResearchOffice" unique_id=850211729]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.2, 3.05, 0)
+use_collision = true
+size = Vector3(0.4, 0.9, 2.2)
+material = ExtResource("3_2wx2l")
+
+[node name="WallEast3" type="CSGBox3D" parent="Geometry/ResearchOffice" unique_id=1593273280]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.2, 1.75, 3.05)
 use_collision = true
 size = Vector3(0.4, 3.5, 3.9)
 material = ExtResource("3_2wx2l")
@@ -335,6 +348,121 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 1.5, 1.7)
 use_collision = true
 size = Vector3(11.2, 3, 0.4)
 material = ExtResource("3_2wx2l")
+
+[node name="CorridorExit" type="Node3D" parent="Geometry" unique_id=82305361]
+
+[node name="Floor" type="CSGBox3D" parent="Geometry/CorridorExit" unique_id=1682081767]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, -0.2, 0)
+use_collision = true
+size = Vector3(11.2, 0.4, 3.8)
+material = ExtResource("1_re88i")
+
+[node name="Ceiling" type="CSGBox3D" parent="Geometry/CorridorExit" unique_id=969657111]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 3.2, 0)
+use_collision = true
+size = Vector3(11.2, 0.4, 3.8)
+material = ExtResource("2_5oopc")
+
+[node name="WallLeft" type="CSGBox3D" parent="Geometry/CorridorExit" unique_id=970673372]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 1.5, -1.7)
+use_collision = true
+size = Vector3(11.2, 3, 0.4)
+material = ExtResource("3_2wx2l")
+
+[node name="WallRight" type="CSGBox3D" parent="Geometry/CorridorExit" unique_id=697894523]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 1.5, 1.7)
+use_collision = true
+size = Vector3(11.2, 3, 0.4)
+material = ExtResource("3_2wx2l")
+
+[node name="GateA" type="Node3D" parent="Geometry" unique_id=54478311]
+
+[node name="Floor" type="CSGBox3D" parent="Geometry/GateA" unique_id=457770575]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, -0.2, 0)
+use_collision = true
+size = Vector3(12.8, 0.4, 12.8)
+material = ExtResource("1_re88i")
+
+[node name="Ceiling" type="CSGBox3D" parent="Geometry/GateA" unique_id=481784588]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 5.2, 0)
+use_collision = true
+size = Vector3(12.8, 0.4, 12.8)
+material = ExtResource("2_5oopc")
+
+[node name="WallNorth" type="CSGBox3D" parent="Geometry/GateA" unique_id=1674266414]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 2.5, -6.2)
+use_collision = true
+size = Vector3(12.8, 5, 0.4)
+material = ExtResource("3_2wx2l")
+
+[node name="WallSouth" type="CSGBox3D" parent="Geometry/GateA" unique_id=1246007423]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 2.5, 6.2)
+use_collision = true
+size = Vector3(12.8, 5, 0.4)
+material = ExtResource("3_2wx2l")
+
+[node name="WallEast" type="CSGBox3D" parent="Geometry/GateA" unique_id=1342574850]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52.2, 2.5, 0)
+use_collision = true
+size = Vector3(0.4, 5, 12)
+material = ExtResource("3_2wx2l")
+
+[node name="WallWest1" type="CSGBox3D" parent="Geometry/GateA" unique_id=175166129]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.8, 2.5, -3.55)
+use_collision = true
+size = Vector3(0.4, 5, 4.9)
+material = ExtResource("3_2wx2l")
+
+[node name="WallWest2" type="CSGBox3D" parent="Geometry/GateA" unique_id=1097388149]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.8, 3.8, 0)
+use_collision = true
+size = Vector3(0.4, 2.4, 2.2)
+material = ExtResource("3_2wx2l")
+
+[node name="WallWest3" type="CSGBox3D" parent="Geometry/GateA" unique_id=1566591940]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.8, 2.5, 3.55)
+use_collision = true
+size = Vector3(0.4, 5, 4.9)
+material = ExtResource("3_2wx2l")
+
+[node name="SurfaceGate" type="CSGBox3D" parent="Geometry/GateA" unique_id=458455611]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51.8, 2.2, 0)
+use_collision = true
+size = Vector3(0.4, 4.4, 7)
+material = ExtResource("4_o0x2n")
+
+[node name="GateFrameTop" type="CSGBox3D" parent="Geometry/GateA" unique_id=1134702377]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51.75, 4.55, 0)
+use_collision = true
+size = Vector3(0.5, 0.3, 7.6)
+material = ExtResource("3_2wx2l")
+
+[node name="GateFrameNorth" type="CSGBox3D" parent="Geometry/GateA" unique_id=1681193473]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51.75, 2.3, -3.6)
+use_collision = true
+size = Vector3(0.5, 4.6, 0.3)
+material = ExtResource("3_2wx2l")
+
+[node name="GateFrameSouth" type="CSGBox3D" parent="Geometry/GateA" unique_id=656806522]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51.75, 2.3, 3.6)
+use_collision = true
+size = Vector3(0.5, 4.6, 0.3)
+material = ExtResource("3_2wx2l")
+
+[node name="EscapeStripe" type="CSGBox3D" parent="Geometry/GateA" unique_id=2087554291]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.3, 0.01, 0)
+size = Vector3(0.3, 0.02, 6.4)
+material = ExtResource("6_t1pi2")
+
+[node name="@CSGBox3D@2" type="CSGBox3D" parent="Geometry/GateA" unique_id=665454362]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.6, 0.01, -3.1)
+size = Vector3(2.8, 0.02, 0.3)
+material = ExtResource("6_t1pi2")
+
+[node name="@CSGBox3D@3" type="CSGBox3D" parent="Geometry/GateA" unique_id=1873272238]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.6, 0.01, 3.1)
+size = Vector3(2.8, 0.02, 0.3)
+material = ExtResource("6_t1pi2")
 
 [node name="Props" type="Node3D" parent="." unique_id=128823085]
 
@@ -645,6 +773,101 @@ spot_range = 6.0
 spot_angle = 50.0
 spot_angle_attenuation = 1.4
 
+[node name="LampCorridorExit1" type="Node3D" parent="Lights" unique_id=1051418101]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 3, 0)
+
+[node name="Fixture" type="CSGBox3D" parent="Lights/LampCorridorExit1" unique_id=2005662919]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.04, 0)
+cast_shadow = 0
+size = Vector3(1.2, 0.08, 0.25)
+material = ExtResource("9_3f3er")
+
+[node name="Light" type="SpotLight3D" parent="Lights/LampCorridorExit1" unique_id=725381077]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, -0.15, 0)
+light_color = Color(1, 0.95, 0.85, 1)
+light_energy = 1.4
+light_volumetric_fog_energy = 1.5
+shadow_enabled = true
+spot_range = 6.0
+spot_angle = 50.0
+spot_angle_attenuation = 1.4
+
+[node name="LampCorridorExit2" type="Node3D" parent="Lights" unique_id=694639316]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37, 3, 0)
+
+[node name="Fixture" type="CSGBox3D" parent="Lights/LampCorridorExit2" unique_id=1261906226]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.04, 0)
+cast_shadow = 0
+size = Vector3(1.2, 0.08, 0.25)
+material = ExtResource("9_3f3er")
+
+[node name="Light" type="SpotLight3D" parent="Lights/LampCorridorExit2" unique_id=1233623438]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, -0.15, 0)
+light_color = Color(1, 0.95, 0.85, 1)
+light_energy = 1.2
+light_volumetric_fog_energy = 1.5
+shadow_enabled = true
+spot_range = 6.0
+spot_angle = 50.0
+spot_angle_attenuation = 1.4
+script = ExtResource("10_fs3vf")
+
+[node name="LampGate1" type="Node3D" parent="Lights" unique_id=1337252355]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 5, -2.5)
+
+[node name="Fixture" type="CSGBox3D" parent="Lights/LampGate1" unique_id=1451447677]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.04, 0)
+cast_shadow = 0
+size = Vector3(1.2, 0.08, 0.25)
+material = ExtResource("9_3f3er")
+
+[node name="Light" type="OmniLight3D" parent="Lights/LampGate1" unique_id=1928472101]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 0)
+light_color = Color(1, 0.95, 0.85, 1)
+light_energy = 2.0
+light_volumetric_fog_energy = 1.5
+shadow_enabled = true
+omni_range = 10.0
+omni_attenuation = 1.2
+
+[node name="LampGate2" type="Node3D" parent="Lights" unique_id=1134446267]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 5, 2.5)
+
+[node name="Fixture" type="CSGBox3D" parent="Lights/LampGate2" unique_id=1508399293]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.04, 0)
+cast_shadow = 0
+size = Vector3(1.2, 0.08, 0.25)
+material = ExtResource("9_3f3er")
+
+[node name="Light" type="OmniLight3D" parent="Lights/LampGate2" unique_id=1829733919]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 0)
+light_color = Color(1, 0.95, 0.85, 1)
+light_energy = 2.0
+light_volumetric_fog_energy = 1.5
+shadow_enabled = true
+omni_range = 10.0
+omni_attenuation = 1.2
+
+[node name="LampGateEscape" type="Node3D" parent="Lights" unique_id=597403388]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 5, 0)
+
+[node name="Fixture" type="CSGBox3D" parent="Lights/LampGateEscape" unique_id=1099049803]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.04, 0)
+cast_shadow = 0
+size = Vector3(1.2, 0.08, 0.25)
+material = ExtResource("9_3f3er")
+
+[node name="Light" type="SpotLight3D" parent="Lights/LampGateEscape" unique_id=295496187]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, -0.15, 0)
+light_color = Color(1, 0.95, 0.85, 1)
+light_energy = 2.2
+light_volumetric_fog_energy = 1.5
+shadow_enabled = true
+spot_range = 9.0
+spot_angle = 50.0
+spot_angle_attenuation = 1.4
+script = ExtResource("10_fs3vf")
+
 [node name="Doors" type="Node3D" parent="." unique_id=335630015]
 
 [node name="DoorCellsNorth" parent="Doors" unique_id=2113114636 instance=ExtResource("11_6x7lq")]
@@ -662,6 +885,12 @@ access = 1
 [node name="DoorStorage" parent="Doors" unique_id=2065240125 instance=ExtResource("11_6x7lq")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -17.8, 0, 0)
 access = 2
+
+[node name="DoorExit" parent="Doors" unique_id=1338642292 instance=ExtResource("11_6x7lq")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 28.2, 0, 0)
+zone_code = "EXIT"
+zone_name = "GATE A - SURFACE ACCESS"
+access = 3
 
 [node name="Signs" type="Node3D" parent="." unique_id=1200758743]
 
@@ -708,16 +937,82 @@ modulate = Color(0.9, 0.9, 0.85, 1)
 text = "STORAGE - ARMORY LEVEL 1"
 outline_size = 0
 
+[node name="SignExitOffice" type="Label3D" parent="Signs" unique_id=461959616]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 27.99, 3, 2.6)
+shaded = true
+modulate = Color(0.9, 0.9, 0.85, 1)
+text = "EXIT  >
+GATE A - ADMIN LEVEL 1"
+outline_size = 0
+
+[node name="SignGateA" type="Label3D" parent="Signs" unique_id=849018082]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 51.55, 4, 0)
+shaded = true
+modulate = Color(0.9, 0.9, 0.85, 1)
+text = "GATE A
+SURFACE"
+font_size = 72
+outline_size = 0
+
+[node name="SignEscape" type="Label3D" parent="Signs" unique_id=55461868]
+transform = Transform3D(-4.371139e-08, 1, 4.371139e-08, 0, -4.371139e-08, 1, 1, 4.371139e-08, 1.9106855e-15, 49.6, 0.03, 0)
+shaded = true
+modulate = Color(0.9, 0.9, 0.85, 1)
+text = "ESCAPE ZONE"
+font_size = 40
+outline_size = 0
+
 [node name="SpawnPoints" type="Node3D" parent="." unique_id=246186204]
 
-[node name="Spawn1" type="Marker3D" parent="SpawnPoints" unique_id=1535099049]
+[node name="ClassD" type="Node3D" parent="SpawnPoints" unique_id=1444578355]
+
+[node name="D1" type="Marker3D" parent="SpawnPoints/ClassD" unique_id=2054515054]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.1, 1)
 
-[node name="Spawn2" type="Marker3D" parent="SpawnPoints" unique_id=476956284]
+[node name="D2" type="Marker3D" parent="SpawnPoints/ClassD" unique_id=592729215]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 1)
 
-[node name="Spawn3" type="Marker3D" parent="SpawnPoints" unique_id=1408024799]
+[node name="D3" type="Marker3D" parent="SpawnPoints/ClassD" unique_id=708311005]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.1, 1)
+
+[node name="D4" type="Marker3D" parent="SpawnPoints/ClassD" unique_id=1257694888]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.1, -2.5)
+
+[node name="D5" type="Marker3D" parent="SpawnPoints/ClassD" unique_id=858044557]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.1, -2.5)
+
+[node name="Scientist" type="Node3D" parent="SpawnPoints" unique_id=241655927]
+
+[node name="S1" type="Marker3D" parent="SpawnPoints/Scientist" unique_id=449122205]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 21.5, 0.1, 1)
+
+[node name="S2" type="Marker3D" parent="SpawnPoints/Scientist" unique_id=1706108210]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 23, 0.1, 2.8)
+
+[node name="S3" type="Marker3D" parent="SpawnPoints/Scientist" unique_id=1808440023]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 20.8, 0.1, -1.5)
+
+[node name="Guard" type="Node3D" parent="SpawnPoints" unique_id=396323087]
+
+[node name="G1" type="Marker3D" parent="SpawnPoints/Guard" unique_id=1055883066]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -20, 0.1, 0)
+
+[node name="G2" type="Marker3D" parent="SpawnPoints/Guard" unique_id=968667819]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -21, 0.1, -1)
+
+[node name="G3" type="Marker3D" parent="SpawnPoints/Guard" unique_id=1406760600]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -21, 0.1, 1)
+
+[node name="Surface" type="Node3D" parent="SpawnPoints" unique_id=821514207]
+
+[node name="E1" type="Marker3D" parent="SpawnPoints/Surface" unique_id=1827159424]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 43.5, 0.1, -2)
+
+[node name="E2" type="Marker3D" parent="SpawnPoints/Surface" unique_id=1994888209]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 43.5, 0.1, 0)
+
+[node name="E3" type="Marker3D" parent="SpawnPoints/Surface" unique_id=942817826]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 43.5, 0.1, 2)
 
 [node name="Items" type="Node3D" parent="." unique_id=1336216131]
 
@@ -823,7 +1118,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -27)
 [node name="ExposedWiring" parent="." unique_id=1605138397 instance=ExtResource("21_l3n31")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 19.6, 0, 4.1)
 
-[node name="NpcSpawns" type="Node3D" parent="." unique_id=1019571529]
-
-[node name="TestSubject" type="Marker3D" parent="NpcSpawns" unique_id=1052221735]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 2, 0.1, -3.5)
+[node name="EscapeZone" parent="." unique_id=1515316453 instance=ExtResource("30_vmj75")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.6, 0, 0)

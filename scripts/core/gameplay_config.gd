@@ -7,7 +7,7 @@ extends Resource
 ## `user://gameplay_config.cfg`, a plain text file, and creates it with the
 ## current values if it doesn't exist yet, so the rules can be changed
 ## without opening Godot. (On Windows, user:// is
-## %APPDATA%\Godot\app_userdata\SCP Noirverse\.)
+## %APPDATA%\SCP-Noirverse\.)
 ##
 ## The match owns its own config object (no global settings), so later the
 ## server can send its rules to every player.
@@ -17,6 +17,19 @@ const MAX_SLOTS := 8
 const MAX_AMMO_LIMIT := 65535
 ## What "0 = unlimited" ammo turns into.
 const UNLIMITED_AMMO := 1 << 30
+
+@export_group("Round")
+## Who spawns, in order: D = Class-D, S = Scientist, G = Facility Guard.
+## The first `player_count` letters are used (the queue repeats if shorter).
+@export var spawn_queue := "DSDGDSDD"
+## Characters per round (you + bots).
+@export_range(1, 40) var player_count := 6
+## The round ends after this many minutes (0 = no time limit).
+@export var round_time_limit_minutes := 20.0
+## Can characters on the same side hurt each other?
+@export var friendly_fire := false
+## Seconds between the end of a round and the next one.
+@export var restart_delay_seconds := 15.0
 
 @export_group("Item limits (0-8, 0 = can't be picked up)")
 @export_range(0, 8) var scp_items := 3
@@ -41,6 +54,10 @@ const UNLIMITED_AMMO := 1 << 30
 @export var ammo_heavy_armor: Dictionary[StringName, int] = {
 	&"9x19mm": 210, &"556x45mm": 200, &"762x39mm": 200, &"12_70_buckshot": 74, &"44_mag": 68,
 }
+
+const _ROUND_KEYS: Array[String] = [
+	"spawn_queue", "player_count", "round_time_limit_minutes", "friendly_fire", "restart_delay_seconds",
+]
 
 const _CATEGORY_KEYS := {
 	ItemData.Category.SCP_ITEM: "scp_items",
@@ -83,6 +100,11 @@ static func load_with_overrides(defaults: GameplayConfig, path := FILE_PATH) -> 
 	var config: GameplayConfig = defaults.duplicate(true)
 	var file := ConfigFile.new()
 	if file.load(path) == OK:
+		config.spawn_queue = str(file.get_value("round", "spawn_queue", config.spawn_queue)).to_upper()
+		config.player_count = clampi(int(file.get_value("round", "player_count", config.player_count)), 1, 40)
+		config.round_time_limit_minutes = maxf(float(file.get_value("round", "round_time_limit_minutes", config.round_time_limit_minutes)), 0.0)
+		config.friendly_fire = bool(file.get_value("round", "friendly_fire", config.friendly_fire))
+		config.restart_delay_seconds = maxf(float(file.get_value("round", "restart_delay_seconds", config.restart_delay_seconds)), 1.0)
 		for key in _CATEGORY_KEYS.values():
 			var value := int(file.get_value("item_limits", key, config.get(key)))
 			config.set(key, clampi(value, 0, MAX_SLOTS))
@@ -98,6 +120,8 @@ static func load_with_overrides(defaults: GameplayConfig, path := FILE_PATH) -> 
 
 func save_to_file(path := FILE_PATH) -> void:
 	var file := ConfigFile.new()
+	for key in _ROUND_KEYS:
+		file.set_value("round", key, get(key))
 	for key in _CATEGORY_KEYS.values():
 		file.set_value("item_limits", key, get(key))
 	for section in _AMMO_TABLES.values():

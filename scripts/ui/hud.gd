@@ -4,7 +4,11 @@ extends CanvasLayer
 ## the held item and its ammo. (The full inventory is the Tab screen.) It only *shows* the character's state; it never
 ## changes it.
 
+## Set by Game so the HUD can show the round timer.
+var round_manager: RoundManager
+
 var _character: CharacterController
+var _role_time := 0.0
 var _damage_flash := 0.0
 var _blind := 0.0
 var _message_time := 0.0
@@ -22,6 +26,12 @@ var _hit_marker_time := 0.0
 @onready var shield_bar: ProgressBar = $HealthPanel/ShieldBar
 @onready var flash_overlay: ColorRect = $FlashOverlay
 @onready var status_label: Label = $StatusLabel
+@onready var role_panel: Control = $Role
+@onready var role_title: Label = $Role/Title
+@onready var role_class: Label = $Role/ClassName
+@onready var role_objective: Label = $Role/Objective
+@onready var class_label: Label = $HealthPanel/ClassLabel
+@onready var timer_label: Label = $RoundTimer
 
 
 func _ready() -> void:
@@ -30,6 +40,8 @@ func _ready() -> void:
 	progress_bar.visible = false
 	status_label.visible = false
 	flash_overlay.color.a = 0.0
+	role_panel.modulate.a = 0.0
+	timer_label.text = ""
 
 
 func bind_character(character: CharacterController) -> void:
@@ -55,6 +67,12 @@ func bind_character(character: CharacterController) -> void:
 
 
 func _process(delta: float) -> void:
+	if _role_time > 0.0:
+		_role_time -= delta
+		role_panel.modulate.a = clampf(_role_time, 0.0, 1.0)
+	if round_manager != null:
+		var left := round_manager.get_time_left()
+		timer_label.text = "" if left < 0.0 else "%d:%02d" % [int(left) / 60, int(left) % 60]
 	_damage_flash = maxf(_damage_flash - delta * 1.5, 0.0)
 	damage_overlay.color.a = _damage_flash
 	# Flashbang: full white, fading out during the last second.
@@ -67,6 +85,15 @@ func _process(delta: float) -> void:
 		message_label.modulate.a = clampf(_message_time, 0.0, 1.0)
 	if _character != null and _character.items.is_reloading():
 		_refresh_ammo()
+
+
+## Big "YOU ARE A ..." text shown for a few seconds at spawn (or escape).
+func show_role(character_class: CharacterClass, title := "YOU ARE") -> void:
+	role_title.text = title
+	role_class.text = character_class.display_name.to_upper()
+	role_objective.text = character_class.objective
+	class_label.text = character_class.display_name.to_upper()
+	_role_time = 6.0
 
 
 func _on_prompt_changed(text: String) -> void:
@@ -106,7 +133,7 @@ func _on_item_added(item: ItemInstance, amount: int) -> void:
 
 
 func _on_died(_source: Node) -> void:
-	for node: CanvasItem in [$Crosshair, prompt_label, $HealthPanel, held_label, ammo_label]:
+	for node: CanvasItem in [$Crosshair, prompt_label, $HealthPanel, held_label, ammo_label, role_panel]:
 		node.visible = false
 
 

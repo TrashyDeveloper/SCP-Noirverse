@@ -219,6 +219,11 @@ func drop_everything() -> void:
 		_drop_ammo(ammo_type, character.inventory.get_ammo(ammo_type))
 
 
+## Drops an item that isn't in the inventory (e.g. equipment that didn't fit).
+func drop_item_instance(item: ItemInstance) -> void:
+	_spawn_pickup(item, 1.0)
+
+
 func _remove_from_inventory(slot: int) -> ItemInstance:
 	if slot == equipped_slot:
 		equip(-1)

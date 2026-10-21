@@ -14,6 +14,7 @@ signal died(source: Node)
 signal disarm_changed(disarmed: bool)
 ## A flashbang went off in view; `duration` = seconds of blindness.
 signal flashed(duration: float)
+signal class_changed(new_class: CharacterClass)
 
 ## Seconds of holding E needed to disarm (or release) someone.
 const DISARM_HOLD_TIME := 1.2
@@ -31,6 +32,10 @@ const MAX_DISARM_DISTANCE := 30.0
 
 var input_source: InputSource
 var is_alive := true
+## This character's class (Class-D, Scientist...). Set with apply_class().
+var character_class: CharacterClass
+## Whether characters on the same side can hurt each other (set by the match).
+var friendly_fire := false
 ## Who disarmed (restrained) this character, or null.
 var disarmed_by: CharacterController
 ## Seconds of flashbang blindness left (bots will use this later).
@@ -44,6 +49,7 @@ var _hold_target: Node
 var _hold_time := 0.0
 var _speed_multiplier := 1.0
 var _speed_boost_left := 0.0
+var _body_material: StandardMaterial3D
 
 @onready var head: Node3D = $Head
 @onready var camera: Camera3D = $Head/Camera3D
@@ -61,8 +67,12 @@ var _speed_boost_left := 0.0
 func _ready() -> void:
 	_head_base_height = head.position.y
 	health.died.connect(_on_died)
+	health.damage_modifier = _modify_damage
 	interact_ray.add_exception(self)
 	status_label.visible = false
+	# Own copy of the body material so each character can have its colour.
+	_body_material = body_mesh.get_active_material(0).duplicate()
+	body_mesh.material_override = _body_material
 
 
 ## Gives this character a controller. `first_person` = true when the local
@@ -110,6 +120,56 @@ func _physics_process(delta: float) -> void:
 	_update_interaction(input, delta)
 	if input.toggle_flashlight:
 		flashlight.visible = not flashlight.visible
+
+
+# --- Class and side ---
+
+## Becomes `new_class`: health, colour and starting equipment. With
+## `keep_items` (e.g. after escaping) the current inventory is kept and the
+## new equipment is added; anything that doesn't fit is dropped.
+func apply_class(new_class: CharacterClass, keep_items := false) -> void:
+	character_class = new_class
+	set_disarmed(null)
+	health.max_health = new_class.max_health
+	health.reset()
+	_body_material.albedo_color = new_class.color
+	if not keep_items:
+		items.equip(-1)
+		for slot in Inventory.SLOT_COUNT:
+			inventory.take_item(slot)
+		inventory.ammo.clear()
+	for data in new_class.starting_items:
+		var item := ItemInstance.new(data)
+		if not inventory.add_item(item):
+			items.drop_item_instance(item)
+	for ammo_type in new_class.starting_ammo:
+		inventory.give_ammo(ammo_type, new_class.starting_ammo[ammo_type])
+	class_changed.emit(new_class)
+
+
+func get_side() -> int:
+	return character_class.side if character_class != null else -1
+
+
+func is_ally_of(other: CharacterController) -> bool:
+	return other != null and character_class != null and other.get_side() == get_side()
+
+
+## The character responsible for `source` (a character itself, or the
+## thrower of a grenade), or null for hazards and the like.
+static func resolve_attacker(source: Node) -> CharacterController:
+	if source is CharacterController:
+		return source
+	if source != null and source.get("thrower") is CharacterController:
+		return source.get("thrower")
+	return null
+
+
+func _modify_damage(amount: float, source: Node) -> float:
+	var attacker := resolve_attacker(source)
+	if attacker != null and attacker != self and not friendly_fire and is_ally_of(attacker):
+		return 0.0
+	return amount
 
 
 # --- Things other objects ask the character (doors, pickups...) ---

@@ -116,6 +116,12 @@ func add_item(item: ItemInstance) -> bool:
 	return item.ammo <= 0
 
 
+## Adds spare rounds directly (e.g. starting ammo), up to the limit.
+func give_ammo(ammo_type: StringName, amount: int) -> void:
+	ammo[ammo_type] = mini(get_ammo(ammo_type) + amount, get_ammo_limit(ammo_type))
+	changed.emit()
+
+
 ## Removes and returns the item in `slot` (or null if empty).
 func take_item(slot: int) -> ItemInstance:
 	var item := get_item(slot)

@@ -42,31 +42,44 @@ noir look. Built with **Godot 4** and **GDScript**.
 | F | Flashlight |
 | Esc | Pause menu (frees the mouse) |
 
+### How a round works
+
+Every round you spawn as a **random class**; the other characters are bots.
+(For now the bots just stand still — they get a brain in Step 4.)
+
+| Class | Side | Spawns in | Starts with | Goal |
+|---|---|---|---|---|
+| Class-D | Class-D & Chaos | Class-D holding | nothing | Escape through Gate A |
+| Scientist | Foundation | Research Office | Scientist keycard, First Aid Kit | Escape through Gate A |
+| Facility Guard | Foundation | Storage | Guard keycard, pistol + 60 rounds, First Aid Kit, Flashbang, Light Armor | Protect scientists, contain Class-D |
+| MTF Private | Foundation | Gate A (after escaping) | MTF Private keycard, pistol + 120, First Aid Kit, Combat Armor | Help scientists, stop Class-D & Chaos |
+| Chaos Insurgency Conscript | Class-D & Chaos | Gate A (after escaping) | Chaos device, pistol + 120, First Aid Kit, Combat Armor | Free Class-D, eliminate the Foundation |
+
+- **Escaping:** walk into the striped **escape zone** in front of the big
+  gate in **Gate A** (east of the Research Office, through the EXIT door,
+  which needs **Admin level 1**: Zone Manager, Guard or better).
+  A Class-D becomes a Chaos Insurgency Conscript, a Scientist becomes an MTF
+  Private. **Disarmed** escapees switch sides (Class-D → MTF, Scientist →
+  Chaos). You keep your items.
+- **Friendly fire** is off: you can't hurt your own side.
+- **The round ends** when only one side is left alive, or when time runs out
+  (then the side with more escapes wins; a disarmed escapee counts for the
+  side that captured them). A summary screen shows the winner and stats,
+  then the next round starts.
+
 ### What to try
 
-1. In the Class-D room, a **Janitor Keycard** lies on the middle bunk (and
-   Painkillers on the left bunk). A test NPC stands in the room.
-2. The east door (to the Research Office) needs **Containment Level 1**.
-   Doors only open with a keycard **in your hand**: press **Ctrl** to pull
-   out the best card, then **E**. Or throw the card (**T**) at the small
-   card reader next to the door!
-3. In the Office: Scientist, Guard and Zone Manager keycards (you can only
-   carry 3 keycards), a First Aid Kit, Adrenaline and Light Armor.
-   Careful with the sparking wiring in the corner.
-4. The west door (Storage) needs **Armory Level 1** → the Guard card.
-   Inside: pistol, ammo, grenades, Heavy Armor, first aid kits.
-5. The north door (Containment Chamber, now a firing range) needs
-   **Containment Level 2** → the Scientist card. Near a door, **Ctrl** picks
-   the best card that actually opens *that* door.
-6. Grab the pistol (**1**), go back to the NPC and **hold E** on it to disarm
-   it: it drops everything and can't pick things up or open doors. Hold E
-   again to release it (it's also released if you drop all your firearms
-   or walk far away). You can't disarm someone holding a non-common item
-   (e.g. a gun).
-7. Throw a grenade at the dummies (**G**, then left click): High-Explosive
-   damages everything in range that isn't behind a wall; a Flashbang blinds
-   whoever looks at it. When a grenade goes off nearby, the colours come
-   back for a moment.
+1. Press **Play** and read the "YOU ARE ..." text: that's your class.
+2. As **Class-D**: grab the Janitor keycard (middle bunk), open the east door
+   (Ctrl, then E), find a Zone Manager or Guard card in the Office and open
+   the EXIT door to Gate A. Step into the escape zone!
+3. As **Scientist**: you already have a card for the east door but need
+   Admin access for the EXIT; look around the Office.
+4. As **Facility Guard**: you start in Storage with a pistol. Disarm a
+   Class-D (hold E with the pistol out) and walk them to Gate A: they
+   become MTF on your side.
+5. Explore the rest: firing range (Containment level 2), grenades, armor,
+   the sparking wiring in the Office...
 
 ## Items
 
@@ -131,6 +144,13 @@ Every item has hidden tier flags: **Common**, **Military Grade**, **Rare**,
 that isn't purely Common prevents you from being disarmed. Tiers will also
 matter for special places later.
 
+## Classes
+
+Each class is a `.tres` file in `resources/classes/` — double-click one to
+change its health, colour, starting items, ammo or what it becomes after
+escaping. Spawn rooms are the markers under `SpawnPoints/<group>` in the
+level.
+
 ## Inventory and carry limits
 
 You have **8 slots**. Each item belongs to a category, and each category has
@@ -151,10 +171,13 @@ a carry limit (shown on the Tab screen):
 - Armor is worn just by carrying it.
 - **Changing the limits ("server owners"):** the first time a match starts,
   the game writes `gameplay_config.cfg` to
-  `%APPDATA%\Godot\app_userdata\SCP Noirverse\`. Open it with Notepad,
+  `%APPDATA%\SCP-Noirverse\`. Open it with Notepad,
   change the numbers and start a new match:
   - item limits: 0–8, **0 = that item type can't be picked up**;
-  - ammo limits (one section per armor type): 0–65535, **0 = unlimited**.
+  - ammo limits (one section per armor type): 0–65535, **0 = unlimited**;
+  - `[round]`: `spawn_queue` (D = Class-D, S = Scientist, G = Guard, e.g.
+    `"DSDGDSDD"`), `player_count` (you + bots), `round_time_limit_minutes`
+    (0 = none), `friendly_fire`, `restart_delay_seconds`.
 
   See `gameplay_config.example.cfg`. The built-in defaults are in
   `resources/gameplay_config.tres`; the armor carry bonuses are on each
@@ -224,5 +247,8 @@ NetworkInput (later)┘
 - Items work the same way: the `ItemHandler` uses the held item when the
   `CharacterInput` says `use_item`, so bots will be able to shoot and heal too.
   `Health` and `Inventory` are small reusable nodes you can add to anything.
+- `RoundManager` (in `game.tscn`) runs the round: it gets a list of player
+  InputSources and fills the remaining slots with bots. For online play the
+  server will pass in one input per connected player.
 - There are no global singletons (autoloads) holding game state; the match
   lives inside `game.tscn`, so a server can later run the same logic.

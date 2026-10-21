@@ -50,11 +50,14 @@ and is committed + pushed once it works. `[x]` = done.
 - [x] Light Containment Zone style: dark metal wall panels with seams, trim and kick plates; tiled floors; LCZ doors with frames, vents, hazard stripe and SCP emblem
 - [ ] Later: per-zone door/wall styles for Heavy Containment, Entrance and Surface
 
-## Step 3 — Classes & rounds
-- [ ] Class definitions (Class-D, Scientist, Facility Guard) with spawn points, starting items and colours
-- [ ] Round manager: assign random classes, start/end a round, round-end screen
-- [ ] Escape exit: Class-D / Scientists who reach it "escape" (disarmed escapees switch sides)
-- [ ] Win conditions per team
+## Step 3 — Classes & rounds ✅
+- [x] Class definitions (Class-D, Scientist, Facility Guard, plus MTF Private and Chaos Conscript for escapees) with spawn points, starting items, ammo and colours
+- [x] Sides (Foundation vs Class-D & Chaos; SCPs later), friendly fire off by default
+- [x] Round manager: spawn queue, random class for the player, bots fill the other slots, round timer
+- [x] Gate A exit wing with escape zone; escapees change class and keep their items; disarmed escapees switch sides
+- [x] Win conditions: last side alive, or most escapes when time runs out; round-end screen with stats and auto restart
+- [x] Round settings in the gameplay config (spawn queue, player count, time limit, friendly fire, restart delay)
+- [ ] Later: spectating after death, respawn waves (Step 7), per-class models
 
 ## Step 4 — AI bots
 - [ ] `BotInput` (an `InputSource` driven by AI) using navigation meshes

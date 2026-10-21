@@ -139,13 +139,19 @@ anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 24.0
-offset_top = -80.0
+offset_top = -100.0
 offset_right = 264.0
 offset_bottom = -24.0
 grow_vertical = 0
 theme = ExtResource("2_theme")
 alignment = 2
 
+
+[node name="ClassLabel" type="Label" parent="HealthPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.62, 0.58, 1)
+theme_override_font_sizes/font_size = 14
+text = "CLASS-D"
 
 [node name="HealthLabel" type="Label" parent="HealthPanel"]
 layout_mode = 2
@@ -222,3 +228,52 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(1, 1, 1, 0)
+
+[node name="RoundTimer" type="Label" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -160.0
+offset_top = 16.0
+offset_right = -24.0
+offset_bottom = 46.0
+grow_horizontal = 0
+theme = ExtResource("2_theme")
+theme_override_colors/font_color = Color(0.75, 0.75, 0.7, 0.9)
+theme_override_font_sizes/font_size = 22
+text = "19:59"
+horizontal_alignment = 2
+
+[node name="Role" type="VBoxContainer" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -400.0
+offset_top = 120.0
+offset_right = 400.0
+offset_bottom = 260.0
+grow_horizontal = 2
+mouse_filter = 2
+theme = ExtResource("2_theme")
+
+[node name="Title" type="Label" parent="Role"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.66, 1)
+theme_override_font_sizes/font_size = 20
+text = "YOU ARE"
+horizontal_alignment = 1
+
+[node name="ClassName" type="Label" parent="Role"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.95, 0.9, 1)
+theme_override_font_sizes/font_size = 52
+text = "CLASS-D"
+horizontal_alignment = 1
+
+[node name="Objective" type="Label" parent="Role"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.75, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "Escape the facility."
+horizontal_alignment = 1
+autowrap_mode = 3
