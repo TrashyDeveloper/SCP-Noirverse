@@ -1,0 +1,100 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
+[ext_resource type="Theme" path="res://resources/noir_theme.tres" id="2_theme"]
+[ext_resource type="PackedScene" path="res://scenes/levels/test_facility.tscn" id="3_level"]
+[ext_resource type="Environment" path="res://resources/noir_environment.tres" id="4_env"]
+[ext_resource type="PackedScene" path="res://scenes/effects/noir_overlay.tscn" id="5_noir"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_menu")
+
+[node name="Backdrop" type="Node3D" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Backdrop"]
+environment = ExtResource("4_env")
+
+[node name="TestFacility" parent="Backdrop" instance=ExtResource("3_level")]
+
+[node name="Camera3D" type="Camera3D" parent="Backdrop"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, -6.5)
+current = true
+fov = 70.0
+
+[node name="Shade" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 520.0
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 90.0
+offset_right = 700.0
+offset_bottom = 170.0
+theme_override_colors/font_color = Color(0.95, 0.94, 0.9, 1)
+theme_override_font_sizes/font_size = 64
+text = "SCP: NOIRVERSE"
+
+[node name="Subtitle" type="Label" parent="."]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 170.0
+offset_right = 700.0
+offset_bottom = 200.0
+theme_override_colors/font_color = Color(0.65, 0.65, 0.6, 1)
+theme_override_font_sizes/font_size = 18
+text = "SECURE  ·  CONTAIN  ·  PROTECT"
+
+[node name="Buttons" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 280.0
+offset_right = 400.0
+offset_bottom = 480.0
+theme_override_constants/separation = 6
+
+[node name="Play" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Play"
+alignment = 0
+
+[node name="Credits" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Credits"
+alignment = 0
+
+[node name="Quit" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Quit"
+alignment = 0
+
+[node name="Disclaimer" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 60.0
+offset_top = -60.0
+offset_right = 900.0
+offset_bottom = -20.0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.55, 0.55, 0.52, 1)
+theme_override_font_sizes/font_size = 14
+text = "Unofficial fan game based on the SCP Foundation (scp-wiki.wikidot.com), CC BY-SA 3.0. See Credits."
+
+[node name="NoirOverlay" parent="." instance=ExtResource("5_noir")]

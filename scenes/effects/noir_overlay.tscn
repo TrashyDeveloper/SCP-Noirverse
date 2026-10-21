@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Shader" path="res://shaders/noir_post.gdshader" id="1_noir"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_noir"]
+shader = ExtResource("1_noir")
+shader_parameter/saturation = 0.06
+shader_parameter/contrast = 1.35
+shader_parameter/brightness = 0.0
+shader_parameter/tint = Color(1, 0.97, 0.9, 1)
+shader_parameter/grain_amount = 0.09
+shader_parameter/vignette_strength = 0.65
+shader_parameter/flicker_amount = 0.04
+shader_parameter/scratch_amount = 0.35
+
+[node name="NoirOverlay" type="CanvasLayer"]
+layer = 100
+
+[node name="Filter" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_noir")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
