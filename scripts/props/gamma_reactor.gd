@@ -19,6 +19,10 @@ const STOP_AT := 20.05
 const STOP_TIME := 0.12
 ## ...then spins this many times faster until the audio loops.
 const AFTER_STOP_SPEED := 3.0
+## In the last FINAL_SECONDS before detonation it spins this much faster,
+## no matter where the pulsar audio is.
+const FINAL_SECONDS := 30.0
+const FINAL_SPEED := 5.0
 ## Loop length used for the stop when there is no GammaPulsar audio file.
 const FALLBACK_LOOP := 40.0
 
@@ -118,8 +122,11 @@ func get_loop_position() -> float:
 	return fmod(_time, FALLBACK_LOOP)
 
 
-## 1 before the stop, 0 during the stop, 3 after it (until the audio loops).
+## 1 before the stop, 0 during the stop, 3 after it (until the audio loops);
+## 5 all the time in the last 30 seconds before the Gamma Warhead goes off.
 func get_spin_multiplier() -> float:
+	if _state == RoundManager.WarheadState.COUNTDOWN and _time_left <= FINAL_SECONDS:
+		return FINAL_SPEED
 	var pos := get_loop_position()
 	if pos < STOP_AT:
 		return 1.0

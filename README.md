@@ -432,7 +432,9 @@ A basic admin menu for testing and messing around (turn it off with
   the reactor, quiet while idle and roaring as the reactor spins up. The
   reactor follows the audio: every loop, at **20.05 s** into the track, it
   stops dead, then a split second later spins on **3× faster** until the
-  track loops and it starts over.
+  track loops and it starts over. In the **last 30 seconds** before the
+  Gamma Warhead goes off it spins **5× faster** the whole time, whatever the
+  audio is doing.
 - **Announcer voice:** uses your computer's text-to-speech (on Windows it
   picks a female voice such as "Microsoft Zira"). Volume: Settings →
   Announcer voice (0 = off, subtitles still show).
