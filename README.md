@@ -20,6 +20,11 @@ noir look. Built with **Godot 4** and **GDScript**.
 4. **Play.** Press **F5** (or the ▶ "Run Project" button, top right). The main
    menu appears; click **Play**.
 
+   Behind the main menu is the wrecked Class-D cell block, frozen by the
+   Temporal Stasis Protocol: a black hole sits at the end of the hall and the
+   debris creeps towards it. Click **Watch** to hide the menu and just look;
+   press any key or click to bring it back.
+
 ### Controls
 
 | Key | Action |

@@ -31,6 +31,11 @@ var kind := "black"
 var cause_of_death := "Torn apart by the black hole"
 ## Time-stop field: 0 = none, grows to 1 while it spreads.
 var stasis := 0.0
+## Scenery only (the main menu): no pull, no protocol, appears at full size.
+var ambient := false
+## Extra slow-motion for its swirling (the menu uses a tiny value: time has
+## all but stopped there).
+var time_scale := 1.0
 var _disks: Array[Node3D] = []
 var _rays: Node3D
 var _beams: Node3D
@@ -63,6 +68,8 @@ func _ready() -> void:
 			_build_pulsar()
 		_:
 			_build_black()
+	if ambient:
+		return
 	scale = Vector3.ONE * 0.01
 	create_tween().tween_property(self, "scale", Vector3.ONE, 3.0).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
 	if kind != "pulsar":
@@ -73,7 +80,7 @@ func _ready() -> void:
 func get_lens_strength() -> float:
 	if kind == "pulsar":
 		return 0.0
-	return (-0.5 if kind == "white" else 0.9) * scale.x * (1.0 - stasis * 0.7)
+	return (-0.5 if kind == "white" else 0.9) * minf(scale.x, 1.0) * (1.0 - stasis * 0.7)
 
 
 func get_world_radius() -> float:
@@ -137,7 +144,7 @@ func in_stasis(pos: Vector3) -> bool:
 func _physics_process(delta: float) -> void:
 	_time += delta
 	# Inside the field time almost stands still - the hole included.
-	var speed := 1.0 - stasis * (1.0 - STASIS_TIME * 0.2)
+	var speed := (1.0 - stasis * (1.0 - STASIS_TIME * 0.2)) * time_scale
 	for i in _disks.size():
 		_disks[i].rotate_object_local(Vector3.UP, delta * (2.5 - i * 0.8) * speed)
 	for p in _particles_nodes:
@@ -149,6 +156,8 @@ func _physics_process(delta: float) -> void:
 		_rays.scale = Vector3.ONE * (1.0 + sin(_time * 3.0 * speed) * 0.08)
 	if _beams != null:
 		_beams.rotate_y(delta * 9.0)
+	if ambient:
+		return
 	_affect_characters(speed)
 	_affect_bodies(speed)
 

@@ -106,6 +106,12 @@ layout_mode = 2
 text = "CREDITS"
 alignment = 0
 
+[node name="Watch" type="Button" parent="Side/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "WATCH"
+alignment = 0
+
 [node name="Quit" type="Button" parent="Side/Buttons"]
 unique_name_in_owner = true
 layout_mode = 2
