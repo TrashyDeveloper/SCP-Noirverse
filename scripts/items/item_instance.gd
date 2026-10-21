@@ -5,11 +5,28 @@ extends RefCounted
 ## lives here.
 
 var data: ItemData
-## Rounds currently loaded (only used by weapons).
+## Rounds loaded in a firearm, or rounds left in an ammo box.
 var ammo := 0
 
 
 func _init(item_data: ItemData = null) -> void:
 	data = item_data
-	if data != null and data.kind == ItemData.Kind.PISTOL:
+	if data == null:
+		return
+	if data.kind == ItemData.Kind.FIREARM:
 		ammo = data.magazine_size
+	elif data.kind == ItemData.Kind.AMMO:
+		ammo = data.ammo_amount
+
+
+## An ammo box holding a specific number of rounds (used when dropping ammo).
+static func ammo_box(box_data: ItemData, rounds: int) -> ItemInstance:
+	var box := ItemInstance.new(box_data)
+	box.ammo = rounds
+	return box
+
+
+func get_label() -> String:
+	if data.kind == ItemData.Kind.AMMO:
+		return "%s (%d)" % [data.display_name, ammo]
+	return data.display_name

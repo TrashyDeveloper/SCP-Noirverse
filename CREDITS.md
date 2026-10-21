@@ -14,7 +14,7 @@ SCP Foundation content is licensed under
 | SCP-173 | Moto42 | <https://scp-wiki.wikidot.com/scp-173> |
 | SCP-096 | Dr Dan | <https://scp-wiki.wikidot.com/scp-096> |
 | SCP-049 | Gabriel Jade | <https://scp-wiki.wikidot.com/scp-049> |
-| SCP Foundation, Class-D, MTF Epsilon-11 "Nine-Tailed Fox", Chaos Insurgency | SCP Wiki contributors | <https://scp-wiki.wikidot.com> |
+| SCP Foundation, O5 Council, Class-D, Mobile Task Forces (MTF Epsilon-11 "Nine-Tailed Fox"), Chaos Insurgency | SCP Wiki contributors | <https://scp-wiki.wikidot.com> |
 
 - The look of SCP-173 in this game is an original design. We do **not** use the
   sculpture "Untitled 2004" by Izumi Kato, which is not under CC BY-SA.

@@ -28,31 +28,107 @@ noir look. Built with **Godot 4** and **GDScript**.
 | Mouse | Look |
 | Shift | Sprint |
 | Space | Jump |
-| E | Interact: open/close doors, pick up items |
-| Tab | Open/close the inventory (left click = hold item, right click = drop) |
-| Left click | Use held item (shoot pistol, use medkit) |
+| E | Interact: doors, card readers, pick up items |
+| Hold E | Disarm someone (while holding a firearm) / release them |
+| Tab | Inventory (left click = hold item, right click = drop) |
+| Left click | Use held item (shoot, heal, throw grenade) |
 | R | Reload |
 | Q | Drop held item |
+| T | Throw held item |
+| Left Ctrl | Hotkey: best keycard |
+| X | Hotkey: medical item |
+| G | Hotkey: grenade |
+| 1 / 2 | Hotkey: primary / secondary firearm |
 | F | Flashlight |
 | Esc | Pause menu (frees the mouse) |
 
 ### What to try
 
-1. In the Class-D room, a **Level 1 Keycard** lies on the middle bunk. Look at
-   it and press **E**.
-2. Go through the west corridor. The *Storage* door has a **red** light (it
-   needs Level 1); with the card you can now open it.
-3. In Storage, grab the **pistol**, the **Level 2 Keycard**, ammo and a
-   medkit.
-4. Open the north *Containment Chamber* (Level 2): it's a temporary firing
-   range. Press **Tab**, click the pistol to hold it, close with Tab, then
-   **left click** to shoot the dummies and **R** to reload.
-5. In the *Research Office* (east), careful with the sparking **exposed
-   wiring** in the corner: it hurts! Hold a medkit and left click to heal.
-   Stay in the sparks too long and you'll see the death screen.
-6. Try the carry limits: you can carry only **one firearm** (there's a second
-   pistol in the chamber). Pick up armor (Light in the Office, Heavy in
-   Storage, Combat in the chamber) and the limits go up. Open Tab to see them.
+1. In the Class-D room, a **Janitor Keycard** lies on the middle bunk (and
+   Painkillers on the left bunk). A test NPC stands in the room.
+2. The east door (to the Research Office) needs **Containment Level 1**.
+   Doors only open with a keycard **in your hand**: press **Ctrl** to pull
+   out the best card, then **E**. Or throw the card (**T**) at the small
+   card reader next to the door!
+3. In the Office: Scientist, Guard and Zone Manager keycards (you can only
+   carry 3 keycards), a First Aid Kit, Adrenaline and Light Armor.
+   Careful with the sparking wiring in the corner.
+4. The west door (Storage) needs **Armory Level 1** → the Guard card.
+   Inside: pistol, ammo, grenades, Heavy Armor, first aid kits.
+5. The north door (Containment Chamber, now a firing range) needs
+   **Containment Level 2** → the Scientist card. Near a door, **Ctrl** picks
+   the best card that actually opens *that* door.
+6. Grab the pistol (**1**), go back to the NPC and **hold E** on it to disarm
+   it: it drops everything and can't pick things up or open doors. Hold E
+   again to release it (it's also released if you drop all your firearms
+   or walk far away). You can't disarm someone holding a non-common item
+   (e.g. a gun).
+7. Throw a grenade at the dummies (**G**, then left click): High-Explosive
+   damages everything in range that isn't behind a wall; a Flashbang blinds
+   whoever looks at it.
+
+## Items
+
+### Keycards and doors
+
+Doors have an access type (**Containment**, **Armory** or **Admin**) and a
+level (1–3). A keycard opens the door if its level for that type is high
+enough. The small squares on each card show its levels (rows: containment,
+armory, admin).
+
+| Keycard (Ctrl priority, best first) | Containment | Armory | Admin |
+|---|---|---|---|
+| O5 | 3 | 3 | 3 |
+| Facility Manager | 3 | 0 | 3 |
+| MTF Captain | 2 | 3 | 2 |
+| Chaos Insurgency Access Device | 2 | 3 | 2 |
+| MTF Sergeant | 2 | 2 | 1 |
+| Containment Engineer | 3 | 0 | 2 |
+| MTF Private | 1 | 2 | 1 |
+| Research Supervisor | 2 | 0 | 1 |
+| Guard | 1 | 1 | 1 |
+| Zone Manager | 1 | 0 | 1 |
+| Scientist | 2 | 0 | 0 |
+| Janitor | 1 | 0 | 0 |
+
+### Medical items (hotkey X)
+
+| Item | Effect | Use time |
+|---|---|---|
+| Adrenaline | +40 temporary shield (fades), 20% faster for 8 s | 0.8 s |
+| First Aid Kit | +65 health | 2.5 s |
+| Painkillers | +50 health over 15 s | 1 s |
+
+X picks the medical item you used last; otherwise Adrenaline → First Aid Kit
+→ Painkillers. Switching items cancels using one.
+
+### Grenades (hotkey G)
+
+High-Explosive (preferred by G) and Flashbang. Left click to throw (armed);
+**T** just tosses it unarmed.
+
+### Ammo
+
+Ammo doesn't use slots. Its limit depends on the armor you wear:
+
+| Ammo | No armor | Light | Combat | Heavy |
+|---|---|---|---|---|
+| 9x19mm | 40 | 70 | 170 | 210 |
+| 5.56x45mm | 40 | 40 | 120 | 200 |
+| 7.62x39mm | 40 | 40 | 120 | 200 |
+| 12/70 Buckshot | 14 | 14 | 54 | 74 |
+| .44 Mag | 18 | 18 | 48 | 68 |
+
+If a box has more than you can carry, the rest stays in the box. Dropping
+armor drops any ammo (and items) above your new limits. (Only the pistol
+exists so far; it uses 9x19mm.)
+
+### Item tiers
+
+Every item has hidden tier flags: **Common**, **Military Grade**, **Rare**,
+**Extra Rare** (see each `.tres` in `resources/items/`). Holding anything
+that isn't purely Common prevents you from being disarmed. Tiers will also
+matter for special places later.
 
 ## Inventory and carry limits
 
@@ -63,7 +139,7 @@ a carry limit (shown on the Tab screen):
 |---|---|---|---|---|
 | SCP Items | 3 | 3 | 3 | 3 |
 | Keycards | 3 | 3 | 3 | 3 |
-| Treatment Items (medkits…) | 3 | 3 | 3 | **4** |
+| Treatment Items | 3 | 3 | 3 | **4** |
 | Firearms | 1 | **2** | **2** | **3** |
 | Grenades | 2 | 2 | **3** | **4** |
 | Radios | 1 | 1 | 1 | 1 |
@@ -71,16 +147,17 @@ a carry limit (shown on the Tab screen):
 | Armor | 1 | 1 | 1 | 1 |
 
 - Other items (e.g. coins, later) have no category limit, only the 8 slots.
-- Ammo doesn't use slots; each ammo type has its own maximum.
-- Armor is worn just by carrying it. If you drop it and now carry too much,
-  the extra items fall on the floor.
+- Armor is worn just by carrying it.
 - **Changing the limits ("server owners"):** the first time a match starts,
   the game writes `gameplay_config.cfg` to
   `%APPDATA%\Godot\app_userdata\SCP Noirverse\`. Open it with Notepad,
-  change the numbers (0–8; **0 means that item type can't be picked up**)
-  and start a new match. See `gameplay_config.example.cfg`. The built-in
-  defaults are in `resources/gameplay_config.tres`, and the armor bonuses
-  are on each armor's `.tres` file in `resources/items/`.
+  change the numbers and start a new match:
+  - item limits: 0–8, **0 = that item type can't be picked up**;
+  - ammo limits (one section per armor type): 0–65535, **0 = unlimited**.
+
+  See `gameplay_config.example.cfg`. The built-in defaults are in
+  `resources/gameplay_config.tres`; the armor carry bonuses are on each
+  armor's `.tres` file in `resources/items/`.
 
 ## Handy Godot tips for beginners
 

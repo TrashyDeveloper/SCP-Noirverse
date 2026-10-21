@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_q60e1"]
+
+[resource]
+script = ExtResource("1_q60e1")
+id = &"ammo_556x45mm"
+display_name = "5.56x45mm Ammo"
+kind = 3
+category = 9
+tiers = 2
+color = Color(0.2, 0.25, 0.6, 1)
+weight = 0.25
+ammo_type = &"556x45mm"

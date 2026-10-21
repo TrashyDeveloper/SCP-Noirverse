@@ -6,6 +6,7 @@ extends CanvasLayer
 
 var _character: CharacterController
 var _damage_flash := 0.0
+var _blind := 0.0
 var _message_time := 0.0
 var _hit_marker_time := 0.0
 
@@ -17,11 +18,18 @@ var _hit_marker_time := 0.0
 @onready var message_label: Label = $Message
 @onready var damage_overlay: ColorRect = $DamageFlash
 @onready var hit_marker: Label = $HitMarker
+@onready var progress_bar: ProgressBar = $ProgressBar
+@onready var shield_bar: ProgressBar = $HealthPanel/ShieldBar
+@onready var flash_overlay: ColorRect = $FlashOverlay
+@onready var status_label: Label = $StatusLabel
 
 
 func _ready() -> void:
 	message_label.text = ""
 	hit_marker.modulate.a = 0.0
+	progress_bar.visible = false
+	status_label.visible = false
+	flash_overlay.color.a = 0.0
 
 
 func bind_character(character: CharacterController) -> void:
@@ -35,6 +43,12 @@ func bind_character(character: CharacterController) -> void:
 	character.items.weapon_state_changed.connect(_refresh_items)
 	character.items.hit_confirmed.connect(_on_hit_confirmed)
 	character.died.connect(_on_died)
+	character.hold_progress_changed.connect(_on_progress)
+	character.items.use_progress_changed.connect(func(p: float, _label: String): _on_progress(p))
+	character.flashed.connect(func(duration: float): _blind = maxf(_blind, duration))
+	character.disarm_changed.connect(func(disarmed: bool):
+		status_label.visible = disarmed
+		status_label.text = "YOU HAVE BEEN DISARMED")
 	_on_prompt_changed("")
 	_on_health_changed(character.health.current, character.health.max_health)
 	_refresh_items()
@@ -43,6 +57,9 @@ func bind_character(character: CharacterController) -> void:
 func _process(delta: float) -> void:
 	_damage_flash = maxf(_damage_flash - delta * 1.5, 0.0)
 	damage_overlay.color.a = _damage_flash
+	# Flashbang: full white, fading out during the last second.
+	_blind = maxf(_blind - delta, 0.0)
+	flash_overlay.color.a = clampf(_blind, 0.0, 1.0)
 	_hit_marker_time = maxf(_hit_marker_time - delta, 0.0)
 	hit_marker.modulate.a = _hit_marker_time / 0.25
 	if _message_time > 0.0:
@@ -60,7 +77,17 @@ func _on_prompt_changed(text: String) -> void:
 func _on_health_changed(current: float, maximum: float) -> void:
 	health_bar.max_value = maximum
 	health_bar.value = current
+	var shield := _character.health.shield
+	shield_bar.visible = shield > 0.0
+	shield_bar.value = shield
 	health_label.text = "HEALTH  %d" % ceili(current)
+	if shield >= 1.0:
+		health_label.text += "   +%d" % floori(shield)
+
+
+func _on_progress(progress: float) -> void:
+	progress_bar.visible = progress >= 0.0
+	progress_bar.value = clampf(progress, 0.0, 1.0)
 
 
 func _on_damaged(amount: float, _source: Node) -> void:
@@ -71,8 +98,11 @@ func _on_hit_confirmed() -> void:
 	_hit_marker_time = 0.25
 
 
-func _on_item_added(item: ItemInstance) -> void:
-	show_message("Picked up: %s" % item.data.display_name)
+func _on_item_added(item: ItemInstance, amount: int) -> void:
+	if item.data.kind == ItemData.Kind.AMMO:
+		show_message("Picked up: %d x %s" % [amount, AmmoTypes.display_name(item.data.ammo_type)])
+	else:
+		show_message("Picked up: %s" % item.data.display_name)
 
 
 func _on_died(_source: Node) -> void:
@@ -93,7 +123,7 @@ func _refresh_items() -> void:
 
 func _refresh_ammo() -> void:
 	var item := _character.items.get_equipped()
-	if item == null or item.data.kind != ItemData.Kind.PISTOL:
+	if item == null or item.data.kind != ItemData.Kind.FIREARM:
 		ammo_label.text = ""
 	elif _character.items.is_reloading():
 		ammo_label.text = "RELOADING..."

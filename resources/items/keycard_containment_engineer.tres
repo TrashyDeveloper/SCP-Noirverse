@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_6v1ml"]
+
+[resource]
+script = ExtResource("1_6v1ml")
+id = &"keycard_containment_engineer"
+display_name = "Containment Engineer Keycard"
+category = 1
+tiers = 8
+color = Color(0.5, 0.8, 0.4, 1)
+weight = 0.05
+containment_level = 3
+admin_level = 2
+priority = 7

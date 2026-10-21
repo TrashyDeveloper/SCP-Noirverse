@@ -14,6 +14,8 @@ var yaw := 0.0
 var pitch := 0.0
 ## Held actions.
 var sprint := false
+## True while the interact key is held (for hold actions like disarming).
+var interact_held := false
 ## One-shot actions (true only on the tick they were pressed).
 var jump := false
 var interact := false
@@ -21,6 +23,9 @@ var toggle_flashlight := false
 var use_item := false
 var reload := false
 var drop_item := false
+var throw_item := false
+## Item hotkey pressed this tick (one of ItemHandler.Hotkey), 0 = none.
+var hotkey := 0
 ## Inventory slot to hold (0-based), or -1 for no change. Choosing the slot
 ## already held puts the item away.
 var select_slot := -1

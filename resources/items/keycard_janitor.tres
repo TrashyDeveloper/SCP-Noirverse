@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_77i85"]
+
+[resource]
+script = ExtResource("1_77i85")
+id = &"keycard_janitor"
+display_name = "Janitor Keycard"
+category = 1
+color = Color(0.62, 0.55, 0.7, 1)
+weight = 0.05
+containment_level = 1
+priority = 1

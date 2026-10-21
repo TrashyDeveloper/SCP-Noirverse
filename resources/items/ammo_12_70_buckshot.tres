@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_gbxbt"]
+
+[resource]
+script = ExtResource("1_gbxbt")
+id = &"ammo_12_70_buckshot"
+display_name = "12/70 Buckshot Ammo"
+kind = 3
+category = 9
+tiers = 4
+color = Color(0.75, 0.2, 0.1, 1)
+weight = 0.25
+ammo_type = &"12_70_buckshot"
+ammo_amount = 14

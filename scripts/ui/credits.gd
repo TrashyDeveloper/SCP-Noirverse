@@ -23,7 +23,7 @@ Main site: [url=https://scp-wiki.wikidot.com]scp-wiki.wikidot.com[/url]
 [b]SCP-096[/b] by Dr Dan — [url=https://scp-wiki.wikidot.com/scp-096]scp-wiki.wikidot.com/scp-096[/url]
 [b]SCP-049[/b] by Gabriel Jade — [url=https://scp-wiki.wikidot.com/scp-049]scp-wiki.wikidot.com/scp-049[/url]
 
-The SCP Foundation, Class-D personnel, Mobile Task Force Epsilon-11 "Nine-Tailed Fox", the Chaos Insurgency and the facility zone concepts come from the SCP Wiki and its many contributors.
+The SCP Foundation, the O5 Council, Class-D personnel, Mobile Task Forces (incl. Epsilon-11 "Nine-Tailed Fox"), the Chaos Insurgency and the facility zone concepts come from the SCP Wiki and its many contributors.
 The appearance of SCP-173 in this game is an original design and does not use the sculpture "Untitled 2004" by Izumi Kato, which is not covered by the CC BY-SA license.
 
 [font_size=24]License of this game's content[/font_size]

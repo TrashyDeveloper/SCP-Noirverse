@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_ybs0w"]
+
+[resource]
+script = ExtResource("1_ybs0w")
+id = &"keycard_zone_manager"
+display_name = "Zone Manager Keycard"
+category = 1
+color = Color(0.25, 0.6, 0.45, 1)
+weight = 0.05
+containment_level = 1
+admin_level = 1
+priority = 3

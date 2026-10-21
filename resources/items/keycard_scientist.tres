@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_jglpb"]
+
+[resource]
+script = ExtResource("1_jglpb")
+id = &"keycard_scientist"
+display_name = "Scientist Keycard"
+category = 1
+color = Color(0.85, 0.78, 0.3, 1)
+weight = 0.05
+containment_level = 2
+priority = 2

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_c0o17"]
+
+[resource]
+script = ExtResource("1_c0o17")
+id = &"adrenaline"
+display_name = "Adrenaline"
+kind = 1
+category = 2
+color = Color(0.85, 0.35, 0.15, 1)
+weight = 0.15
+medical_effect = 2
+use_time = 0.8
+shield_amount = 40.0
+speed_boost = 1.2
+speed_boost_duration = 8.0

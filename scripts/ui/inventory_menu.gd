@@ -68,7 +68,7 @@ func refresh() -> void:
 			var note := ItemData.category_name(item.data.category)
 			if item.data.kind == ItemData.Kind.ARMOR:
 				note = "WORN"
-			elif item.data.kind == ItemData.Kind.PISTOL:
+			elif item.data.kind == ItemData.Kind.FIREARM:
 				note = "%s  ·  %d/%d" % [note, item.ammo, item.data.magazine_size]
 			button.text = "%s\n%s" % [item.data.display_name, note]
 			button.disabled = false
@@ -92,13 +92,15 @@ func _limits_text(inventory: Inventory) -> String:
 		elif limit == 0:
 			line = "[color=#666666]%s[/color]" % line
 		lines.append(line)
-	lines.append("\n[b]AMMO[/b]")
-	var any_ammo := false
-	for ammo_type in inventory.config.ammo_limits:
-		lines.append("%s  %d / %d" % [ammo_type, inventory.get_ammo(ammo_type), inventory.config.get_ammo_limit(ammo_type)])
-		any_ammo = true
-	if not any_ammo:
-		lines.append("none")
+	var armor := inventory.get_armor()
+	lines.append("\n[b]AMMO[/b]  (%s)" % (armor.display_name if armor else "no armor"))
+	for ammo_type in AmmoTypes.ALL:
+		var limit := inventory.get_ammo_limit(ammo_type)
+		var limit_text := "unlimited" if limit >= GameplayConfig.UNLIMITED_AMMO else str(limit)
+		var line := "%s  %d / %s" % [AmmoTypes.display_name(ammo_type), inventory.get_ammo(ammo_type), limit_text]
+		if inventory.get_ammo(ammo_type) > 0:
+			line = "[color=#ffffff]%s[/color]" % line
+		lines.append(line)
 	return "\n".join(lines)
 
 

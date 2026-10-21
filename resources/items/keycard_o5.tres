@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_j1w2x"]
+
+[resource]
+script = ExtResource("1_j1w2x")
+id = &"keycard_o5"
+display_name = "O5 Keycard"
+category = 1
+tiers = 8
+color = Color(0.07, 0.07, 0.08, 1)
+weight = 0.05
+containment_level = 3
+armory_level = 3
+admin_level = 3
+priority = 12

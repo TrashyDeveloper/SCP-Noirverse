@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_xakbs"]
+
+[resource]
+script = ExtResource("1_xakbs")
+id = &"ammo_44_mag"
+display_name = ".44 Mag Ammo"
+kind = 3
+category = 9
+tiers = 4
+color = Color(0.12, 0.12, 0.12, 1)
+weight = 0.25
+ammo_type = &"44_mag"
+ammo_amount = 18

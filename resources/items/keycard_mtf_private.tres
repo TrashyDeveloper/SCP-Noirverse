@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_aay62"]
+
+[resource]
+script = ExtResource("1_aay62")
+id = &"keycard_mtf_private"
+display_name = "MTF Private Keycard"
+category = 1
+tiers = 4
+color = Color(0.35, 0.6, 0.75, 1)
+weight = 0.05
+containment_level = 1
+armory_level = 2
+admin_level = 1
+priority = 6

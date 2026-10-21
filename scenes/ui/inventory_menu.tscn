@@ -59,7 +59,7 @@ text = "Left click: hold / put away  ·  Right click: drop  ·  Tab: close"
 
 [node name="Limits" type="RichTextLabel" parent="Dim/Center/Layout"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(260, 360)
+custom_minimum_size = Vector2(280, 480)
 layout_mode = 2
 theme_override_colors/default_color = Color(0.7, 0.7, 0.66, 1)
 theme_override_font_sizes/normal_font_size = 16

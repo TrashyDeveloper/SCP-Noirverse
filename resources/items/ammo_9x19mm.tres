@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_o5352"]
+
+[resource]
+script = ExtResource("1_o5352")
+id = &"ammo_9x19mm"
+display_name = "9x19mm Ammo"
+kind = 3
+category = 9
+tiers = 2
+color = Color(0.7, 0.15, 0.12, 1)
+weight = 0.25

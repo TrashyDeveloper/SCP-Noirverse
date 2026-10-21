@@ -4,11 +4,14 @@
 
 [resource]
 script = ExtResource("1_tps01")
+id = &"armor_heavy"
 display_name = "Heavy Armor"
-short_name = "HEAVY ARMOR"
 kind = 4
 category = 7
+tiers = 2
 color = Color(0.2, 0.2, 0.2, 1)
+weight = 6.0
+armor_tier = 3
 limit_bonuses = Dictionary[int, int]({
 2: 1,
 3: 2,

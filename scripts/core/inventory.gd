@@ -3,10 +3,11 @@ extends Node
 ## A character's items: 8 slots plus spare ammo per ammo type.
 ##
 ## How many items of each category fit is decided by the match's
-## GameplayConfig, plus bonuses from any armor being carried.
+## GameplayConfig plus bonuses from carried armor. Ammo limits depend on the
+## armor worn.
 
 signal changed
-signal item_added(item: ItemInstance)
+signal item_added(item: ItemInstance, amount: int)
 
 const SLOT_COUNT := 8
 
@@ -15,7 +16,7 @@ const SLOT_COUNT := 8
 var config: GameplayConfig = GameplayConfig.new()
 ## Fixed-size list; empty slots are null.
 var slots: Array[ItemInstance] = []
-## Spare rounds per ammo type, e.g. {&"9mm": 24}.
+## Spare rounds per ammo type, e.g. {&"9x19mm": 24}.
 var ammo: Dictionary[StringName, int] = {}
 
 
@@ -38,14 +39,27 @@ func count_category(category: ItemData.Category) -> int:
 	return total
 
 
+## The armor being worn (carried), or null.
+func get_armor() -> ItemData:
+	for item in slots:
+		if item != null and item.data.kind == ItemData.Kind.ARMOR:
+			return item.data
+	return null
+
+
+func get_armor_tier() -> ItemData.ArmorTier:
+	var armor := get_armor()
+	return armor.armor_tier if armor != null else ItemData.ArmorTier.NONE
+
+
 ## The carry limit for `category`, including bonuses from carried armor.
 func get_limit(category: ItemData.Category) -> int:
 	var limit := config.get_item_limit(category)
 	if limit == 0:
 		return 0  # 0 means "can never be picked up", armor or not.
-	for item in slots:
-		if item != null and item.data.kind == ItemData.Kind.ARMOR:
-			limit += item.data.limit_bonuses.get(category, 0)
+	var armor := get_armor()
+	if armor != null:
+		limit += armor.limit_bonuses.get(category, 0)
 	return clampi(limit, 0, SLOT_COUNT)
 
 
@@ -53,13 +67,18 @@ func get_ammo(ammo_type: StringName) -> int:
 	return ammo.get(ammo_type, 0)
 
 
+func get_ammo_limit(ammo_type: StringName) -> int:
+	return config.get_ammo_limit(ammo_type, get_armor_tier())
+
+
 ## Why `item` can't be picked up, or "" if it can.
 func get_block_reason(item: ItemInstance) -> String:
 	var data := item.data
 	if not data.uses_slot():
-		var ammo_limit := config.get_ammo_limit(data.ammo_type)
-		if get_ammo(data.ammo_type) >= ammo_limit:
-			return "Can't carry more %s ammo (%d/%d)" % [data.ammo_type, get_ammo(data.ammo_type), ammo_limit]
+		var limit := get_ammo_limit(data.ammo_type)
+		if get_ammo(data.ammo_type) >= limit:
+			return "Can't carry more %s ammo (%d/%d)" % [
+				AmmoTypes.display_name(data.ammo_type), get_ammo(data.ammo_type), limit]
 		return ""
 	var limit := get_limit(data.category)
 	var category_name := ItemData.category_name(data.category)
@@ -77,18 +96,24 @@ func can_add(item: ItemInstance) -> bool:
 	return get_block_reason(item) == ""
 
 
-## Puts the item in the first free slot. Returns false if it doesn't fit.
+## Takes the item. Returns true if it was taken completely. An ammo box may be
+## taken only partly (its `ammo` goes down) when the ammo limit is reached.
 func add_item(item: ItemInstance) -> bool:
 	if not can_add(item):
 		return false
 	if item.data.uses_slot():
 		slots[slots.find(null)] = item
-	else:
-		var ammo_type := item.data.ammo_type
-		ammo[ammo_type] = mini(get_ammo(ammo_type) + item.data.ammo_amount, config.get_ammo_limit(ammo_type))
-	item_added.emit(item)
+		item_added.emit(item, 1)
+		changed.emit()
+		return true
+	var ammo_type := item.data.ammo_type
+	var room := get_ammo_limit(ammo_type) - get_ammo(ammo_type)
+	var taken := mini(room, item.ammo)
+	ammo[ammo_type] = get_ammo(ammo_type) + taken
+	item.ammo -= taken
+	item_added.emit(item, taken)
 	changed.emit()
-	return true
+	return item.ammo <= 0
 
 
 ## Removes and returns the item in `slot` (or null if empty).
@@ -109,7 +134,7 @@ func take_ammo(ammo_type: StringName, amount: int) -> int:
 
 
 ## Slots holding items above their category's limit (e.g. after armor was
-## dropped). The newest extras come last so they are the ones dropped.
+## dropped). Later slots count as the extras.
 func get_excess_slots() -> Array[int]:
 	var excess: Array[int] = []
 	var seen := {}
@@ -124,10 +149,24 @@ func get_excess_slots() -> Array[int]:
 	return excess
 
 
-## The best keycard level carried (0 if none).
-func get_clearance() -> int:
-	var best := 0
-	for item in slots:
-		if item != null and item.data.kind == ItemData.Kind.KEYCARD:
-			best = maxi(best, item.data.clearance)
-	return best
+## Spare rounds above the current limits, per ammo type.
+func get_excess_ammo() -> Dictionary[StringName, int]:
+	var excess: Dictionary[StringName, int] = {}
+	for ammo_type in ammo:
+		var extra := get_ammo(ammo_type) - get_ammo_limit(ammo_type)
+		if extra > 0:
+			excess[ammo_type] = extra
+	return excess
+
+
+## Slot numbers of carried items matching `kind`, in inventory order.
+func find_slots(kind: ItemData.Kind) -> Array[int]:
+	var found: Array[int] = []
+	for slot in SLOT_COUNT:
+		if slots[slot] != null and slots[slot].data.kind == kind:
+			found.append(slot)
+	return found
+
+
+func has_firearm() -> bool:
+	return not find_slots(ItemData.Kind.FIREARM).is_empty()

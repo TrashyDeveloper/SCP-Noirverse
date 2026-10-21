@@ -5,6 +5,11 @@ extends Node3D
 ## singletons), so later a server can run the same logic for many players.
 
 const CHARACTER_SCENE := preload("res://scenes/player/character.tscn")
+## Items the test NPC carries (so you can practise disarming it).
+const TEST_NPC_ITEMS: Array[String] = [
+	"res://resources/items/keycard_janitor.tres",
+	"res://resources/items/painkillers.tres",
+]
 const MAIN_MENU_PATH := "res://scenes/ui/main_menu.tscn"
 
 @export var level_scene: PackedScene
@@ -31,6 +36,7 @@ func _ready() -> void:
 	level = level_scene.instantiate()
 	level_root.add_child(level)
 	_spawn_local_player()
+	_spawn_test_npcs()
 	pause_menu.resume_requested.connect(set_paused.bind(false))
 	pause_menu.main_menu_requested.connect(_go_to_main_menu)
 	death_screen.restart_requested.connect(_restart)
@@ -54,8 +60,31 @@ func _spawn_local_player() -> void:
 	local_input.set_view_angles(spawn.global_rotation.y, 0.0)
 	local_character.possess(local_input, true)
 	local_character.died.connect(_on_local_player_died)
+	local_character.disarm_changed.connect(func(disarmed: bool):
+		if disarmed and inventory_menu.visible:
+			set_inventory_open(false))
 	hud.bind_character(local_character)
 	inventory_menu.bind_character(local_character)
+
+
+## Characters standing still at the level's "NpcSpawns" markers, so you can
+## practise disarming. Real AI bots replace these in Step 4.
+func _spawn_test_npcs() -> void:
+	var markers := level.get_node_or_null("NpcSpawns")
+	if markers == null:
+		return
+	for marker: Node3D in markers.get_children():
+		var npc: CharacterController = CHARACTER_SCENE.instantiate()
+		npc.name = "TestNpc"
+		actors.add_child(npc)
+		npc.inventory.config = config
+		npc.global_position = marker.global_position
+		var npc_input := IdleInput.new()
+		npc_input.yaw = marker.global_rotation.y
+		npc.possess(npc_input, false)
+		for path in TEST_NPC_ITEMS:
+			npc.give_item(ItemInstance.new(load(path)))
+		npc.items.equip(0)
 
 
 func _pick_spawn_point() -> Node3D:
@@ -72,7 +101,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			set_paused(not get_tree().paused)
 		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("inventory") and not get_tree().paused:
+	elif event.is_action_pressed("inventory") and not get_tree().paused \
+			and (inventory_menu.visible or not local_character.is_disarmed()):
 		set_inventory_open(not inventory_menu.visible)
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.pressed and not get_tree().paused \

@@ -17,6 +17,14 @@ var _pitch := 0.0
 # up, so a quick tap between two ticks is never lost.
 var _pending := CharacterInput.new()
 
+const _HOTKEY_ACTIONS := {
+	"hotkey_keycard": ItemHandler.Hotkey.KEYCARD,
+	"hotkey_medical": ItemHandler.Hotkey.MEDICAL,
+	"hotkey_grenade": ItemHandler.Hotkey.GRENADE,
+	"hotkey_primary": ItemHandler.Hotkey.PRIMARY,
+	"hotkey_secondary": ItemHandler.Hotkey.SECONDARY,
+}
+
 
 func set_view_angles(yaw: float, pitch: float) -> void:
 	_yaw = yaw
@@ -56,6 +64,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		_pending.reload = true
 	elif event.is_action_pressed("drop_item"):
 		_pending.drop_item = true
+	elif event.is_action_pressed("throw_item"):
+		_pending.throw_item = true
+	else:
+		for action in _HOTKEY_ACTIONS:
+			if event.is_action_pressed(action):
+				_pending.hotkey = _HOTKEY_ACTIONS[action]
 
 
 func sample() -> CharacterInput:
@@ -68,6 +82,7 @@ func sample() -> CharacterInput:
 	if enabled:
 		input.move = Input.get_vector("move_left", "move_right", "move_back", "move_forward")
 		input.sprint = Input.is_action_pressed("sprint")
+		input.interact_held = look_enabled and Input.is_action_pressed("interact")
 	return input
 
 

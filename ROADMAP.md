@@ -31,10 +31,23 @@ and is committed + pushed once it works. `[x]` = done.
 - [x] Gameplay config: defaults in `resources/gameplay_config.tres`, overridable in `user://gameplay_config.cfg` (limits 0–8, 0 = can't pick up)
 - [ ] Later: flashlight and coin as inventory items, armor damage reduction, more item types per category
 
+## Step 2.6 — Item basics ✅
+- [x] 12 keycards with Containment / Armory / Admin access levels; doors need the keycard **in hand**
+- [x] Card readers on both sides of every door; thrown keycards that hit a reader operate the door
+- [x] Hotkeys: Ctrl keycard (best card for the nearby door), X medical (last used first), G grenade, 1/2 primary/secondary firearm
+- [x] Throwing any held item (T)
+- [x] Medical items with use times: First Aid Kit, Painkillers (heal over time), Adrenaline (shield + speed)
+- [x] Grenades: High-Explosive (damage with falloff, blocked by walls) and Flashbang (blinds if looking)
+- [x] 5 ammo types with armor-dependent limits, configurable (0–65535, 0 = unlimited); partial ammo pickup; excess dropped
+- [x] Item tier flags (Common / Military Grade / Rare / Extra Rare)
+- [x] Disarming (hold E with a firearm): target drops everything, can't open inventory/doors or pick up; release by holding E, or automatically when the captor dies, has no firearm or is too far
+- [x] Test NPC (idle) to practise disarming
+- [ ] Later: custom hotkeys in a settings menu, glass that breaks from thrown items, disarm effects on escape (Step 3), third-person held items
+
 ## Step 3 — Classes & rounds
 - [ ] Class definitions (Class-D, Scientist, Facility Guard) with spawn points, starting items and colours
 - [ ] Round manager: assign random classes, start/end a round, round-end screen
-- [ ] Escape exit: Class-D / Scientists who reach it "escape"
+- [ ] Escape exit: Class-D / Scientists who reach it "escape" (disarmed escapees switch sides)
 - [ ] Win conditions per team
 
 ## Step 4 — AI bots

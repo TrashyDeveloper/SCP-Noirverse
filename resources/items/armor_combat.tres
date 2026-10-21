@@ -4,11 +4,14 @@
 
 [resource]
 script = ExtResource("1_0t3hg")
+id = &"armor_combat"
 display_name = "Combat Armor"
-short_name = "COMBAT ARMOR"
 kind = 4
 category = 7
+tiers = 2
 color = Color(0.35, 0.37, 0.32, 1)
+weight = 4.0
+armor_tier = 2
 limit_bonuses = Dictionary[int, int]({
 3: 1,
 4: 1

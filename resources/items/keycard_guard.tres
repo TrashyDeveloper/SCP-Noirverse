@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_etpid"]
+
+[resource]
+script = ExtResource("1_etpid")
+id = &"keycard_guard"
+display_name = "Guard Keycard"
+category = 1
+color = Color(0.55, 0.55, 0.55, 1)
+weight = 0.05
+containment_level = 1
+armory_level = 1
+admin_level = 1
+priority = 4

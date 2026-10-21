@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_hpg2y"]
+
+[resource]
+script = ExtResource("1_hpg2y")
+id = &"ammo_762x39mm"
+display_name = "7.62x39mm Ammo"
+kind = 3
+category = 9
+tiers = 4
+color = Color(0.3, 0.45, 0.2, 1)
+weight = 0.25
+ammo_type = &"762x39mm"

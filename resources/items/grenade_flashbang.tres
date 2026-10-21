@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_q661t"]
+
+[resource]
+script = ExtResource("1_q661t")
+id = &"grenade_flashbang"
+display_name = "Flashbang Grenade"
+kind = 5
+category = 4
+tiers = 6
+color = Color(0.15, 0.15, 0.15, 1)
+weight = 0.5
+grenade_type = 1
+fuse_time = 2.0
+blast_radius = 10.0

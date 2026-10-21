@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_ta2no"]
+
+[resource]
+script = ExtResource("1_ta2no")
+id = &"keycard_facility_manager"
+display_name = "Facility Manager Keycard"
+category = 1
+tiers = 8
+color = Color(0.6, 0.1, 0.12, 1)
+weight = 0.05
+containment_level = 3
+admin_level = 3
+priority = 11

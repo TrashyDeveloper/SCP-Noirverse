@@ -4,8 +4,10 @@
 
 [resource]
 script = ExtResource("1_lqglu")
+id = &"pistol"
 display_name = "Pistol"
-short_name = "PISTOL"
 kind = 2
 category = 3
+tiers = 6
 color = Color(0.12, 0.12, 0.13, 1)
+weight = 1.0
