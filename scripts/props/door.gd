@@ -46,11 +46,15 @@ var _indicator_materials: Array[StandardMaterial3D] = []
 
 func _ready() -> void:
 	add_to_group(KEYCARD_DOOR_GROUP)
-	for face in [$Panel/FaceFront, $Panel/FaceBack]:
-		face.get_node("ZoneCode").text = zone_code
-		face.get_node("ZoneName").text = zone_name
-	for path in ["ReaderFront/Light", "ReaderBack/Light"]:
-		var mesh: MeshInstance3D = get_node(path)
+	# Not every door has stencilled faces or card readers (e.g. cell doors).
+	for face in [get_node_or_null("Panel/FaceFront"), get_node_or_null("Panel/FaceBack")]:
+		if face != null:
+			face.get_node("ZoneCode").text = zone_code
+			face.get_node("ZoneName").text = zone_name
+	for path in ["ReaderFront/Light", "ReaderBack/Light", "Panel/Indicator"]:
+		var mesh := get_node_or_null(path) as MeshInstance3D
+		if mesh == null:
+			continue
 		var mat := mesh.get_active_material(0).duplicate() as StandardMaterial3D
 		mesh.material_override = mat
 		_indicator_materials.append(mat)
@@ -155,7 +159,7 @@ func _update_indicator() -> void:
 	# Green = open, red = closed and needs a keycard, yellow = closed.
 	var color := Color(0.3, 1.0, 0.3)
 	if not is_open:
-		color = Color(1.0, 0.3, 0.2) if requires_keycard() else Color(1.0, 0.85, 0.3)
+		color = Color(1.0, 0.3, 0.2) if requires_keycard() or remote_controlled else Color(1.0, 0.85, 0.3)
 	_set_indicator_color(color)
 
 

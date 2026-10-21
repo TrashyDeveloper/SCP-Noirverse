@@ -47,21 +47,32 @@ noir look. Built with **Godot 4** and **GDScript**.
 The site has four zones. Underground, from west to east:
 
 ```
-      LIGHT CONTAINMENT       HEAVY CONTAINMENT       ENTRANCE ZONE
-   D # L . O .            . 1 . 2 . .            A # O . B .
-   D # # # # .            # # # # # .            # # # # # .
-   D # . K # =  checkpoint # # . G # = checkpoint # S . M # .
-   . # T . # .            . 3 # # # .            # # # # # .
-   . O # # A .            . . S H . .            C . O . F .
+       LIGHT CONTAINMENT         HEAVY CONTAINMENT       ENTRANCE ZONE
+   D D D # L # P            . 1 . 2 . .            A # O . B .
+   W . O # . # .            # # # # # .            # # # # # .
+   # # # # X # =  checkpoint # # . G # = checkpoint # S . M # .
+   K Z # . . # .            . 3 # # # .            # # # # # .
+   A # # 9 9 # T            . . S H . .            C . O . F .
 ```
 
 | | Light Containment (LCZ) | Heavy Containment (HCZ) | Entrance Zone (EZ) |
 |---|---|---|---|
-| Rooms | D Class-D cells, L labs, O offices, K locker room, T test chamber (dummies), A LCZ armory | 1/2/3 SCP-173, SCP-096, SCP-049 chambers (empty for now), G generators (careful: sparking wiring), S server room, H HCZ armory | A/B/C **Gates A, B, C** (elevators to the Surface), S security office, M facility manager, O offices, F cafeteria |
-| Who spawns here | Class-D, Scientists | SCPs (later) | Facility Guards, Containment Captain |
+| Rooms | **DDD Class-D cell block**, L lab, O office, P computer room, W restrooms, Z storage, K locker room, T test chamber (dummies), A LCZ armory, **99 SCP-914**, X **lockroom** | 1/2/3 SCP-173, SCP-096, SCP-049 chambers (empty for now), G generators (careful: sparking wiring), S server room, H HCZ armory | A/B/C **Gates A, B, C** (elevators to the Surface), S security office, M facility manager, O offices, F cafeteria |
+| Who spawns here | Class-D (in the cells), Scientists | SCPs (later) | Facility Guards, Containment Captain |
 
-`#` corridors, `=` checkpoints (need **Admin 1**). Each cell is 12 × 12 m; sprinting
-from the Class-D cells to Gate A takes about 40 seconds.
+`#` corridors, `=` checkpoints (need **Admin 1**). Each cell of the grid is
+12 × 12 m; sprinting from a Class-D cell to Gate A takes about 40 seconds.
+
+**The Class-D cell block** is a 36 m hall with 16 small numbered cells
+(D-01 … D-16), 8 on each side, each with a bunk, toilet and sink. Every
+Class-D starts locked in a cell; **6 seconds after the round starts the
+breach begins and all cell doors open**. The hall leads out east into
+Light Containment.
+
+**SCP-914** is the big clockwork machine with an INTAKE and an OUTPUT booth
+and its ROUGH / COARSE / 1:1 / FINE / VERY FINE dial (it doesn't refine
+items yet — that comes with the SCPs). The **lockroom** is a corridor with
+two doors one after another.
 
 **Surface** (reached by the Gate elevators, 20 m up): a night-time yard with
 the Gate A/B/C buildings, the **MTF helipad**, the **Chaos Insurgency trucks**,

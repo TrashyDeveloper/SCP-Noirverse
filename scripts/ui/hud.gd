@@ -155,9 +155,9 @@ func _on_died(_source: Node) -> void:
 		node.visible = false
 
 
-func show_message(text: String) -> void:
+func show_message(text: String, duration := 2.5) -> void:
 	message_label.text = text
-	_message_time = 2.5
+	_message_time = duration
 
 
 func _refresh_items() -> void:

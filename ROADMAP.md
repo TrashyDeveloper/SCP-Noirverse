@@ -70,6 +70,13 @@ and is committed + pushed once it works. `[x]` = done.
 - [x] Delta Warhead (underground) and Gamma Warhead (whole site) with countdowns, alarm lights and detonation
 - [ ] Later: more weapons for the MTF/CI ranks, per-zone room variety, zone lockdowns/decontamination
 
+## Step 3.6 — Classic Light Containment ✅
+- [x] Rooms spanning several grid cells
+- [x] Class-D cell block: 16 numbered cells with bunks, toilets and sinks; Class-D start locked in, cells open 6 s into the round with an announcement
+- [x] SCP-914 room (machine, intake/output booths, dial; refining comes later)
+- [x] Lockroom (double doors), computer room, restrooms, storage
+- [ ] Later: SCP-914 refining items, LCZ decontamination timer
+
 ## Step 4 — AI bots
 - [ ] `BotInput` (an `InputSource` driven by AI) using navigation meshes
 - [ ] Simple behaviours: wander, flee, follow, open doors

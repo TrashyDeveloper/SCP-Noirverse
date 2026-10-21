@@ -10,6 +10,8 @@ extends Node
 signal character_spawned(character: CharacterController, is_player: bool)
 signal character_escaped(character: CharacterController, old_class: CharacterClass, new_class: CharacterClass)
 signal round_ended(result: Dictionary)
+## Something every player should be told (facility announcements).
+signal announcement(text: String)
 ## A warhead started, was cancelled or detonated. `state` is a WarheadState.
 signal warhead_changed(warhead: int, state: int, time_left: float)
 
@@ -19,6 +21,8 @@ enum WarheadState { IDLE, COUNTDOWN, DETONATED }
 const CHARACTER_SCENE := preload("res://scenes/player/character.tscn")
 ## Used for the "winner" field of the result when nobody wins.
 const NO_WINNER := -1
+## Seconds after the round starts before the Class-D cell doors open.
+const CELL_DOORS_OPEN_AFTER := 6.0
 ## Anyone below this height is "underground" (inside the facility).
 const SURFACE_HEIGHT := 15.0
 ## Warhead rules: keycard Admin level needed, countdown seconds, and until
@@ -56,6 +60,7 @@ var warhead_state := {WarheadConsole.Warhead.DELTA: WarheadState.IDLE, WarheadCo
 var warhead_time_left := {WarheadConsole.Warhead.DELTA: 0.0, WarheadConsole.Warhead.GAMMA: 0.0}
 
 var _consoles: Array[WarheadConsole] = []
+var _cells_opened := false
 var _elimination_possible := false
 var _spawn_points := {}  # group name -> Array[Node3D] (shuffled)
 var _spawn_counters := {}  # group name -> how many used
@@ -92,6 +97,7 @@ func start_round(player_inputs: Array[InputSource]) -> void:
 	_elimination_possible = sides.size() > 1
 	elapsed = 0.0
 	state = State.RUNNING
+	announcement.emit("Class-D cell doors open in %d seconds..." % int(CELL_DOORS_OPEN_AFTER))
 
 
 ## The classes for this round, read from the config's spawn queue.
@@ -147,6 +153,8 @@ func _physics_process(delta: float) -> void:
 	if state != State.RUNNING:
 		return
 	elapsed += delta
+	if not _cells_opened and elapsed >= CELL_DOORS_OPEN_AFTER:
+		_open_class_d_cells()
 	_update_warheads(delta)
 	if state == State.RUNNING:
 		_check_round_end()
@@ -248,6 +256,14 @@ func _take_spawn_transform(group: String) -> Transform3D:
 	if index >= markers.size():
 		result.origin += Vector3(randf_range(-0.6, 0.6), 0.0, randf_range(-0.6, 0.6))
 	return result
+
+
+func _open_class_d_cells() -> void:
+	_cells_opened = true
+	for door in get_tree().get_nodes_in_group("class_d_cell_doors"):
+		if level.is_ancestor_of(door):
+			door.set_open(true)
+	announcement.emit("FACILITY ANNOUNCEMENT: Containment breach. Class-D cell doors are open.")
 
 
 # --- Warheads ------------------------------------------------------------

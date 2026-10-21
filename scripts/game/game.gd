@@ -56,6 +56,7 @@ func _ready() -> void:
 	round_manager.character_escaped.connect(_on_character_escaped)
 	round_manager.round_ended.connect(_on_round_ended)
 	round_manager.warhead_changed.connect(_on_warhead_changed)
+	round_manager.announcement.connect(func(text: String): hud.show_message(text, 5.0))
 	round_manager.setup(level, actors, config)
 	var players: Array[InputSource] = [local_input]
 	round_manager.start_round(players)
