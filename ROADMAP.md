@@ -113,6 +113,13 @@ and is committed + pushed once it works. `[x]` = done.
 - [x] Admin menu (N): players list with go to / bring / kill / select, teleport to rooms and zones, item giver, role switch, god mode, noclip (Alt), forced warheads
 - [ ] Later: key rebinding, admin permissions for online servers
 
+## Step 3.11 — Epic warheads and a real Surface ✅
+- [x] Warhead music (your tracks) with countdowns matched to them; Gamma pulsar sound
+- [x] Text-to-speech announcer (female voice) with subtitles and countdown call-outs
+- [x] Location-dependent shaking, falling dust, flickering lights, rumbles; quieter alarm
+- [x] Real detonations: facility fireball and blackout, smoke from the gates, Gamma supernova and shockwave; only Gamma kills the Surface; the round ends after the blast
+- [x] Surface rebuilt: ravine with bridges, exit checkpoint, helipad with helicopter, hangar, two-storey HQ with roof, container yards, reactor compound, Chaos breach
+
 ## Step 4 — AI bots
 - [ ] `BotInput` (an `InputSource` driven by AI) using navigation meshes
 - [ ] Simple behaviours: wander, flee, follow, open doors

@@ -1,0 +1,10 @@
+Put your warhead audio files in this folder (exact names):
+
+  AlphaWarheadEnhancedAudio.ogg   - plays when the Alpha Warhead is armed
+  DeltaWarheadEnhancedAudio.ogg   - plays when the Delta Warhead is armed
+  GammaWarheadEnhancedAudio.ogg   - plays when the Gamma Warhead is armed
+  GammaPulsar.ogg                 - looping pulsar sound of the Gamma reactor
+
+The countdown is set from each track's length: the warhead detonates 6 seconds
+before its track ends. Open the project in Godot once so the files get imported.
+(Or put them in %APPDATA%\SCP-Noirverse\music\warheads\ instead.)

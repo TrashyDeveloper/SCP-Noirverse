@@ -44,6 +44,7 @@ func _ready() -> void:
 	_slider("Master volume", "master_volume", 0.0, 1.0, 0.05, "%d%%", 100.0)
 	_slider("Music volume", "music_volume", 0.0, 1.0, 0.05, "%d%%", 100.0)
 	_slider("Effects volume", "sfx_volume", 0.0, 1.0, 0.05, "%d%%", 100.0)
+	_slider("Announcer voice", "announcer_volume", 0.0, 1.0, 0.05, "%d%%", 100.0)
 	_section("DISPLAY")
 	_check("Fullscreen", "fullscreen")
 	_check("V-Sync", "vsync")

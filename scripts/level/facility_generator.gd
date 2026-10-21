@@ -22,8 +22,6 @@ const EZ_ORIGIN := Vector2i(10, 0)
 const EZ_SIZE := Vector2i(7, 6)
 ## The corridor cell (on the lower floor) with the HCZ/EZ checkpoint.
 const CONNECTOR_COL := 9
-const SURF_COLS := Vector2i(10, 16)
-const SURF_ROWS := Vector2i(-3, 5)
 const DIRS := LayoutGenerator.DIRS
 ## Width of the Alpha Warhead shaft.
 const SILO_SHAFT := 9.6
@@ -1471,101 +1469,13 @@ func _build_surface() -> void:
 		groups[g] = add(s, Node3D.new(), g)
 	var moon := DirectionalLight3D.new()
 	moon.light_color = Color(0.7, 0.75, 0.9)
-	moon.light_energy = 0.45
+	moon.light_energy = 1.0
 	moon.shadow_enabled = true
 	moon.light_cull_mask = 8
-	moon.directional_shadow_max_distance = 120.0
+	moon.directional_shadow_max_distance = 140.0
 	moon.rotation = Vector3(deg_to_rad(-50), deg_to_rad(30), 0)
 	add(s, moon, "Moonlight")
-
-	var used := {}  # cells with a building or feature
-	for lift_name in lifts:
-		if lifts[lift_name].surface:
-			var cell: Vector2i = lifts[lift_name].cell
-			used[cell] = true
-			used[cell + lifts[lift_name].facing] = true  # keep the way out clear
-			_surface_gate_building(lift_name)
-	for col in range(SURF_COLS.x, SURF_COLS.y + 1):
-		for row in range(SURF_ROWS.x, SURF_ROWS.y + 1):
-			var cell := Vector2i(col, row)
-			var c := center(cell)
-			slab(c.x - C / 2, c.z - C / 2, c.x + C / 2, c.z + C / 2, -0.5, 0, "ground_surface", surface_holes.get(cell, Rect2()))
-
-	var exit_col := rng.randi_range(SURF_COLS.x + 1, SURF_COLS.y - 1)
-	var road := center(Vector2i(exit_col, SURF_ROWS.x - 1))
-	slab(road.x - C / 2, road.z - C / 2, road.x + C / 2, road.z + C / 2, -0.5, 0, "ground_surface")
-	used[Vector2i(exit_col, SURF_ROWS.x)] = true
-	var x0 := SURF_COLS.x * C - C / 2
-	var x1 := SURF_COLS.y * C + C / 2
-	var z0 := SURF_ROWS.x * C - C / 2
-	var z1 := SURF_ROWS.y * C + C / 2
-	var wh := 8.0
-	box_mm(x0 - 1, -0.5, z1, x1 + 1, wh, z1 + 1, "wall_surface")
-	box_mm(x0 - 1, -0.5, z0 - 1, x0, wh, z1, "wall_surface")
-	box_mm(x1, -0.5, z0 - 1, x1 + 1, wh, z1, "wall_surface")
-	box_mm(x0 - 1, -0.5, z0 - 1, road.x - C / 2, wh, z0, "wall_surface")
-	box_mm(road.x + C / 2, -0.5, z0 - 1, x1 + 1, wh, z0, "wall_surface")
-	box_mm(road.x - C / 2 - 1, -0.5, road.z - C / 2 - 1, road.x - C / 2, wh, road.z + C / 2, "wall_surface")
-	box_mm(road.x + C / 2, -0.5, road.z - C / 2 - 1, road.x + C / 2 + 1, wh, road.z + C / 2, "wall_surface")
-	box_mm(road.x - C / 2, -0.5, road.z - C / 2 - 1, road.x + C / 2, wh, road.z - C / 2, "metal_dark")
-	label("EXIT", Vector3(road.x, 6.0, z0 + 0.02), 0.0, 200)
-	label("SITE EXIT - ESCAPE ROUTE", Vector3(road.x, 4.5, z0 + 0.02), 0.0, 60)
-	for x in [-4.0, 0.0, 4.0]:
-		box(Vector3(road.x + x, 0.01, road.z + 2.0), Vector3(0.3, 0.02, 6.0), "hazard", false)
-	var zone := EscapeZone.new()
-	zone.collision_layer = 0
-	zone.collision_mask = 2
-	zone.position = Vector3(road.x, 0, road.z - 1.0)
-	add(s, zone, "EscapeZone")
-	_shape(zone, Vector3(C - 1.0, 4.0, C - 3.0), Vector3(0, 2.0, 0))
-	label("ESCAPE", Vector3(road.x, 0.03, road.z + 3.0), 0.0, 160).rotation = Vector3(-PI / 2, 0, 0)
-	var area := Area3D.new()
-	area.collision_layer = 0
-	area.collision_mask = 2
-	add(level, area, "SurfaceArea")
-	_shape(area, Vector3(x1 - x0 + 4.0, 32.0, (z1 - z0) + C + 4.0), Vector3((x0 + x1) / 2, 14.0, (z0 + z1) / 2 - C / 2))
-
-	# Features go into free cells: the north rows first, then the rest.
-	var north := []
-	var rest := []
-	for col in range(SURF_COLS.x, SURF_COLS.y + 1):
-		for row in range(SURF_ROWS.x, SURF_ROWS.y + 1):
-			var cell := Vector2i(col, row)
-			if used.has(cell):
-				continue
-			(north if row < 0 else rest).append(cell)
-	_shuffle(north)
-	_shuffle(rest)
-	var pool: Array = north + rest
-	var target := center(Vector2i(exit_col, 0))
-	var heli: Vector2i = pool.pop_front()
-	_helipad(center(heli), target)
-	var trucks: Vector2i = pool.pop_front()
-	_chaos_staging(center(trucks), target)
-	var warhead_cell: Vector2i = rest.pop_back() if not rest.is_empty() else pool.pop_back()
-	pool.erase(warhead_cell)
-	_warhead_building(center(warhead_cell))
-	var reactor_cell: Vector2i = rest.pop_back() if not rest.is_empty() else pool.pop_back()
-	pool.erase(reactor_cell)
-	_gamma_reactor(center(reactor_cell))
-	# Watchtowers in the far corners of the yard (if those cells are free).
-	var towers := 0
-	for corner in [Vector2i(SURF_COLS.x, SURF_ROWS.x), Vector2i(SURF_COLS.y, SURF_ROWS.x),
-			Vector2i(SURF_COLS.x, SURF_ROWS.y), Vector2i(SURF_COLS.y, SURF_ROWS.y)]:
-		if pool.has(corner) and towers < 3:
-			pool.erase(corner)
-			_watchtower(center(corner), corner.x == SURF_COLS.x, corner.y == SURF_ROWS.x)
-			towers += 1
-	for i in 2:
-		if not pool.is_empty():
-			_staging_area(center(pool.pop_front()))
-	for i in 2:
-		if not pool.is_empty():
-			_vehicle_park(center(pool.pop_front()))
-	for i in 4:
-		if not pool.is_empty():
-			_barriers(center(pool.pop_front()))
-	_floodlights(x0, x1, z0, z1)
+	SurfaceBuilder.new(self).build(s)
 	var geometry: Node3D = add(s, Node3D.new(), "Geometry")
 	batch.build(geometry, 1 | 8)
 	surface_mode = false
@@ -1749,7 +1659,7 @@ func _floodlights(x0: float, x1: float, z0: float, z1: float) -> void:
 		spot.spot_angle_attenuation = 0.8
 		spot.light_energy = 5.0
 		spot.light_color = Color(0.9, 0.93, 1.0)
-		spot.shadow_enabled = true
+		spot.shadow_enabled = points.find(p) % 3 == 0
 		var to_mid := Vector3((x0 + x1) / 2, 0, (z0 + z1) / 2) - p
 		spot.rotation = Vector3(deg_to_rad(-60), atan2(-to_mid.x, -to_mid.z), 0)
 		spot.distance_fade_enabled = true

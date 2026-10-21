@@ -22,6 +22,8 @@ var _reactor: GammaReactor
 var settings: GameSettings
 var admin_tools: AdminTools
 var admin_menu: AdminMenu
+var announcer: Announcer
+var warhead_director: WarheadDirector
 var config: GameplayConfig
 var level: Node3D
 var local_character: CharacterController
@@ -85,6 +87,14 @@ func _ready() -> void:
 	admin_menu.tools = admin_tools
 	add_child(admin_menu)
 	pause_menu.settings_requested.connect(_open_settings)
+	announcer = Announcer.new()
+	announcer.name = "Announcer"
+	add_child(announcer)
+	announcer.subtitle.connect(func(text: String): hud.show_message(text, 8.0))
+	warhead_director = WarheadDirector.new()
+	warhead_director.name = "WarheadDirector"
+	add_child(warhead_director)
+	warhead_director.setup(round_manager, level, hud, noir_overlay, announcer, func(): return local_character)
 	settings = GameSettings.load_settings()
 	var players: Array[InputSource] = [local_input]
 	round_manager.start_round(players)
@@ -99,6 +109,8 @@ func _apply_settings() -> void:
 	settings.apply_overlay(noir_overlay)
 	local_input.mouse_sensitivity = GameSettings.BASE_SENSITIVITY * settings.mouse_sensitivity
 	local_input.invert_y = settings.invert_mouse
+	announcer.volume = settings.announcer_volume
+	announcer.enabled = settings.announcer_volume > 0.0
 	if local_character != null:
 		local_character.camera.fov = settings.fov
 		local_character.items.base_fov = settings.fov
@@ -206,9 +218,6 @@ func _on_warhead_changed(_warhead: int, _state: int, _time_left: float) -> void:
 	for warhead in round_manager.warhead_state:
 		counting = counting or round_manager.warhead_state[warhead] == RoundManager.WarheadState.COUNTDOWN
 	_set_alarm(counting)
-	if _state == RoundManager.WarheadState.DETONATED:
-		hud.flash_white(3.0)
-		noir_overlay.color_burst(1.0)
 
 
 func _set_alarm(on: bool) -> void:
@@ -216,7 +225,8 @@ func _set_alarm(on: bool) -> void:
 		return
 	_alarm_on = on
 	if on:
-		_alarm_sound = Sfx.play_2d(self, "alarm_loop", -14.0)
+		# Kept low: the warhead music and the announcer do the talking.
+		_alarm_sound = Sfx.play_2d(self, "alarm_loop", -30.0)
 	elif _alarm_sound != null:
 		_alarm_sound.queue_free()
 		_alarm_sound = null

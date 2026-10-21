@@ -68,11 +68,24 @@ always has the same *parts* and is always escapable:
   to the Surface), security office, facility manager, the **intercom
   room**, a two-storey **cafeteria** with a balcony, offices, meeting rooms,
   medical bay, break rooms, restrooms.
-- **Surface:** a night-time yard with the gate buildings, the MTF helipad,
-  Chaos trucks, Warhead Control, **watchtowers** with ramps, sandbag
-  **staging areas**, parked **vehicles** (trucks, jeeps, an APC), concrete
-  **barriers** for cover and the **EXIT road** (escape zone). Their places
-  change every round too.
+- **Surface:** a walled compound at night, built for fighting and
+  escaping:
+  - the **Gate A/B/C buildings** (where the lifts come up) around an inner
+    yard with shipping containers, sandbags and concrete barriers;
+  - a deep **ravine** across the whole site, crossed by a road **bridge**
+    and a narrow footbridge (ramps at the ends lead back out);
+  - north of it the **EXIT checkpoint** (guard booth, boom barrier,
+    chicane) with the escape road beyond the wall, and the **MTF helipad**
+    with a helicopter;
+  - east: **Hangar 2** (vehicles, a mezzanine you can walk up to), the
+    two-storey **Security HQ** (ramps to the upper floor and the roof),
+    **Warhead Control** (Delta) and a container yard with stacks you can
+    climb;
+  - south: the **Gamma reactor** compound and the **Chaos breach** — a
+    blown-out hole in the south wall with their trucks;
+  - watchtowers, a fuel depot, street lamps and floodlights.
+  The gate positions still change every round, and so do the containers
+  and cover.
 
 How the zones connect never changes:
 
@@ -128,8 +141,8 @@ the minor roles instead. Minor roles escape like Scientists.
 |---|---|---|---|
 | Where | **Heavy Containment**, the Alpha Warhead silo (console at the shaft) | Surface, Warhead Control building | Surface, the **Gamma reactor** |
 | Needs (held keycard) | Admin level 2 | Admin level 2 | Admin level 3 |
-| Countdown | 100 s, can be cancelled until 15 s are left | 90 s, can be cancelled until 10 s are left | 120 s, can't be cancelled |
-| Effect | Everyone **underground** dies; the lifts stop | Everyone **underground** dies; the lifts stop | The **whole site** is destroyed; the round ends (more escapes wins) |
+| Countdown | its music track (default 2:24), can be cancelled until 15 s are left | its music track (default 1:24), can be cancelled until 10 s are left | its music track (default 2:09), can't be cancelled |
+| Effect | Everyone **underground** dies; the lifts stop. The Surface survives. | Everyone **underground** dies; the lifts stop. The Surface survives. | The **whole site** is destroyed, Surface included; the round ends (more escapes wins) |
 
 - **Alpha Warhead silo:** a missile stands in a 14 m deep shaft, held by
   gantry arms and lit by floodlights; its status lights glow green. When
@@ -142,8 +155,23 @@ the minor roles instead. Minor roles escape like Scientists.
   so fast that the **colours come back** around it (the closer you are and
   the faster it spins, the more colour you see).
 
-During a countdown the facility lights turn red, an alarm sounds and a
-warning shows at the top of the screen.
+During a countdown:
+
+- the warhead's **music** plays and it detonates just before the track ends;
+- the **announcer** (a female text-to-speech voice) announces it, then
+  60 s, 30 s and "ten seconds, brace for impact" (with subtitles);
+- the ground **shakes**, harder and harder: Alpha and Delta shake the
+  facility a lot but the Surface only trembles; Gamma shakes the Surface
+  around the reactor and the facility only a little. Underground, dust
+  falls from the ceilings, lights flicker and distant rumbles roll through;
+- the lights turn red and a (quiet) alarm loops.
+
+When it goes off: Alpha/Delta send a fireball through the facility, the
+power dies (most lights go out, the rest glow red) and smoke and fire pour
+out of the gate buildings on the Surface, which only feels a jolt. The
+Gamma reactor goes **supernova** — a blinding sphere and a shockwave ring
+sweep over the whole site, all colour comes back — and the round ends a
+few seconds later.
 
 ### SCP-914
 
@@ -395,6 +423,17 @@ A basic admin menu for testing and messing around (turn it off with
   put it in `%APPDATA%\SCP-Noirverse\music\menu.ogg`. It loops
   automatically. Until then a placeholder track plays
   (`assets/audio/music/menu_placeholder.wav`).
+- **Warhead music:** put `AlphaWarheadEnhancedAudio.ogg`,
+  `DeltaWarheadEnhancedAudio.ogg` and `GammaWarheadEnhancedAudio.ogg` in
+  `assets/audio/music/warheads/` (or `%APPDATA%\SCP-Noirverse\music\warheads\`).
+  Each warhead's countdown is set from its track: it detonates **6 seconds
+  before the track ends** (so a 2:15 track gives a 2:09 countdown).
+- **Gamma pulsar sound:** `GammaPulsar.ogg` in the same folder. It loops at
+  the reactor, quiet while idle and roaring (and a bit higher) as the
+  reactor spins up.
+- **Announcer voice:** uses your computer's text-to-speech (on Windows it
+  picks a female voice such as "Microsoft Zira"). Volume: Settings →
+  Announcer voice (0 = off, subtitles still show).
 - **Sound effects** are in `assets/audio/sfx/` (gunshots, doors, keycard
   beeps, footsteps, lifts, explosions, alarm, SCP-914, the reactor hum,
   ambience…). They are our own, generated by `tools/make_sounds.py`. To

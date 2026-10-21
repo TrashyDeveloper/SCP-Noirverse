@@ -24,6 +24,8 @@ var _core: MeshInstance3D
 var _core_light: OmniLight3D
 var _beam_lights: Array[SpotLight3D] = []
 var _hum: AudioStreamPlayer3D
+## The pulsar sound (your GammaPulsar file, see README), louder as it spins.
+var _pulsar_sound: AudioStreamPlayer3D
 var _time := 0.0
 var _mats := {}
 
@@ -32,6 +34,17 @@ func _ready() -> void:
 	add_to_group(&"warhead_listeners")
 	_build()
 	_hum = Sfx.play_3d(self, "reactor_hum_loop", global_position + Vector3(0, CORE_HEIGHT, 0), -6.0, 0.6, self, 60.0)
+	var pulsar := Music.load_track("warheads/GammaPulsar", false, true)
+	if pulsar != null:
+		_pulsar_sound = AudioStreamPlayer3D.new()
+		_pulsar_sound.stream = pulsar
+		_pulsar_sound.bus = &"SFX"
+		_pulsar_sound.max_distance = 220.0
+		_pulsar_sound.unit_size = 25.0
+		_pulsar_sound.volume_db = -40.0
+		_pulsar_sound.position = Vector3(0, CORE_HEIGHT, 0)
+		add_child(_pulsar_sound)
+		_pulsar_sound.play()
 
 
 ## Called by the RoundManager whenever a warhead changes state.
@@ -83,6 +96,10 @@ func _process(delta: float) -> void:
 	if _hum != null:
 		_hum.pitch_scale = 0.6 + heat * 2.6
 		_hum.volume_db = -6.0 + heat * 8.0
+	if _pulsar_sound != null:
+		# Quiet while idle, roaring at full spin, a bit faster as it spins up.
+		_pulsar_sound.volume_db = lerpf(-30.0, 6.0, clampf(heat * 1.6, 0.0, 1.0))
+		_pulsar_sound.pitch_scale = 1.0 + heat * 0.5
 
 
 # --- Model ----------------------------------------------------------------------

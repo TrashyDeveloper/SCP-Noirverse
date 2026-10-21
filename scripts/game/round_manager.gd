@@ -40,9 +40,9 @@ const SURFACE_HEIGHT := 15.0
 ## Warhead rules: keycard Admin level needed, countdown seconds, and until
 ## how many seconds before detonation it can still be cancelled (-1 = never).
 const WARHEADS := {
-	WarheadConsole.Warhead.DELTA: {"name": "Delta Warhead", "admin": 2, "countdown": 90.0, "cancel_until": 10.0},
-	WarheadConsole.Warhead.GAMMA: {"name": "Gamma Warhead", "admin": 3, "countdown": 120.0, "cancel_until": -1.0},
-	WarheadConsole.Warhead.ALPHA: {"name": "Alpha Warhead", "admin": 2, "countdown": 100.0, "cancel_until": 15.0},
+	WarheadConsole.Warhead.DELTA: {"name": "Delta Warhead", "admin": 2, "countdown": 84.0, "cancel_until": 10.0},
+	WarheadConsole.Warhead.GAMMA: {"name": "Gamma Warhead", "admin": 3, "countdown": 129.0, "cancel_until": -1.0},
+	WarheadConsole.Warhead.ALPHA: {"name": "Alpha Warhead", "admin": 2, "countdown": 144.0, "cancel_until": 15.0},
 }
 
 ## Influence a side needs for each tier (tier 0 = start).
@@ -119,6 +119,13 @@ var personal_xp := {}
 ## Round time (elapsed) of the next reinforcement wave (-1 = none).
 var next_wave_at := -1.0
 var waves_spawned := 0
+
+## Countdown seconds per warhead set by the game (to match its music);
+## otherwise WARHEADS[...].countdown is used.
+var countdown_override := {}
+## After a detonation the round keeps going a few seconds (so everyone sees
+## the explosion) before it can end.
+var _blast_hold := 0.0
 
 var _consoles: Array[WarheadConsole] = []
 var _intercoms: Array[Intercom] = []
@@ -251,7 +258,9 @@ func _physics_process(delta: float) -> void:
 	if Engine.get_physics_frames() % 30 == 0:
 		_update_intercoms()
 	_update_warheads(delta)
-	if state == State.RUNNING:
+	if _blast_hold > 0.0:
+		_blast_hold -= delta
+	elif state == State.RUNNING:
 		_check_round_end()
 
 
@@ -613,7 +622,7 @@ func force_warhead(warhead: int, action: String) -> void:
 			if warhead_state[warhead] != WarheadState.IDLE:
 				return
 			warhead_state[warhead] = WarheadState.COUNTDOWN
-			warhead_time_left[warhead] = WARHEADS[warhead].countdown
+			warhead_time_left[warhead] = get_countdown(warhead)
 		"cancel":
 			if warhead_state[warhead] != WarheadState.COUNTDOWN:
 				return
@@ -689,7 +698,7 @@ func _on_warhead_console_used(console: WarheadConsole, actor: Node) -> void:
 	match warhead_state[warhead]:
 		WarheadState.IDLE:
 			warhead_state[warhead] = WarheadState.COUNTDOWN
-			warhead_time_left[warhead] = rules.countdown
+			warhead_time_left[warhead] = get_countdown(warhead)
 		WarheadState.COUNTDOWN:
 			if not _can_cancel(warhead):
 				return
@@ -713,6 +722,10 @@ func _update_warheads(delta: float) -> void:
 		_update_consoles()
 
 
+func get_countdown(warhead: int) -> float:
+	return countdown_override.get(warhead, WARHEADS[warhead].countdown)
+
+
 func _detonate(warhead: int) -> void:
 	warhead_state[warhead] = WarheadState.DETONATED
 	var rules: Dictionary = WARHEADS[warhead]
@@ -730,7 +743,15 @@ func _detonate(warhead: int) -> void:
 			elevator.disabled = true
 	warhead_changed.emit(warhead, WarheadState.DETONATED, 0.0)
 	_update_consoles()
-	if warhead == WarheadConsole.Warhead.GAMMA and state == State.RUNNING:
+	_blast_hold = 9.0 if warhead == WarheadConsole.Warhead.GAMMA else 7.0
+	if warhead == WarheadConsole.Warhead.GAMMA:
+		get_tree().create_timer(8.0).timeout.connect(_end_after_gamma)
+
+
+## The round ends a few seconds after the Gamma Warhead (once the blast has
+## swept over the site).
+func _end_after_gamma() -> void:
+	if state == State.RUNNING:
 		var scores := get_escape_scores()
 		var foundation: int = scores[CharacterClass.Side.FOUNDATION]
 		var insurgency: int = scores[CharacterClass.Side.INSURGENCY]

@@ -15,6 +15,8 @@ var fov := 80.0
 var master_volume := 0.9
 var music_volume := 0.7
 var sfx_volume := 0.9
+## The announcer's text-to-speech voice (0 = off).
+var announcer_volume := 0.9
 var fullscreen := false
 var vsync := true
 var shadows := true
@@ -23,7 +25,7 @@ var film_grain := 1.0
 var brightness := 0.0
 
 const _KEYS: Array[String] = ["mouse_sensitivity", "invert_mouse", "fov", "master_volume", "music_volume",
-	"sfx_volume", "fullscreen", "vsync", "shadows", "film_grain", "brightness"]
+	"sfx_volume", "announcer_volume", "fullscreen", "vsync", "shadows", "film_grain", "brightness"]
 
 
 static func load_settings() -> GameSettings:
