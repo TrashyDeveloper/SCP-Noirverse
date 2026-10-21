@@ -1,7 +1,7 @@
 class_name ItemHandler
 extends Node
 ## Uses whatever the character holds: shoot the pistol, use a medkit, reload,
-## switch slots, drop items. Like movement, it is driven only by
+## choose which item to hold, drop items. Like movement, it is driven only by
 ## CharacterInput, so bots and network players can use items the same way.
 
 signal equipped_changed(slot: int)
@@ -40,8 +40,8 @@ func tick(input: CharacterInput, delta: float) -> void:
 
 	if input.select_slot != -1:
 		equip(-1 if input.select_slot == equipped_slot else input.select_slot)
-	elif input.cycle_slot != 0:
-		_cycle(input.cycle_slot)
+	if input.drop_slot != -1:
+		drop_slot(input.drop_slot)
 
 	if is_reloading():
 		reload_time_left -= delta
@@ -63,8 +63,11 @@ func tick(input: CharacterInput, delta: float) -> void:
 				_use_medkit()
 
 
+## Takes the item in `slot` into the hands (-1 = empty hands). Armor is worn
+## just by carrying it, so it can't be held.
 func equip(slot: int) -> void:
-	if slot != -1 and character.inventory.get_item(slot) == null:
+	var item := character.inventory.get_item(slot)
+	if slot != -1 and (item == null or item.data.kind == ItemData.Kind.ARMOR):
 		return
 	if slot == equipped_slot:
 		return
@@ -76,10 +79,24 @@ func equip(slot: int) -> void:
 
 
 func drop_equipped() -> void:
-	var item := character.inventory.take_item(equipped_slot)
-	equip(-1)
+	drop_slot(equipped_slot)
+
+
+func drop_slot(slot: int) -> void:
+	var item := character.inventory.take_item(slot)
 	if item == null:
 		return
+	if slot == equipped_slot:
+		equip(-1)
+	_spawn_dropped(item)
+	# Dropping armor can lower the limits; extra items fall to the floor.
+	for extra in character.inventory.get_excess_slots():
+		if extra == equipped_slot:
+			equip(-1)
+		_spawn_dropped(character.inventory.take_item(extra))
+
+
+func _spawn_dropped(item: ItemInstance) -> void:
 	var camera := character.camera
 	var forward := -camera.global_basis.z
 	var pickup: ItemPickup = PICKUP_SCENE.instantiate()
@@ -91,16 +108,7 @@ func drop_equipped() -> void:
 	if hit:
 		drop_distance = maxf(camera.global_position.distance_to(hit.position) - 0.2, 0.0)
 	pickup.global_position = camera.global_position + forward * drop_distance
-	pickup.linear_velocity = forward * 2.5 + character.velocity
-
-
-func _cycle(direction: int) -> void:
-	var slot := equipped_slot
-	for i in Inventory.SLOT_COUNT:
-		slot = wrapi(slot + direction, 0, Inventory.SLOT_COUNT)
-		if character.inventory.get_item(slot) != null:
-			equip(slot)
-			return
+	pickup.linear_velocity = forward * 2.5 + character.velocity + Vector3(randf_range(-0.3, 0.3), 0, 0)
 
 
 func _fire(item: ItemInstance) -> void:
@@ -130,7 +138,7 @@ func _fire(item: ItemInstance) -> void:
 func _start_reload(item: ItemInstance) -> void:
 	if item.data.kind != ItemData.Kind.PISTOL or is_reloading():
 		return
-	if item.ammo >= item.data.magazine_size or character.inventory.reserve_ammo <= 0:
+	if item.ammo >= item.data.magazine_size or character.inventory.get_ammo(item.data.ammo_type) <= 0:
 		return
 	reload_time_left = item.data.reload_time
 	weapon_state_changed.emit()
@@ -140,7 +148,7 @@ func _finish_reload() -> void:
 	reload_time_left = 0.0
 	var item := get_equipped()
 	if item != null and item.data.kind == ItemData.Kind.PISTOL:
-		item.ammo += character.inventory.take_ammo(item.data.magazine_size - item.ammo)
+		item.ammo += character.inventory.take_ammo(item.data.ammo_type, item.data.magazine_size - item.ammo)
 	weapon_state_changed.emit()
 
 

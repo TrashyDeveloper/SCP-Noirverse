@@ -7,6 +7,10 @@ extends InputSource
 ## How far up/down you can look, in degrees.
 @export var max_pitch_degrees := 89.0
 
+## False while a menu like the inventory is open: you can still walk, but
+## mouse look and item use are paused.
+var look_enabled := true
+
 var _yaw := 0.0
 var _pitch := 0.0
 # One-shot presses are collected here until the next physics tick picks them
@@ -19,35 +23,39 @@ func set_view_angles(yaw: float, pitch: float) -> void:
 	_pitch = pitch
 
 
+## Called by the inventory screen.
+func request_select_slot(slot: int) -> void:
+	_pending.select_slot = slot
+
+
+## Called by the inventory screen.
+func request_drop_slot(slot: int) -> void:
+	_pending.drop_slot = slot
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if not enabled:
 		return
 	if event is InputEventMouseMotion:
-		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		if look_enabled and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			_yaw = wrapf(_yaw - event.relative.x * mouse_sensitivity, -PI, PI)
 			_pitch -= event.relative.y * mouse_sensitivity
 			_pitch = clampf(_pitch, -deg_to_rad(max_pitch_degrees), deg_to_rad(max_pitch_degrees))
 		return
 	if event.is_action_pressed("jump"):
 		_pending.jump = true
-	elif event.is_action_pressed("interact"):
-		_pending.interact = true
 	elif event.is_action_pressed("toggle_flashlight"):
 		_pending.toggle_flashlight = true
+	elif not look_enabled:
+		return
+	elif event.is_action_pressed("interact"):
+		_pending.interact = true
 	elif event.is_action_pressed("use_item") and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		_pending.use_item = true
 	elif event.is_action_pressed("reload"):
 		_pending.reload = true
 	elif event.is_action_pressed("drop_item"):
 		_pending.drop_item = true
-	elif event.is_action_pressed("slot_next"):
-		_pending.cycle_slot = 1
-	elif event.is_action_pressed("slot_prev"):
-		_pending.cycle_slot = -1
-	else:
-		for i in Inventory.SLOT_COUNT:
-			if event.is_action_pressed("slot_%d" % (i + 1)):
-				_pending.select_slot = i
 
 
 func sample() -> CharacterInput:

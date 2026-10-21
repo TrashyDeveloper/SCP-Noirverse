@@ -8,6 +8,11 @@ const CHARACTER_SCENE := preload("res://scenes/player/character.tscn")
 const MAIN_MENU_PATH := "res://scenes/ui/main_menu.tscn"
 
 @export var level_scene: PackedScene
+## Default rules for this match (carry limits, ammo limits). Values from
+## user://gameplay_config.cfg are applied on top when the match starts.
+@export var gameplay_config: GameplayConfig
+
+var config: GameplayConfig
 
 var level: Node3D
 var local_character: CharacterController
@@ -18,9 +23,11 @@ var local_input: LocalPlayerInput
 @onready var hud: Hud = $HUD
 @onready var pause_menu: PauseMenu = $PauseMenu
 @onready var death_screen: DeathScreen = $DeathScreen
+@onready var inventory_menu: InventoryMenu = $InventoryMenu
 
 
 func _ready() -> void:
+	config = GameplayConfig.load_with_overrides(gameplay_config)
 	level = level_scene.instantiate()
 	level_root.add_child(level)
 	_spawn_local_player()
@@ -28,6 +35,8 @@ func _ready() -> void:
 	pause_menu.main_menu_requested.connect(_go_to_main_menu)
 	death_screen.restart_requested.connect(_restart)
 	death_screen.main_menu_requested.connect(_go_to_main_menu)
+	inventory_menu.select_requested.connect(local_input.request_select_slot)
+	inventory_menu.drop_requested.connect(local_input.request_drop_slot)
 	set_paused(false)
 
 
@@ -35,6 +44,7 @@ func _spawn_local_player() -> void:
 	local_character = CHARACTER_SCENE.instantiate()
 	local_character.name = "LocalPlayer"
 	actors.add_child(local_character)
+	local_character.inventory.config = config
 	var spawn := _pick_spawn_point()
 	local_character.global_position = spawn.global_position
 	local_character.rotation.y = spawn.global_rotation.y
@@ -45,6 +55,7 @@ func _spawn_local_player() -> void:
 	local_character.possess(local_input, true)
 	local_character.died.connect(_on_local_player_died)
 	hud.bind_character(local_character)
+	inventory_menu.bind_character(local_character)
 
 
 func _pick_spawn_point() -> Node3D:
@@ -56,14 +67,30 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not local_character.is_alive:
 		return
 	if event.is_action_pressed("pause"):
-		set_paused(not get_tree().paused)
+		if inventory_menu.visible:
+			set_inventory_open(false)
+		else:
+			set_paused(not get_tree().paused)
 		get_viewport().set_input_as_handled()
-	elif event is InputEventMouseButton and event.pressed and not get_tree().paused:
+	elif event.is_action_pressed("inventory") and not get_tree().paused:
+		set_inventory_open(not inventory_menu.visible)
+		get_viewport().set_input_as_handled()
+	elif event is InputEventMouseButton and event.pressed and not get_tree().paused \
+			and not inventory_menu.visible:
 		# Clicking back into the window grabs the mouse again.
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
+func set_inventory_open(open: bool) -> void:
+	inventory_menu.visible = open
+	inventory_menu.refresh()
+	local_input.look_enabled = not open
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if open else Input.MOUSE_MODE_CAPTURED
+
+
 func set_paused(paused: bool) -> void:
+	if paused and inventory_menu.visible:
+		set_inventory_open(false)
 	get_tree().paused = paused
 	pause_menu.visible = paused
 	local_input.enabled = not paused
@@ -71,6 +98,7 @@ func set_paused(paused: bool) -> void:
 
 
 func _on_local_player_died(source: Node) -> void:
+	inventory_menu.visible = false
 	local_input.enabled = false
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	death_screen.show_death(_describe_cause_of_death(source))

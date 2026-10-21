@@ -23,6 +23,14 @@ and is committed + pushed once it works. `[x]` = done.
 - [x] Pistol: hitscan shots, magazine + reload, muzzle flash, recoil, bullet holes, hit marker
 - [x] Training dummies (firing range) and an electrical hazard for testing
 
+## Step 2.5 — Inventory rework ✅
+- [x] No hotbar: 8-slot inventory screen on **Tab** (left click hold, right click drop)
+- [x] Item categories with carry limits (SCP items, keycards, treatment, firearms, grenades, radios, special weapons, armor; others only limited by slots)
+- [x] Armor (Light / Combat / Heavy) raises some limits; dropping armor drops the extras
+- [x] Per-ammo-type limits
+- [x] Gameplay config: defaults in `resources/gameplay_config.tres`, overridable in `user://gameplay_config.cfg` (limits 0–8, 0 = can't pick up)
+- [ ] Later: flashlight and coin as inventory items, armor damage reduction, more item types per category
+
 ## Step 3 — Classes & rounds
 - [ ] Class definitions (Class-D, Scientist, Facility Guard) with spawn points, starting items and colours
 - [ ] Round manager: assign random classes, start/end a round, round-end screen

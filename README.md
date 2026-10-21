@@ -29,7 +29,7 @@ noir look. Built with **Godot 4** and **GDScript**.
 | Shift | Sprint |
 | Space | Jump |
 | E | Interact: open/close doors, pick up items |
-| 1–6 / mouse wheel | Choose which item to hold |
+| Tab | Open/close the inventory (left click = hold item, right click = drop) |
 | Left click | Use held item (shoot pistol, use medkit) |
 | R | Reload |
 | Q | Drop held item |
@@ -45,11 +45,42 @@ noir look. Built with **Godot 4** and **GDScript**.
 3. In Storage, grab the **pistol**, the **Level 2 Keycard**, ammo and a
    medkit.
 4. Open the north *Containment Chamber* (Level 2): it's a temporary firing
-   range. Press the pistol's number key, **left click** to shoot the dummies,
-   **R** to reload.
+   range. Press **Tab**, click the pistol to hold it, close with Tab, then
+   **left click** to shoot the dummies and **R** to reload.
 5. In the *Research Office* (east), careful with the sparking **exposed
    wiring** in the corner: it hurts! Hold a medkit and left click to heal.
    Stay in the sparks too long and you'll see the death screen.
+6. Try the carry limits: you can carry only **one firearm** (there's a second
+   pistol in the chamber). Pick up armor (Light in the Office, Heavy in
+   Storage, Combat in the chamber) and the limits go up. Open Tab to see them.
+
+## Inventory and carry limits
+
+You have **8 slots**. Each item belongs to a category, and each category has
+a carry limit (shown on the Tab screen):
+
+| Category | Default | Light Armor | Combat Armor | Heavy Armor |
+|---|---|---|---|---|
+| SCP Items | 3 | 3 | 3 | 3 |
+| Keycards | 3 | 3 | 3 | 3 |
+| Treatment Items (medkits…) | 3 | 3 | 3 | **4** |
+| Firearms | 1 | **2** | **2** | **3** |
+| Grenades | 2 | 2 | **3** | **4** |
+| Radios | 1 | 1 | 1 | 1 |
+| Special Weapons | 1 | 1 | 1 | 1 |
+| Armor | 1 | 1 | 1 | 1 |
+
+- Other items (e.g. coins, later) have no category limit, only the 8 slots.
+- Ammo doesn't use slots; each ammo type has its own maximum.
+- Armor is worn just by carrying it. If you drop it and now carry too much,
+  the extra items fall on the floor.
+- **Changing the limits ("server owners"):** the first time a match starts,
+  the game writes `gameplay_config.cfg` to
+  `%APPDATA%\Godot\app_userdata\SCP Noirverse\`. Open it with Notepad,
+  change the numbers (0–8; **0 means that item type can't be picked up**)
+  and start a new match. See `gameplay_config.example.cfg`. The built-in
+  defaults are in `resources/gameplay_config.tres`, and the armor bonuses
+  are on each armor's `.tres` file in `resources/items/`.
 
 ## Handy Godot tips for beginners
 

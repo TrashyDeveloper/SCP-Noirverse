@@ -25,6 +25,13 @@ static func build(data: ItemData) -> Node3D:
 			_box(root, Vector3(0.035, 0.05, 0.22), Vector3(0, 0.03, -0.03), dark, 0.6)  # slide
 			_box(root, Vector3(0.032, 0.12, 0.05), Vector3(0, -0.05, 0.05), dark, 0.3)  # grip
 			_box(root, Vector3(0.01, 0.03, 0.04), Vector3(0, -0.015, 0.0), dark, 0.6)  # trigger guard
+		ItemData.Kind.ARMOR:
+			# A vest: front plate, two shoulder straps; heavier armor is bulkier.
+			var bulk := 0.06 + 0.02 * data.limit_bonuses.size()
+			_box(root, Vector3(0.42, 0.5, bulk), Vector3.ZERO, data.color)
+			_box(root, Vector3(0.08, 0.04, 0.3), Vector3(-0.13, 0.23, 0.1), data.color.darkened(0.3))
+			_box(root, Vector3(0.08, 0.04, 0.3), Vector3(0.13, 0.23, 0.1), data.color.darkened(0.3))
+			_box(root, Vector3(0.3, 0.12, bulk + 0.02), Vector3(0, -0.08, 0), data.color.darkened(0.5))
 		ItemData.Kind.AMMO:
 			_box(root, Vector3(0.18, 0.1, 0.12), Vector3.ZERO, data.color)
 			_box(root, Vector3(0.182, 0.03, 0.122), Vector3(0, 0.02, 0), Color(0.85, 0.85, 0.8))
@@ -41,6 +48,8 @@ static func get_pickup_size(data: ItemData) -> Vector3:
 			return Vector3(0.4, 0.24, 0.28)
 		ItemData.Kind.PISTOL:
 			return Vector3(0.08, 0.17, 0.26)
+		ItemData.Kind.ARMOR:
+			return Vector3(0.44, 0.52, 0.16)
 		_:
 			return Vector3(0.18, 0.12, 0.12)
 

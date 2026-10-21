@@ -21,7 +21,8 @@ var toggle_flashlight := false
 var use_item := false
 var reload := false
 var drop_item := false
-## Inventory slot to hold (0-based), or -1 for no change.
+## Inventory slot to hold (0-based), or -1 for no change. Choosing the slot
+## already held puts the item away.
 var select_slot := -1
-## +1 / -1 to switch to the next / previous item, 0 for no change.
-var cycle_slot := 0
+## Inventory slot to drop on the floor, or -1 for none.
+var drop_slot := -1

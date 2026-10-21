@@ -24,8 +24,10 @@ func _ready() -> void:
 
 
 func get_interaction_prompt(actor: Node) -> String:
-	if actor.has_method("can_take_item") and not actor.can_take_item(item):
-		return "Inventory full"
+	if actor.has_method("get_pickup_block_reason"):
+		var reason: String = actor.get_pickup_block_reason(item)
+		if reason != "":
+			return reason
 	return "[E] Pick up %s" % item.data.display_name
 
 

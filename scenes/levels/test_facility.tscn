@@ -17,7 +17,11 @@
 [ext_resource type="Resource" path="res://resources/items/ammo_9mm.tres" id="16_ahki3"]
 [ext_resource type="Resource" path="res://resources/items/keycard_level_2.tres" id="17_r4382"]
 [ext_resource type="Resource" path="res://resources/items/pistol.tres" id="18_dndq6"]
+[ext_resource type="Resource" path="res://resources/items/armor_light.tres" id="18_jvlb6"]
+[ext_resource type="Resource" path="res://resources/items/armor_heavy.tres" id="19_luvr8"]
 [ext_resource type="PackedScene" path="res://scenes/props/training_dummy.tscn" id="19_w8d4u"]
+[ext_resource type="Resource" path="res://resources/items/armor_combat.tres" id="20_c1smh"]
+[ext_resource type="Resource" path="res://resources/items/keycard_level_3.tres" id="21_ahki3"]
 [ext_resource type="PackedScene" path="res://scenes/props/hazard_wiring.tscn" id="21_l3n31"]
 
 [node name="TestFacility" type="Node3D" unique_id=108702426]
@@ -734,6 +738,34 @@ item_data = ExtResource("16_ahki3")
 
 [node name="MedkitStorage" parent="Items" unique_id=1190445135 instance=ExtResource("12_6x7lq")]
 transform = Transform3D(0.5403023, 0, 0.84147096, 0, 1, 0, -0.84147096, 0, 0.5403023, -20, 0.2, 3)
+item_data = ExtResource("15_c1smh")
+
+[node name="LightArmor" parent="Items" unique_id=1650218336 instance=ExtResource("12_6x7lq")]
+transform = Transform3D(0.9553365, 0, 0.29552022, 0, 1, 0, -0.29552022, 0, 0.9553365, 21.5, 0.4, -3.6)
+item_data = ExtResource("18_jvlb6")
+
+[node name="HeavyArmor" parent="Items" unique_id=1989088543 instance=ExtResource("12_6x7lq")]
+transform = Transform3D(0.921061, 0, -0.38941833, 0, 1, 0, 0.38941833, 0, 0.921061, -21.4, 0.4, 1.2)
+item_data = ExtResource("19_luvr8")
+
+[node name="CombatArmor" parent="Items" unique_id=592301479 instance=ExtResource("12_6x7lq")]
+transform = Transform3D(0.9800666, 0, 0.19866933, 0, 1, 0, -0.19866933, 0, 0.9800666, 5.6, 0.4, -29)
+item_data = ExtResource("20_c1smh")
+
+[node name="KeycardL3" parent="Items" unique_id=786538351 instance=ExtResource("12_6x7lq")]
+transform = Transform3D(-0.41614684, 0, 0.9092974, 0, 1, 0, -0.9092974, 0, -0.41614684, 24, 0.92, -1.7)
+item_data = ExtResource("21_ahki3")
+
+[node name="Pistol2" parent="Items" unique_id=1298003746 instance=ExtResource("12_6x7lq")]
+transform = Transform3D(0.5403023, 0, 0.84147096, 0, 1, 0, -0.84147096, 0, 0.5403023, -5.6, 0.2, -17.5)
+item_data = ExtResource("18_dndq6")
+
+[node name="MedkitStorage2" parent="Items" unique_id=1015794536 instance=ExtResource("12_6x7lq")]
+transform = Transform3D(0.87758255, 0, 0.47942555, 0, 1, 0, -0.47942555, 0, 0.87758255, -25.2, 0.2, 1.4)
+item_data = ExtResource("15_c1smh")
+
+[node name="MedkitStorage3" parent="Items" unique_id=604078407 instance=ExtResource("12_6x7lq")]
+transform = Transform3D(0.9800666, 0, -0.19866933, 0, 1, 0, 0.19866933, 0, 0.9800666, -25.2, 0.2, 3.2)
 item_data = ExtResource("15_c1smh")
 
 [node name="Dummies" type="Node3D" parent="." unique_id=1364951686]

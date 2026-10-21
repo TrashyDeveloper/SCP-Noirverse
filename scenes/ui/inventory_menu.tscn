@@ -1,0 +1,68 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/inventory_menu.gd" id="1_inv"]
+[ext_resource type="Theme" path="res://resources/noir_theme.tres" id="2_theme"]
+
+[node name="InventoryMenu" type="CanvasLayer"]
+layer = 12
+script = ExtResource("1_inv")
+
+[node name="Dim" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+color = Color(0, 0, 0, 0.55)
+
+[node name="Center" type="CenterContainer" parent="Dim"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Layout" type="HBoxContainer" parent="Dim/Center"]
+layout_mode = 2
+theme_override_constants/separation = 36
+
+[node name="Left" type="VBoxContainer" parent="Dim/Center/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Dim/Center/Layout/Left"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "INVENTORY"
+
+[node name="Held" type="Label" parent="Dim/Center/Layout/Left"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.75, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "Holding: nothing"
+
+[node name="Grid" type="GridContainer" parent="Dim/Center/Layout/Left"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 4
+
+[node name="Hint" type="Label" parent="Dim/Center/Layout/Left"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.56, 1)
+theme_override_font_sizes/font_size = 15
+text = "Left click: hold / put away  ·  Right click: drop  ·  Tab: close"
+
+[node name="Limits" type="RichTextLabel" parent="Dim/Center/Layout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 360)
+layout_mode = 2
+theme_override_colors/default_color = Color(0.7, 0.7, 0.66, 1)
+theme_override_font_sizes/normal_font_size = 16
+theme_override_font_sizes/bold_font_size = 18
+bbcode_enabled = true
+text = "CARRY LIMITS"

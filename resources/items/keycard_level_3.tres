@@ -6,5 +6,6 @@
 script = ExtResource("1_26hw6")
 display_name = "Level 3 Keycard"
 short_name = "CARD L3"
+category = 1
 color = Color(0.08, 0.08, 0.1, 1)
 clearance = 3

@@ -7,4 +7,5 @@ script = ExtResource("1_bgcub")
 display_name = "9mm Ammo (24)"
 short_name = "AMMO"
 kind = 3
+category = 9
 color = Color(0.3, 0.32, 0.25, 1)

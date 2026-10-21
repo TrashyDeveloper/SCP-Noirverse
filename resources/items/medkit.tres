@@ -7,4 +7,5 @@ script = ExtResource("1_aln6e")
 display_name = "Medkit"
 short_name = "MEDKIT"
 kind = 1
+category = 2
 color = Color(0.7, 0.1, 0.1, 1)

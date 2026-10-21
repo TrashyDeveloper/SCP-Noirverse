@@ -90,8 +90,11 @@ func get_clearance() -> int:
 	return inventory.get_clearance()
 
 
-func can_take_item(item: ItemInstance) -> bool:
-	return is_alive and inventory.can_add(item)
+## Why this character can't pick up `item` right now ("" = it can).
+func get_pickup_block_reason(item: ItemInstance) -> String:
+	if not is_alive:
+		return "Dead"
+	return inventory.get_block_reason(item)
 
 
 func give_item(item: ItemInstance) -> bool:
