@@ -33,6 +33,8 @@ var announcer: Announcer
 ## func() -> CharacterController: the local player (may be null).
 var get_player: Callable
 
+## The black (or white) hole left by the Gamma Warhead, once it exists.
+var singularity: Singularity
 var _tracks := {}
 var _music: AudioStreamPlayer
 var _music_warhead := -1
@@ -121,6 +123,9 @@ func _process(delta: float) -> void:
 		var total := round_manager.get_countdown(warhead)
 		var progress := clampf(1.0 - left / total, 0.0, 1.0)
 		_announce_milestones(warhead, left)
+		# The Gamma music swells as the reactor overheats.
+		if warhead == WarheadConsole.Warhead.GAMMA and _music_warhead == warhead:
+			_music.volume_db = lerpf(-3.0, 4.0, progress)
 		shake += _shake_for(warhead, progress, cam.global_position, underground)
 		if underground and warhead != WarheadConsole.Warhead.GAMMA:
 			_flicker(delta, progress)
@@ -290,6 +295,13 @@ func _supernova() -> void:
 	hud.flash_white(6.0)
 	_fireball(c, 420.0, Color(0.75, 0.95, 1.0), 5.0)
 	_fireball(c, 140.0, Color(1.0, 0.9, 0.6), 2.5)
+	# What's left: a black hole - or, rarely, a white hole.
+	get_tree().create_timer(1.5).timeout.connect(func():
+		singularity = Singularity.new()
+		singularity.white = randf() < Singularity.WHITE_CHANCE
+		level.add_child(singularity)
+		singularity.global_position = c + Vector3(0, 4.0, 0)
+		announcer.say("Gravitational anomaly detected." if not singularity.white else "Unknown radiation source detected.", true))
 	# Shockwave ring along the ground.
 	var ring := MeshInstance3D.new()
 	var torus := TorusMesh.new()

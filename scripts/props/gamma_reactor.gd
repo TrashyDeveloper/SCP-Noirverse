@@ -4,59 +4,50 @@ extends Node3D
 ## between four pylons inside spinning gyroscope rings, with two pulsar
 ## beams sweeping around it.
 ##
-## Idle it turns slowly. When the Gamma Warhead is activated it spins up
-## faster and faster, like a pulsar, until it spins so fast that the noir
-## filter can't hold: colour floods back into the world around it (Game reads
-## get_color_strength() / get_color_radius() for the screen filter).
+## Idle it turns slowly. Once the Gamma Warhead is activated it overheats
+## as its music plays on: it spins faster and faster, the core grows bigger
+## and brighter, colour floods back into the world around it, reality starts
+## to glitch (the screen of anyone close by, and in the end everyone's),
+## the gyroscope rings break off one by one and finally the four pylons
+## topple. When it goes off it leaves a black hole (or, rarely, a white hole).
+## Game reads the get_* functions for the screen effects.
 ## Origin = ground level at the centre.
 
 const CORE_HEIGHT := 4.6
 const IDLE_SPIN := 0.6
-const MAX_SPIN := 70.0
-## At this point in the pulsar audio (every loop) the reactor stops dead...
-const STOP_AT := 20.05
-## ...stays still this long...
-const STOP_TIME := 0.12
-## ...then spins this many times faster until the audio loops.
-const AFTER_STOP_SPEED := 3.0
-## In the last FINAL_SECONDS before detonation it spins this much faster,
-## no matter where the pulsar audio is.
-const FINAL_SECONDS := 30.0
-const FINAL_SPEED := 5.0
-## Loop length used for the stop when there is no GammaPulsar audio file.
-const FALLBACK_LOOP := 40.0
+const MAX_SPIN := 110.0
+## Countdown progress (0..1) at which each ring breaks off.
+const RING_BREAKS: Array[float] = [0.45, 0.6, 0.72]
+## Countdown progress at which each pylon topples.
+const PYLON_BREAKS: Array[float] = [0.82, 0.87, 0.92, 0.96]
+## The core grows to this many times its size by the end.
+const CORE_GROWTH := 4.5
 
 var spin := IDLE_SPIN
+## 0 = calm, 1 = about to go off (follows the countdown, i.e. the music).
+var progress := 0.0
 var _state := 0
 var _time_left := 0.0
 var _countdown := 120.0
 var _rings: Array[Node3D] = []
+var _pylons: Array[Node3D] = []
+var _hub: Node3D
 var _pulsar: Node3D
 var _core: MeshInstance3D
+var _core_material: StandardMaterial3D
+var _halo: MeshInstance3D
 var _core_light: OmniLight3D
 var _beam_lights: Array[SpotLight3D] = []
 var _hum: AudioStreamPlayer3D
-## The pulsar sound (your GammaPulsar file, see README), louder as it spins.
-var _pulsar_sound: AudioStreamPlayer3D
 var _time := 0.0
+var _detonated_at := 0.0
 var _mats := {}
 
 
 func _ready() -> void:
 	add_to_group(&"warhead_listeners")
 	_build()
-	_hum = Sfx.play_3d(self, "reactor_hum_loop", global_position + Vector3(0, CORE_HEIGHT, 0), -6.0, 0.6, self, 60.0)
-	var pulsar := Music.load_track("warheads/GammaPulsar", false, true)
-	if pulsar != null:
-		_pulsar_sound = AudioStreamPlayer3D.new()
-		_pulsar_sound.stream = pulsar
-		_pulsar_sound.bus = &"SFX"
-		_pulsar_sound.max_distance = 220.0
-		_pulsar_sound.unit_size = 25.0
-		_pulsar_sound.volume_db = -40.0
-		_pulsar_sound.position = Vector3(0, CORE_HEIGHT, 0)
-		add_child(_pulsar_sound)
-		_pulsar_sound.play()
+	_hum = Sfx.play_3d(self, "reactor_hum_loop", global_position + Vector3(0, CORE_HEIGHT, 0), -6.0, 0.6, self, 70.0)
 
 
 ## Called by the RoundManager whenever a warhead changes state.
@@ -67,16 +58,35 @@ func on_warhead_changed(warhead: int, state: int, time_left: float) -> void:
 		_countdown = maxf(time_left, 1.0)
 	_state = state
 	_time_left = time_left
+	if state == RoundManager.WarheadState.DETONATED:
+		_collapse()
 
 
 ## 0 = no colour, 1 = full colour around the reactor.
 func get_color_strength() -> float:
-	return clampf(0.12 + (spin - IDLE_SPIN) / (MAX_SPIN - IDLE_SPIN) * 1.2, 0.0, 1.0)
+	if _state == RoundManager.WarheadState.DETONATED:
+		return 0.0
+	return clampf(0.12 + progress * 1.3, 0.0, 1.0)
 
 
 ## How far (meters) the colour reaches.
 func get_color_radius() -> float:
-	return 8.0 + (spin - IDLE_SPIN) / (MAX_SPIN - IDLE_SPIN) * 60.0
+	return 8.0 + progress * progress * 90.0
+
+
+## Screen glitching for people near the reactor (0..1).
+func get_glitch() -> float:
+	if _state == RoundManager.WarheadState.DETONATED:
+		return 0.0
+	return pow(clampf((progress - 0.3) / 0.7, 0.0, 1.0), 1.5)
+
+
+## Screen glitching for everyone, wherever they are (the very end, fading
+## away a few seconds after the blast).
+func get_global_glitch() -> float:
+	if _state == RoundManager.WarheadState.DETONATED:
+		return clampf(1.0 - (_time - _detonated_at) / 3.0, 0.0, 1.0)
+	return clampf((progress - 0.88) / 0.12, 0.0, 1.0)
 
 
 func get_core_position() -> Vector3:
@@ -85,54 +95,125 @@ func get_core_position() -> Vector3:
 
 func _process(delta: float) -> void:
 	_time += delta
-	var target := IDLE_SPIN
+	if _state == RoundManager.WarheadState.DETONATED:
+		return
 	if _state == RoundManager.WarheadState.COUNTDOWN:
 		_time_left = maxf(_time_left - delta, 0.0)
-		var progress := 1.0 - _time_left / _countdown
-		target = lerpf(2.0, MAX_SPIN, pow(progress, 2.2))
-	elif _state == RoundManager.WarheadState.DETONATED:
-		target = 0.0
-	spin = lerpf(spin, target, minf(delta * 0.8, 1.0))
-	var turn := spin * get_spin_multiplier()
+		progress = clampf(1.0 - _time_left / _countdown, 0.0, 1.0)
+	else:
+		progress = move_toward(progress, 0.0, delta * 0.1)
+	var target := lerpf(IDLE_SPIN, MAX_SPIN, pow(progress, 1.6)) if progress > 0.0 else IDLE_SPIN
+	spin = lerpf(spin, target, minf(delta * 1.5, 1.0))
 	# Gyroscope rings on different axes, the pulsar beams sweeping around.
 	for i in _rings.size():
+		if _rings[i].has_meta("broken"):
+			continue
 		var axis: Vector3 = _rings[i].get_meta("axis")
-		_rings[i].rotate_object_local(axis, delta * turn * (0.6 + i * 0.35) * (1.0 if i % 2 == 0 else -1.0))
-	_pulsar.rotate_y(delta * turn * 1.5)
-	var pulse := 0.5 + 0.5 * sin(_time * (3.0 + spin * 0.6))
-	var heat := clampf(spin / MAX_SPIN, 0.0, 1.0)
-	_core.scale = Vector3.ONE * (1.0 + pulse * 0.08 + heat * 0.25)
-	_core_light.light_energy = 3.0 + heat * 12.0 + pulse * 1.5
-	_core_light.omni_range = 14.0 + heat * 30.0
+		_rings[i].rotate_object_local(axis, delta * spin * (0.6 + i * 0.35) * (1.0 if i % 2 == 0 else -1.0))
+	_pulsar.rotate_y(delta * spin * 1.5)
+	# Overheating: the core swells, burns whiter and shakes.
+	var pulse := 0.5 + 0.5 * sin(_time * (3.0 + spin * 0.4))
+	var grow := 1.0 + pow(progress, 1.4) * (CORE_GROWTH - 1.0)
+	var jitter := Vector3(randf() - 0.5, randf() - 0.5, randf() - 0.5) * progress * progress * 0.4
+	_core.scale = Vector3.ONE * grow * (1.0 + pulse * 0.08)
+	_core.position = jitter
+	_halo.scale = Vector3.ONE * grow * (1.15 + pulse * 0.15)
+	_core_material.emission = Color(0.75, 0.95, 1.0).lerp(Color(1.0, 1.0, 1.0), progress)
+	_core_material.emission_energy_multiplier = 6.0 + progress * 20.0
+	_core_light.light_energy = 3.0 + progress * 30.0 + pulse * 2.0
+	_core_light.omni_range = 14.0 + progress * 60.0
+	_core_light.light_color = Color(0.55, 0.85, 1.0).lerp(Color(1.0, 0.98, 0.95), progress)
 	for l in _beam_lights:
-		l.light_energy = 4.0 + heat * 20.0
+		l.light_energy = 4.0 + progress * 40.0
 	if _hum != null:
-		_hum.pitch_scale = 0.6 + heat * 2.6
-		_hum.volume_db = -6.0 + heat * 8.0
-	if _pulsar_sound != null:
-		# Quiet while idle, roaring at full spin, a bit faster as it spins up.
-		_pulsar_sound.volume_db = lerpf(-30.0, 6.0, clampf(heat * 1.6, 0.0, 1.0))
+		_hum.pitch_scale = 0.6 + progress * 2.4
+		_hum.volume_db = -6.0 + progress * 10.0
+	# Things breaking.
+	for i in RING_BREAKS.size():
+		if progress >= RING_BREAKS[i] and i < _rings.size() and not _rings[i].has_meta("broken"):
+			_break_ring(_rings[i])
+	for i in PYLON_BREAKS.size():
+		if progress >= PYLON_BREAKS[i] and i < _pylons.size() and not _pylons[i].has_meta("broken"):
+			_break_pylon(_pylons[i])
 
 
-## Where we are in the pulsar loop (seconds), taken straight from the
-## pulsar audio so the stop always happens exactly with the sound.
-func get_loop_position() -> float:
-	if _pulsar_sound != null and _pulsar_sound.playing:
-		return _pulsar_sound.get_playback_position() + AudioServer.get_time_since_last_mix()
-	return fmod(_time, FALLBACK_LOOP)
+## A ring tears loose and crashes to the ground in pieces.
+func _break_ring(ring: Node3D) -> void:
+	ring.set_meta("broken", true)
+	var pos := ring.global_position
+	var away := Vector3(randf_range(-1, 1), 0, randf_range(-1, 1)).normalized()
+	_sparks(pos, 60)
+	Sfx.play_3d(self, "explosion", pos, 2.0, 1.4, null, 120.0)
+	var t := create_tween().set_parallel()
+	t.tween_property(ring, "position", ring.position + away * 9.0 + Vector3(0, -CORE_HEIGHT + 0.5, 0), 1.6).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+	t.tween_property(ring, "rotation", ring.rotation + Vector3(randf_range(2, 5), randf_range(2, 5), randf_range(2, 5)), 1.6)
+	t.chain().tween_callback(func():
+		_debris(ring.global_position, 12, Color(0.6, 0.6, 0.65))
+		_sparks(ring.global_position, 40)
+		ring.visible = false)
 
 
-## 1 before the stop, 0 during the stop, 3 after it (until the audio loops);
-## 5 all the time in the last 30 seconds before the Gamma Warhead goes off.
-func get_spin_multiplier() -> float:
-	if _state == RoundManager.WarheadState.COUNTDOWN and _time_left <= FINAL_SECONDS:
-		return FINAL_SPEED
-	var pos := get_loop_position()
-	if pos < STOP_AT:
-		return 1.0
-	if pos < STOP_AT + STOP_TIME:
-		return 0.0
-	return AFTER_STOP_SPEED
+## A pylon snaps at its base and falls outwards.
+func _break_pylon(pylon: Node3D) -> void:
+	pylon.set_meta("broken", true)
+	var axis: Vector3 = pylon.get_meta("axis")
+	var cable: Node3D = pylon.get_meta("cable")
+	if is_instance_valid(cable):
+		cable.queue_free()
+	_sparks(pylon.global_position + Vector3(0, 1, 0), 50)
+	Sfx.play_3d(self, "explosion", pylon.global_position, 4.0, 0.8, null, 140.0)
+	var t := create_tween()
+	t.tween_method(func(a: float): pylon.basis = Basis(axis, a), -0.18, -1.52, 1.4).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+	t.tween_callback(func():
+		_debris(pylon.global_position + (pylon.global_basis.y * 6.0), 10, Color(0.15, 0.15, 0.17))
+		Sfx.play_3d(self, "explosion", pylon.global_position, 0.0, 1.6, null, 100.0))
+
+
+## The reactor is gone: only the scorched base remains.
+func _collapse() -> void:
+	_detonated_at = _time
+	_hub.visible = false
+	for pylon in _pylons:
+		pylon.visible = false
+	if _hum != null:
+		_hum.queue_free()
+		_hum = null
+
+
+func _sparks(pos: Vector3, amount: int) -> void:
+	var p := CPUParticles3D.new()
+	p.one_shot = true
+	p.amount = amount
+	p.lifetime = 1.2
+	p.explosiveness = 0.95
+	p.spread = 180.0
+	p.initial_velocity_min = 6.0
+	p.initial_velocity_max = 16.0
+	p.gravity = Vector3(0, -12, 0)
+	var mesh := BoxMesh.new()
+	mesh.size = Vector3(0.05, 0.05, 0.25)
+	mesh.material = _glow(Color(1.0, 0.8, 0.4), 6.0)
+	p.mesh = mesh
+	p.particle_flag_align_y = true
+	get_parent().add_child(p)
+	p.global_position = pos
+	p.emitting = true
+	get_tree().create_timer(3.0).timeout.connect(p.queue_free)
+
+
+func _debris(pos: Vector3, count: int, color: Color) -> void:
+	for i in count:
+		var chunk := RigidBody3D.new()
+		chunk.collision_layer = 0
+		chunk.collision_mask = 1
+		var size := Vector3(randf_range(0.2, 0.7), randf_range(0.1, 0.4), randf_range(0.2, 0.9))
+		PropBuilder.add_box(chunk, Vector3.ZERO, size, _metal(color))
+		PropBuilder.add_shape(chunk, Vector3.ZERO, size)
+		get_parent().add_child(chunk)
+		chunk.global_position = pos + Vector3(randf_range(-1, 1), randf_range(0.2, 1.5), randf_range(-1, 1))
+		chunk.linear_velocity = Vector3(randf_range(-7, 7), randf_range(3, 9), randf_range(-7, 7))
+		chunk.angular_velocity = Vector3(randf_range(-6, 6), randf_range(-6, 6), randf_range(-6, 6))
+		get_tree().create_timer(20.0).timeout.connect(chunk.queue_free)
 
 
 # --- Model ----------------------------------------------------------------------
@@ -158,13 +239,15 @@ func _build() -> void:
 		var pylon := Node3D.new()
 		pylon.position = base
 		pylon.basis = Basis(Vector3(-dir.z, 0, dir.x), -0.18)
+		pylon.set_meta("axis", Vector3(-dir.z, 0, dir.x))
 		add_child(pylon)
+		_pylons.append(pylon)
 		_cone(pylon, 0.45, 0.22, 8.0, Vector3(0, 4.0, 0), dark, 16)
 		for y: float in [2.0, 3.2, 4.4, 5.6, 6.8]:
 			_torus(pylon, 0.36 - y * 0.02, 0.07, Vector3(0, y, 0), _glow(Color(1.0, 0.35, 0.8), 2.5))
 		_sphere(pylon, 0.35, Vector3(0, 8.1, 0), _glow(Color(0.3, 0.9, 1.0), 4.0))
 		PropBuilder.add_shape(body, base + Vector3(0, 2.0, 0), Vector3(1.0, 4.0, 1.0))
-		_cable(base + Vector3(0, 6.0, 0) - dir * 0.9, Vector3(0, CORE_HEIGHT, 0) + dir * 1.0)
+		pylon.set_meta("cable", _cable(base + Vector3(0, 6.0, 0) - dir * 0.9, Vector3(0, CORE_HEIGHT, 0) + dir * 1.0))
 	# The core and its gyroscope rings.
 	var hub := Node3D.new()
 	hub.position = Vector3(0, CORE_HEIGHT, 0)
@@ -177,7 +260,10 @@ func _build() -> void:
 	_core.material_override = _glow(Color(0.75, 0.95, 1.0), 6.0)
 	_core.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	hub.add_child(_core)
+	_hub = hub
+	_core_material = _core.material_override
 	var halo := _sphere(hub, 1.3, Vector3.ZERO, _glow(Color(0.3, 0.6, 1.0, 0.25), 2.0, true))
+	_halo = halo
 	halo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var ring_specs := [
 		[1.8, 0.08, Color(1.0, 0.75, 0.2), Vector3(1, 0, 0)],
@@ -231,7 +317,7 @@ func _build() -> void:
 	sign.modulate = Color(0.5, 0.85, 1.0)
 
 
-func _cable(a: Vector3, b: Vector3) -> void:
+func _cable(a: Vector3, b: Vector3) -> MeshInstance3D:
 	var mesh := CylinderMesh.new()
 	mesh.top_radius = 0.06
 	mesh.bottom_radius = 0.06
@@ -243,6 +329,7 @@ func _cable(a: Vector3, b: Vector3) -> void:
 	m.position = (a + b) / 2
 	m.basis = Basis(Quaternion(Vector3.UP, (b - a).normalized()))
 	add_child(m)
+	return m
 
 
 func _beam_material() -> StandardMaterial3D:

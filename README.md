@@ -150,10 +150,15 @@ the minor roles instead. Minor roles escape like Scientists.
   the status lights blink red and the warhead slowly rises out of the
   shaft while the screen counts down.
 - **Gamma reactor:** a fusion core hanging between four pylons inside
-  spinning gyroscope rings, with two pulsar beams sweeping around. When the
-  Gamma Warhead is activated it spins up faster and faster, until it spins
-  so fast that the **colours come back** around it (the closer you are and
-  the faster it spins, the more colour you see).
+  spinning gyroscope rings, with two pulsar beams sweeping around. Once the
+  Gamma Warhead is activated it **overheats along with its music**: it
+  spins faster and faster, the core grows bigger and burns whiter, colour
+  floods back around it and the music swells. Reality starts **glitching**
+  for anyone near it (torn picture, split colours, static, flashes) — and in
+  the last seconds for everyone. The rings **break off one by one** and
+  crash down, then the four **pylons snap and topple**. After the blast it
+  leaves a **black hole** that bends the light around it and swallows loose
+  objects — or, with a 5% chance, a blazing **white hole**.
 
 During a countdown:
 
@@ -428,13 +433,6 @@ A basic admin menu for testing and messing around (turn it off with
   `assets/audio/music/warheads/` (or `%APPDATA%\SCP-Noirverse\music\warheads\`).
   Each warhead's countdown is set from its track: it detonates **6 seconds
   before the track ends** (so a 2:15 track gives a 2:09 countdown).
-- **Gamma pulsar sound:** `GammaPulsar.ogg` in the same folder. It loops at
-  the reactor, quiet while idle and roaring as the reactor spins up. The
-  reactor follows the audio: every loop, at **20.05 s** into the track, it
-  stops dead, then a split second later spins on **3× faster** until the
-  track loops and it starts over. In the **last 30 seconds** before the
-  Gamma Warhead goes off it spins **5× faster** the whole time, whatever the
-  audio is doing.
 - **Announcer voice:** uses your computer's text-to-speech (on Windows it
   picks a female voice such as "Microsoft Zira"). Volume: Settings →
   Announcer voice (0 = off, subtitles still show).

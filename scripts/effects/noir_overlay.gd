@@ -49,6 +49,19 @@ func set_film(grain: float, bright: float) -> void:
 	m.set_shader_parameter("brightness", bright)
 
 
+## Reality glitching (0 = off, 1 = breaking apart).
+func set_glitch(amount: float) -> void:
+	_material().set_shader_parameter("glitch", clampf(amount, 0.0, 1.0))
+
+
+## Bends the picture around a point (black/white hole). strength 0 = off.
+func set_lens(center: Vector2, radius: float, strength: float) -> void:
+	var m := _material()
+	m.set_shader_parameter("lens_center", center)
+	m.set_shader_parameter("lens_radius", radius)
+	m.set_shader_parameter("lens_strength", strength)
+
+
 ## Brings colour back inside a circle on screen (`center` in screen UV,
 ## `radius` in screen heights, `strength` 0..1). strength 0 turns it off.
 func set_color_zone(center: Vector2, radius: float, strength: float) -> void:

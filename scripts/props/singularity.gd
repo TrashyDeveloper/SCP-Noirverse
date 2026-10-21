@@ -1,0 +1,213 @@
+class_name Singularity
+extends Node3D
+## What the Gamma reactor leaves behind: a black hole - a black sphere
+## with a burning accretion disk swirling around it, sucking in loose
+## objects and bending the light around it - or, with a 5% chance, a white
+## hole that blazes and throws everything away from it.
+
+## Chance that it becomes a white hole instead.
+const WHITE_CHANCE := 0.05
+const RADIUS := 6.0
+
+var white := false
+var _disks: Array[Node3D] = []
+var _rays: Node3D
+var _grow := 0.0
+var _time := 0.0
+var _bodies: Array = []
+
+
+func _ready() -> void:
+	if white:
+		_build_white()
+	else:
+		_build_black()
+	scale = Vector3.ONE * 0.01
+	create_tween().tween_property(self, "scale", Vector3.ONE, 3.0).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
+
+
+## How strongly it bends the light on screen (+ pulls in, - pushes out).
+func get_lens_strength() -> float:
+	return (-0.5 if white else 0.9) * scale.x
+
+
+func get_world_radius() -> float:
+	return RADIUS * scale.x
+
+
+func _physics_process(delta: float) -> void:
+	_time += delta
+	for i in _disks.size():
+		_disks[i].rotate_object_local(Vector3.UP, delta * (2.5 - i * 0.8))
+	if _rays != null:
+		_rays.rotate_y(delta * 0.6)
+		_rays.scale = Vector3.ONE * (1.0 + sin(_time * 3.0) * 0.08)
+	# Pull in (or blow away) loose objects nearby (the list is refreshed now
+	# and then; searching every frame would be slow).
+	if Engine.get_physics_frames() % 30 == 0:
+		_bodies = get_tree().current_scene.find_children("*", "RigidBody3D", true, false) if get_tree().current_scene != null else []
+	for node in _bodies:
+		if not is_instance_valid(node):
+			continue
+		var b := node as RigidBody3D
+		var to := global_position - b.global_position
+		var d := to.length()
+		if d < 90.0 and d > 0.5:
+			var force := to.normalized() * (1400.0 / maxf(d, 3.0)) * b.mass * (-0.6 if white else 1.0)
+			b.apply_central_force(force)
+			if not white and d < RADIUS * 0.8:
+				b.queue_free()
+
+
+func _build_black() -> void:
+	var core := _sphere(RADIUS, _unshaded(Color(0, 0, 0, 1), false))
+	core.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# Photon ring hugging the horizon.
+	_ring(RADIUS * 1.08, 0.12, Color(1.0, 0.95, 0.85, 1.0), 0.0)
+	# Accretion disks: hot inner, cooler outer, slightly tilted.
+	_disks.append(_disk(RADIUS * 1.6, RADIUS * 2.6, Color(1.0, 0.75, 0.4, 0.9), 0.12))
+	_disks.append(_disk(RADIUS * 2.6, RADIUS * 4.2, Color(1.0, 0.4, 0.15, 0.6), 0.08))
+	var halo := _sphere(RADIUS * 1.35, _unshaded(Color(1.0, 0.55, 0.2, 0.15), true))
+	halo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var light := OmniLight3D.new()
+	light.light_color = Color(1.0, 0.6, 0.3)
+	light.light_energy = 8.0
+	light.omni_range = 70.0
+	add_child(light)
+	# Matter spiralling in.
+	var p := _particles(Color(1.0, 0.7, 0.4, 0.8))
+	p.emission_shape = CPUParticles3D.EMISSION_SHAPE_RING
+	p.emission_ring_axis = Vector3.UP
+	p.emission_ring_radius = RADIUS * 5.0
+	p.emission_ring_inner_radius = RADIUS * 3.5
+	p.emission_ring_height = 1.0
+	p.radial_accel_min = -30.0
+	p.radial_accel_max = -18.0
+	p.tangential_accel_min = 20.0
+	p.tangential_accel_max = 30.0
+
+
+func _build_white() -> void:
+	var core := _sphere(RADIUS, _unshaded(Color(1, 1, 1, 1), false, 8.0))
+	core.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var halo := _sphere(RADIUS * 1.6, _unshaded(Color(0.85, 0.95, 1.0, 0.25), true))
+	halo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_ring(RADIUS * 1.25, 0.2, Color(1, 1, 1, 1), 0.0)
+	# Rays shooting out in all directions.
+	_rays = Node3D.new()
+	add_child(_rays)
+	for i in 24:
+		var ray := MeshInstance3D.new()
+		var mesh := CylinderMesh.new()
+		mesh.top_radius = 0.02
+		mesh.bottom_radius = 0.5
+		mesh.height = 40.0
+		ray.mesh = mesh
+		ray.material_override = _unshaded(Color(0.9, 0.95, 1.0, 0.35), true)
+		ray.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var dir := Vector3(randf_range(-1, 1), randf_range(-0.6, 1), randf_range(-1, 1)).normalized()
+		ray.basis = Basis(Quaternion(Vector3.UP, dir))
+		ray.position = dir * (RADIUS + 20.0)
+		_rays.add_child(ray)
+	var light := OmniLight3D.new()
+	light.light_color = Color(0.95, 0.97, 1.0)
+	light.light_energy = 25.0
+	light.omni_range = 140.0
+	add_child(light)
+	# Matter pouring out.
+	var p := _particles(Color(0.9, 0.95, 1.0, 0.8))
+	p.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	p.emission_sphere_radius = RADIUS
+	p.spread = 180.0
+	p.initial_velocity_min = 10.0
+	p.initial_velocity_max = 25.0
+	p.radial_accel_min = 10.0
+	p.radial_accel_max = 20.0
+
+
+func _particles(color: Color) -> CPUParticles3D:
+	var p := CPUParticles3D.new()
+	p.amount = 400
+	p.lifetime = 4.0
+	p.gravity = Vector3.ZERO
+	p.scale_amount_min = 0.5
+	p.scale_amount_max = 1.5
+	var mesh := SphereMesh.new()
+	mesh.radius = 0.15
+	mesh.height = 0.3
+	mesh.radial_segments = 6
+	mesh.rings = 3
+	mesh.material = _unshaded(color, true)
+	p.mesh = mesh
+	add_child(p)
+	return p
+
+
+func _disk(inner: float, outer: float, color: Color, tilt: float) -> Node3D:
+	var pivot := Node3D.new()
+	pivot.rotation.x = tilt
+	add_child(pivot)
+	var mesh := TorusMesh.new()
+	mesh.inner_radius = inner
+	mesh.outer_radius = outer
+	mesh.rings = 64
+	mesh.ring_segments = 12
+	var m := MeshInstance3D.new()
+	m.mesh = mesh
+	m.scale = Vector3(1, 0.04, 1)
+	m.material_override = _unshaded(color, true)
+	m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	pivot.add_child(m)
+	return pivot
+
+
+func _ring(radius: float, thickness: float, color: Color, tilt: float) -> void:
+	var mesh := TorusMesh.new()
+	mesh.inner_radius = radius - thickness
+	mesh.outer_radius = radius + thickness
+	mesh.rings = 64
+	var m := MeshInstance3D.new()
+	m.mesh = mesh
+	m.rotation.x = PI / 2 + tilt
+	m.material_override = _unshaded(color, true, 4.0)
+	m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# Always faces the viewer, like a real photon ring.
+	var face := Node3D.new()
+	add_child(face)
+	face.add_child(m)
+	face.set_meta("billboard", true)
+
+
+func _process(_delta: float) -> void:
+	var cam := get_viewport().get_camera_3d()
+	if cam == null:
+		return
+	for child in get_children():
+		if child.has_meta("billboard") and child is Node3D:
+			var to := cam.global_position - global_position
+			if to.length() > 0.1:
+				(child as Node3D).look_at(global_position - to, Vector3.UP)
+
+
+func _sphere(radius: float, material: Material) -> MeshInstance3D:
+	var mesh := SphereMesh.new()
+	mesh.radius = radius
+	mesh.height = radius * 2
+	mesh.radial_segments = 48
+	mesh.rings = 24
+	var m := MeshInstance3D.new()
+	m.mesh = mesh
+	m.material_override = material
+	add_child(m)
+	return m
+
+
+func _unshaded(color: Color, additive: bool, energy := 1.0) -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.albedo_color = Color(color.r * energy, color.g * energy, color.b * energy, color.a) if energy > 1.0 else color
+	if additive:
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+		m.cull_mode = BaseMaterial3D.CULL_DISABLED
+	return m

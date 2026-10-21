@@ -183,16 +183,23 @@ func _process(_delta: float) -> void:
 	_update_reactor_colors()
 
 
-## Colour comes back on screen around the spinning Gamma reactor.
+## Screen effects of the Gamma reactor: colour around it, reality glitching
+## near it (everywhere at the very end) and the lens of the black/white hole.
 func _update_reactor_colors() -> void:
 	var cam := get_viewport().get_camera_3d()
-	if _reactor == null or cam == null:
+	if cam == null:
+		return
+	_update_lens(cam)
+	if _reactor == null:
 		noir_overlay.set_color_zone(Vector2.ZERO, 0.0, 0.0)
+		noir_overlay.set_glitch(0.0)
 		return
 	var core := _reactor.get_core_position()
+	var distance := cam.global_position.distance_to(core)
+	var near := clampf(1.0 - distance / 110.0, 0.0, 1.0)
+	noir_overlay.set_glitch(_reactor.get_glitch() * near + _reactor.get_global_glitch())
 	var reach := _reactor.get_color_radius()
 	var strength := _reactor.get_color_strength()
-	var distance := cam.global_position.distance_to(core)
 	var size := get_viewport().get_visible_rect().size
 	if distance < reach * 0.6:
 		# Standing inside the field: the whole screen gets its colour back.
@@ -211,8 +218,19 @@ func _update_reactor_colors() -> void:
 	noir_overlay.set_color_zone(screen / size, radius, strength * clampf(1.5 - distance / (reach * 4.0), 0.0, 1.0))
 
 
-## Presentation only: alarm lights while a warhead counts down, and a white
-## flash when one goes off.
+func _update_lens(cam: Camera3D) -> void:
+	var hole := warhead_director.singularity if warhead_director != null else null
+	if hole == null or not is_instance_valid(hole) or cam.is_position_behind(hole.global_position):
+		noir_overlay.set_lens(Vector2.ZERO, 0.0, 0.0)
+		return
+	var size := get_viewport().get_visible_rect().size
+	var screen := cam.unproject_position(hole.global_position)
+	var edge := cam.unproject_position(hole.global_position + cam.global_basis.x * hole.get_world_radius())
+	noir_overlay.set_lens(screen / size, screen.distance_to(edge) / size.y, hole.get_lens_strength())
+
+
+## Presentation only: alarm lights while a warhead counts down (the
+## WarheadDirector does the rest).
 func _on_warhead_changed(_warhead: int, _state: int, _time_left: float) -> void:
 	var counting := false
 	for warhead in round_manager.warhead_state:

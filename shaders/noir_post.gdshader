@@ -20,6 +20,14 @@ uniform float scratch_amount : hint_range(0.0, 1.0) = 0.35;
 uniform vec2 color_center = vec2(0.5, 0.5);
 uniform float color_radius = 0.0;
 uniform float color_strength : hint_range(0.0, 1.0) = 0.0;
+// Reality breaking down (near the overheating Gamma reactor): torn lines,
+// colour channels splitting apart, blocks of static, inverted flashes.
+uniform float glitch : hint_range(0.0, 1.0) = 0.0;
+// Gravitational lens (the black/white hole): centre in screen UV, radius in
+// screen heights, strength > 0 pulls light in, < 0 pushes it out.
+uniform vec2 lens_center = vec2(0.5, 0.5);
+uniform float lens_radius = 0.0;
+uniform float lens_strength = 0.0;
 
 float hash(vec2 p) {
 	p = fract(p * vec2(123.34, 456.21));
@@ -28,7 +36,38 @@ float hash(vec2 p) {
 }
 
 void fragment() {
-	vec3 color = texture(screen_texture, SCREEN_UV).rgb;
+	float frame = floor(TIME * 24.0);
+	vec2 uv = SCREEN_UV;
+	float aspect = SCREEN_PIXEL_SIZE.y / SCREEN_PIXEL_SIZE.x;
+
+	// Gravitational lens: bend the picture around the hole.
+	if (lens_radius > 0.0 && lens_strength != 0.0) {
+		vec2 dv = (uv - lens_center) * vec2(aspect, 1.0);
+		float d = max(length(dv), 0.0001);
+		float reach = smoothstep(lens_radius * 5.0, lens_radius * 1.1, d);
+		float bend = lens_strength * lens_radius * lens_radius / max(d, lens_radius * 0.6) * reach;
+		uv -= (dv / d) / vec2(aspect, 1.0) * bend * 0.35;
+		// Swirl around a black hole.
+		float swirl = lens_strength * reach * 0.6;
+		vec2 rel = uv - lens_center;
+		float c = cos(swirl), s = sin(swirl);
+		uv = lens_center + vec2(rel.x * c - rel.y * s, rel.x * s + rel.y * c);
+	}
+
+	// Glitch: tear some horizontal bands sideways.
+	float g = glitch;
+	if (g > 0.0) {
+		float band = floor(uv.y * mix(12.0, 60.0, hash(vec2(frame, 11.0))));
+		float tear = step(1.0 - g * 0.45, hash(vec2(band, frame)));
+		uv.x += (hash(vec2(band, frame + 3.0)) - 0.5) * 0.25 * g * tear;
+		// The whole picture jumps now and then.
+		uv.y += step(1.0 - g * 0.15, hash(vec2(frame, 5.0))) * (hash(vec2(frame, 6.0)) - 0.5) * 0.1 * g;
+	}
+	float split = g * 0.012 * (0.5 + hash(vec2(frame, 9.0)));
+	vec3 color;
+	color.r = texture(screen_texture, uv + vec2(split, 0.0)).r;
+	color.g = texture(screen_texture, uv).g;
+	color.b = texture(screen_texture, uv - vec2(split, split * 0.5)).b;
 
 	// Desaturate.
 	float luma = dot(color, vec3(0.299, 0.587, 0.114));
@@ -48,7 +87,6 @@ void fragment() {
 	color *= tint;
 
 	// Film runs at ~24 frames per second; noise changes per "film frame".
-	float frame = floor(TIME * 24.0);
 	float seed = fract(frame * 0.6180339);
 
 	// Grain.
@@ -63,6 +101,16 @@ void fragment() {
 
 	// Whole-frame flicker.
 	color *= 1.0 - flicker_amount * hash(vec2(frame, 1.0));
+
+	// Glitch: blocks of static and inverted flashes.
+	if (g > 0.0) {
+		vec2 block = floor(SCREEN_UV * vec2(24.0, 14.0));
+		float noisy = step(1.0 - g * g * 0.08, hash(block + frame));
+		color = mix(color, vec3(hash(FRAGCOORD.xy + frame)), noisy);
+		float invert = step(1.0 - g * 0.04, hash(vec2(frame, 21.0)));
+		color = mix(color, 1.0 - color, invert);
+		color += (hash(vec2(SCREEN_UV.y * 400.0, frame)) - 0.5) * 0.2 * g;
+	}
 
 	// Vignette (darker corners).
 	vec2 centered = SCREEN_UV - 0.5;
