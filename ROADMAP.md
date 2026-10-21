@@ -98,6 +98,15 @@ and is committed + pushed once it works. `[x]` = done.
 - [x] Tests: 200 seeds plan correctly; flood-fill check that every door, lift and the exit can be reached on foot
 - [ ] Later: SCP-914 refining, SCPs that move (Step 5), more vehicle use, decontamination timer
 
+## Step 3.9 — Guns, machines, warheads, bodies and sound ✅
+- [x] New guns: SMG, Vector, M4, AK-47, Light Machine Gun, MG-60, Sniper Rifle; detailed models (pistol remodelled); automatic fire, spread, recoil, aiming/zoom
+- [x] SCP-914 works: dial with five settings, key, intake/output booths, item recipes and effects on people; new clockwork model with spinning gears
+- [x] Alpha Warhead silo in Heavy Containment (rising missile, gantry arms, beacons, steam, countdown screen)
+- [x] Gamma Warhead is a spinning fusion reactor; spinning up brings the colours back around it
+- [x] Jointed, animated player bodies dressed for every role; others' held items visible
+- [x] Sound effects (generated, original) and menu music (placeholder or your own track)
+- [ ] Later: settings menu with volume sliders, per-weapon reload animations, more SCP-914 recipes
+
 ## Step 4 — AI bots
 - [ ] `BotInput` (an `InputSource` driven by AI) using navigation meshes
 - [ ] Simple behaviours: wander, flee, follow, open doors
@@ -116,7 +125,7 @@ and is committed + pushed once it works. `[x]` = done.
 ## Step 7 — Reinforcements
 - [x] Respawn waves on the Surface using the MTF / Chaos ranks and the round's unit/cell (Step 3.8)
 - [ ] Their goals: MTF contain SCPs and escort scientists, Chaos help Class-D
-- [ ] New weapons for the ranks (SMG, rifles, shotgun, machine guns)
+- [x] New weapons for the ranks (SMG, rifles, machine guns — Step 3.9); shotgun later
 
 ## Step 8 — Sound & polish
 - [ ] Original sound effects and ambience (footsteps, doors, alarms, SCP sounds)

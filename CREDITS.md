@@ -29,6 +29,10 @@ SCP Foundation content is licensed under
   sculpture "Untitled 2004" by Izumi Kato, which is not under CC BY-SA.
 - Because the game adapts CC BY-SA 3.0 material, its SCP-derived content is
   shared under **CC BY-SA 3.0** as well.
+- All sound effects and the placeholder menu music are our own, synthesised
+  by `tools/make_sounds.py`.
+- Weapon names (M4, AK-47, Vector...) refer to real-world firearm types; the
+  models are our own simple designs.
 - Not affiliated with or endorsed by the SCP Wiki or any other SCP game.
 
 **When adding a new SCP or wiki concept:** add a row above *and* to

@@ -25,6 +25,8 @@ const CONNECTOR_COL := 9
 const SURF_COLS := Vector2i(10, 16)
 const SURF_ROWS := Vector2i(-3, 5)
 const DIRS := LayoutGenerator.DIRS
+## Width of the Alpha Warhead shaft.
+const SILO_SHAFT := 9.6
 
 const ZONES := {
 	"LCZ": {"wall": "concrete_wall", "floor": "concrete_floor", "ceiling": "ceiling", "corridor_h": 3.6, "room_h": 4.2,
@@ -39,7 +41,8 @@ const ZONES := {
 ## A room can override any of these in its "info" entry.
 const ROOMS := {
 	"class_d_block": {"name": "CLASS-D CONTAINMENT", "open": true},
-	"scp914": {"name": "SCP-914", "access": 1, "level": 2},
+	"scp914": {"name": "SCP-914", "access": 1, "level": 2, "height": 6.0},
+	"silo": {"name": "ALPHA WARHEAD", "access": 3, "level": 1, "height": 9.0},
 	"scp173": {"name": "SCP-173", "wide": true, "wall": "wall_white"},
 	"server": {"name": "TERTIARY SERVER ROOM", "wall": "wall_server", "floor": "floor_server"},
 	"lift": {"name": "CHECKPOINT", "access": 3, "level": 1},
@@ -109,7 +112,7 @@ const GUARANTEED := {
 }
 
 ## Room types that never get loose loot or guaranteed items.
-const NO_LOOT := ["lift", "gate", "class_d_block", "scp173", "scp914", "server", "pit", "scp096", "scp049"]
+const NO_LOOT := ["lift", "gate", "class_d_block", "scp173", "scp914", "server", "pit", "scp096", "scp049", "silo"]
 
 var rng := RandomNumberGenerator.new()
 var level: Node3D
@@ -260,10 +263,10 @@ func _plan_hcz(lift_a: Vector2i, lift_b: Vector2i, connector: Vector2i) -> Layou
 	var ok := _place_all(g, [
 		["lift", 1, 1, {"at": lift_a, "door_dirs": ["W"]}, {"name": "CHECKPOINT A", "lift": "CHECKPOINT A"}],
 		["lift", 1, 1, {"at": lift_b, "door_dirs": ["E"]}, {"name": "CHECKPOINT B", "lift": "CHECKPOINT B"}],
-		["pit", 2, 2],
+		["silo", 2, 2], ["pit", 2, 2],
 		["scp096", 1, 1, {"door_dirs": ["E", "W"]}], ["scp049", 1, 1, {"door_dirs": ["E", "W"]}],
 		["generator", 1, 1], ["armory", 1, 1, {}, {"name": "HCZ ARMORY", "level": 2}],
-		["archive", 1, 1], ["testing", 1, 1], ["pump", 1, 1], ["pump", 1, 1],
+		["archive", 1, 1], ["testing", 1, 1], ["pump", 1, 1],
 	])
 	if not ok or not g.connect_corridors():
 		return null
@@ -665,6 +668,8 @@ func _build_room(room: Dictionary) -> void:
 	var inner := Rect2(x0 + T, z0 + T, x1 - x0 - 2 * T, z1 - z0 - 2 * T)
 	if room.type == "pit":
 		floor_hole = inner.grow(-3.2)
+	elif room.type == "silo":
+		floor_hole = inner.grow(-(inner.size.x - SILO_SHAFT) / 2.0)
 	slab(x0, z0, x1, z1, -T, 0, info.get("floor", z.floor), floor_hole)
 	slab(x0, z0, x1, z1, h, h + T, z.ceiling, ceiling_hole)
 	var wide: bool = info.get("wide", false)
@@ -964,6 +969,8 @@ func _furnish_big(room: Dictionary, info: Dictionary, inner: Rect2, h: float, z:
 			_build_pit(inner, h, z)
 		"cafeteria":
 			_build_cafeteria(inner, h, z, room, door_dirs)
+		"silo":
+			_build_silo(inner, h, z)
 
 
 func _build_class_d_block(inner: Rect2, h: float, z: Dictionary) -> void:
@@ -1016,33 +1023,18 @@ func _build_class_d_block(inner: Rect2, h: float, z: Dictionary) -> void:
 	showcase = Transform3D(Basis(Vector3.UP, PI / 2), Vector3(inner.end.x - 1.0, floor_y + 1.7, zc))
 
 
-## SCP-914: the clockwork machine against the back wall with intake and
-## output booths on raised platforms, ramps, railings and hazard zones.
+## SCP-914: the working clockwork machine (scripts/props/scp_914.gd) against
+## the back wall, plus shelves, an observation desk and hazard markings.
 func _build_scp914(inner: Rect2, h: float, _z: Dictionary) -> void:
 	var xm := inner.get_center().x
-	var zs := inner.end.y
-	var m := "metal_dark"
-	box(Vector3(xm, 1.9, zs - 1.5), Vector3(4.4, 3.8, 3.0), m)
-	box(Vector3(xm, 3.95, zs - 1.2), Vector3(3.2, 0.3, 2.2), "metal")
-	box(Vector3(xm, 1.3, zs - 3.08), Vector3(1.8, 0.9, 0.15), "metal")
-	box(Vector3(xm, 1.2, zs - 3.2), Vector3(0.25, 0.25, 0.12), m)
-	label("ROUGH  ·  COARSE  ·  1:1  ·  FINE  ·  VERY FINE", Vector3(xm, 1.55, zs - 3.17), PI, 22, 0.003).modulate = Color(0.1, 0.1, 0.1)
-	label("SCP-914", Vector3(xm, h - 0.45, zs - 3.02), PI, 70)
+	var zs := inner.end.y  # back (south) wall
+	var machine := Scp914.new()
+	machine.position = Vector3(xm, 0, zs)
+	add(groups["Props"], machine, "SCP914")
 	for side: float in [-1.0, 1.0]:
-		var bx := xm + side * 4.8
-		var bz := zs - 1.8
-		box(Vector3(bx, 0.25, bz), Vector3(3.4, 0.5, 3.6), m)
-		box(Vector3(bx - 1.45, 1.85, bz), Vector3(0.15, 2.7, 3.6), m)
-		box(Vector3(bx + 1.45, 1.85, bz), Vector3(0.15, 2.7, 3.6), m)
-		box(Vector3(bx, 3.25, bz), Vector3(3.05, 0.15, 3.6), m)
-		box(Vector3(bx, 2.85, zs - 3.63), Vector3(1.6, 0.4, 0.05), "sign_orange", false)
-		label("OUTPUT" if side < 0 else "INTAKE", Vector3(bx, 2.85, zs - 3.67), PI, 40).modulate = Color(0.08, 0.08, 0.08)
-		box(Vector3(xm + side * 2.6, 2.6, zs - 1.0), Vector3(0.9, 0.35, 0.35), "metal")
-		ramp(Vector3(bx, 0.0, zs - 5.3), Vector3(bx, 0.5, zs - 3.6), 2.6)
-		railing(Vector3(bx - 1.4, 0.0, zs - 5.3), Vector3(bx - 1.4, 0.0, zs - 3.6))
-		railing(Vector3(bx + 1.4, 0.0, zs - 5.3), Vector3(bx + 1.4, 0.0, zs - 3.6))
-		box(Vector3(bx, 0.015, zs - 6.1), Vector3(2.6, 0.02, 1.2), "hazard_stripes", false)
-	box(Vector3(inner.end.x - 0.45, 1.1, inner.position.y + 1.8), Vector3(0.8, 2.2, 2.8), m)
+		box(Vector3(xm + side * 4.8, 0.015, zs - 3.9), Vector3(2.0, 0.02, 1.0), "hazard_stripes", false)
+	box(Vector3(xm, 0.015, zs - 4.9), Vector3(2.4, 0.02, 0.15), "hazard", false)
+	box(Vector3(inner.end.x - 0.45, 1.1, inner.position.y + 1.8), Vector3(0.8, 2.2, 2.8), "metal_dark")
 	box(Vector3(inner.position.x + 1.6, 0.4, inner.position.y + 1.1), Vector3(3.0, 0.8, 1.0), "metal")
 	terminal(Vector3(inner.position.x + 3.8, 0, inner.position.y + 0.5), Vector3(0, 0, 1))
 	for x: float in [-6.0, 0.0, 6.0]:
@@ -1231,6 +1223,45 @@ func _build_pit(inner: Rect2, h: float, z: Dictionary) -> void:
 	lamp(pc + Vector3(0, 4.0, -3.0), 2.4, 11.0, 0.3, true, Color(1.0, 0.9, 0.75), false)
 	var cr := inner.position + Vector2(1.2, 1.2)
 	crate(Vector3(cr.x, 0, cr.y), 1.0)
+
+
+## The Alpha Warhead silo (2x2): a deep shaft with the missile inside
+## (scripts/props/alpha_warhead_silo.gd), railings, a control console and a
+## status screen.
+func _build_silo(inner: Rect2, h: float, z: Dictionary) -> void:
+	var shaft := inner.grow(-(inner.size.x - SILO_SHAFT) / 2.0)
+	var depth := 14.0
+	var w: String = z.wall
+	box_mm(shaft.position.x, -depth - 0.3, shaft.position.y, shaft.end.x, -depth, shaft.end.y, z.floor)
+	box_mm(shaft.position.x - T, -depth, shaft.position.y - T, shaft.end.x + T, 0, shaft.position.y, w)
+	box_mm(shaft.position.x - T, -depth, shaft.end.y, shaft.end.x + T, 0, shaft.end.y + T, w)
+	box_mm(shaft.position.x - T, -depth, shaft.position.y, shaft.position.x, 0, shaft.end.y, w)
+	box_mm(shaft.end.x, -depth, shaft.position.y, shaft.end.x + T, 0, shaft.end.y, w)
+	# Hazard border and railings around the shaft.
+	for side in [[shaft.position.x, shaft.position.y, shaft.end.x, shaft.position.y], [shaft.position.x, shaft.end.y, shaft.end.x, shaft.end.y],
+			[shaft.position.x, shaft.position.y, shaft.position.x, shaft.end.y], [shaft.end.x, shaft.position.y, shaft.end.x, shaft.end.y]]:
+		var a := Vector3(side[0], 0, side[1])
+		var b := Vector3(side[2], 0, side[3])
+		railing(a, b, 1.1)
+		var mid := (a + b) / 2
+		var along_x := absf(b.x - a.x) > 1.0
+		box(mid + Vector3(0, 0.012, 0) + (mid - Vector3(shaft.get_center().x, 0, shaft.get_center().y)).normalized() * 0.5,
+			Vector3(SILO_SHAFT + 1.0, 0.02, 0.6) if along_x else Vector3(0.6, 0.02, SILO_SHAFT + 1.0), "hazard_stripes", false)
+	var silo := AlphaWarheadSilo.new()
+	silo.position = Vector3(shaft.get_center().x, 0, shaft.get_center().y)
+	silo.shaft_depth = depth
+	add(groups["Props"], silo, "AlphaWarheadSilo")
+	# The arming console on the north side, facing the shaft.
+	var console: Node3D = load("res://scenes/props/warhead_console.tscn").instantiate()
+	console.position = Vector3(shaft.get_center().x, 0, shaft.position.y - 1.6)
+	console.rotation.y = 0.0
+	console.warhead = WarheadConsole.Warhead.ALPHA
+	add(groups["Props"], console, "AlphaConsole")
+	label("ALPHA WARHEAD", Vector3(shaft.get_center().x, h - 1.0, inner.position.y + 0.02), 0.0, 140)
+	for x: float in [-8.0, 8.0]:
+		for zz: float in [-8.0, 8.0]:
+			lamp(Vector3(shaft.get_center().x + x, h, shaft.get_center().y + zz), z.light * 1.7, 18.0, z.flicker)
+	terminal(Vector3(inner.position.x + 0.5, 0, inner.end.y - 4.0), Vector3(1, 0, 0), "personnel")
 
 
 ## The cafeteria (2x1): tables, a serving counter and vending machines, with
@@ -1514,6 +1545,9 @@ func _build_surface() -> void:
 	var warhead_cell: Vector2i = rest.pop_back() if not rest.is_empty() else pool.pop_back()
 	pool.erase(warhead_cell)
 	_warhead_building(center(warhead_cell))
+	var reactor_cell: Vector2i = rest.pop_back() if not rest.is_empty() else pool.pop_back()
+	pool.erase(reactor_cell)
+	_gamma_reactor(center(reactor_cell))
 	# Watchtowers in the far corners of the yard (if those cells are free).
 	var towers := 0
 	for corner in [Vector2i(SURF_COLS.x, SURF_ROWS.x), Vector2i(SURF_COLS.y, SURF_ROWS.x),
@@ -1671,15 +1705,26 @@ func _warhead_building(wc: Vector3) -> void:
 	box_mm(wc.x - 1.6, 3.0, wc.z - e - T / 2, wc.x + 1.6, h, wc.z - e + T / 2, "wall_surface")
 	box_mm(wc.x - e - T / 2, h, wc.z - e - T / 2, wc.x + e + T / 2, h + 0.4, wc.z + e + T / 2, "wall_surface")
 	label("WARHEAD CONTROL", Vector3(wc.x, 4.2, wc.z - e - T / 2 - 0.02), PI, 70)
-	var console_scene: PackedScene = load("res://scenes/props/warhead_console.tscn")
-	for info in [["DeltaConsole", 0, -2.5], ["GammaConsole", 1, 2.5]]:
-		var con: Node3D = console_scene.instantiate()
-		con.position = Vector3(wc.x + info[2], 0, wc.z + 2.0)
-		con.rotation.y = PI
-		con.warhead = info[1]
-		add(groups["Props"], con, info[0])
+	var con: Node3D = load("res://scenes/props/warhead_console.tscn").instantiate()
+	con.position = Vector3(wc.x, 0, wc.z + 2.0)
+	con.rotation.y = PI
+	con.warhead = WarheadConsole.Warhead.DELTA
+	add(groups["Props"], con, "DeltaConsole")
 	terminal(Vector3(wc.x - e + 0.6, 0, wc.z - 2.0), Vector3(1, 0, 0), "personnel")
 	lamp(Vector3(wc.x, h, wc.z), 1.6, 11.0, 0.0)
+
+
+## The Gamma Warhead: a fusion reactor (scripts/props/gamma_reactor.gd) with
+## its console at the edge of the platform.
+func _gamma_reactor(c: Vector3) -> void:
+	var reactor := GammaReactor.new()
+	reactor.position = c
+	add(groups["Props"], reactor, "GammaReactor")
+	var con: Node3D = load("res://scenes/props/warhead_console.tscn").instantiate()
+	con.position = c + Vector3(0, 0, -5.2)
+	con.rotation.y = PI
+	con.warhead = WarheadConsole.Warhead.GAMMA
+	add(groups["Props"], con, "GammaConsole")
 
 
 func _floodlights(x0: float, x1: float, z0: float, z1: float) -> void:

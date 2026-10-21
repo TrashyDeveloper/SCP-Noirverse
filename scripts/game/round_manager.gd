@@ -42,6 +42,7 @@ const SURFACE_HEIGHT := 15.0
 const WARHEADS := {
 	WarheadConsole.Warhead.DELTA: {"name": "Delta Warhead", "admin": 2, "countdown": 90.0, "cancel_until": 10.0},
 	WarheadConsole.Warhead.GAMMA: {"name": "Gamma Warhead", "admin": 3, "countdown": 120.0, "cancel_until": -1.0},
+	WarheadConsole.Warhead.ALPHA: {"name": "Alpha Warhead", "admin": 2, "countdown": 100.0, "cancel_until": 15.0},
 }
 
 ## Influence a side needs for each tier (tier 0 = start).
@@ -106,8 +107,10 @@ var stats := {
 ## This round's Mobile Task Force unit and Chaos Insurgency cell (see Factions).
 var mtf_unit: Dictionary = {}
 var chaos_cell: Dictionary = {}
-var warhead_state := {WarheadConsole.Warhead.DELTA: WarheadState.IDLE, WarheadConsole.Warhead.GAMMA: WarheadState.IDLE}
-var warhead_time_left := {WarheadConsole.Warhead.DELTA: 0.0, WarheadConsole.Warhead.GAMMA: 0.0}
+var warhead_state := {WarheadConsole.Warhead.DELTA: WarheadState.IDLE, WarheadConsole.Warhead.GAMMA: WarheadState.IDLE,
+	WarheadConsole.Warhead.ALPHA: WarheadState.IDLE}
+var warhead_time_left := {WarheadConsole.Warhead.DELTA: 0.0, WarheadConsole.Warhead.GAMMA: 0.0,
+	WarheadConsole.Warhead.ALPHA: 0.0}
 
 ## Influence per side, and XP per player/bot (keyed by their InputSource so
 ## it survives escapes and respawns).
@@ -138,6 +141,10 @@ func setup(level_node: Node3D, actors_node: Node3D, match_config: GameplayConfig
 		console.use_requested.connect(_on_warhead_console_used)
 		console.prompt_provider = _warhead_prompt
 	_update_consoles()
+	# Things that show warhead states (the Alpha silo, the Gamma reactor).
+	for node in get_tree().get_nodes_in_group(&"warhead_listeners"):
+		if level.is_ancestor_of(node):
+			warhead_changed.connect(node.on_warhead_changed)
 	for terminal in level.find_children("*", "Terminal", true, false):
 		terminal.use_requested.connect(_on_terminal_used)
 	for intercom in level.find_children("*", "Intercom", true, false):
@@ -668,7 +675,7 @@ func _detonate(warhead: int) -> void:
 			continue
 		if warhead == WarheadConsole.Warhead.GAMMA or not is_on_surface(character):
 			character.health.take_damage(100000.0, blast)
-	if warhead == WarheadConsole.Warhead.DELTA:
+	if warhead != WarheadConsole.Warhead.GAMMA:
 		# The facility below is destroyed: the elevators stop working.
 		for elevator in level.find_children("*", "Elevator", true, false):
 			elevator.disabled = true

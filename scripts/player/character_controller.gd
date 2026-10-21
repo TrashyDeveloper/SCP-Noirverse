@@ -53,13 +53,13 @@ var _step_distance := 0.0
 ## True when someone looks through these eyes (the gun in hand is drawn).
 var view_model_visible := false
 var _speed_boost_left := 0.0
-var _body_material: StandardMaterial3D
+## The visible body (dressed for the class and animated).
+var model: HumanoidModel
 
 @onready var head: Node3D = $Head
 @onready var camera: Camera3D = $Head/Camera3D
 @onready var interact_ray: RayCast3D = $Head/Camera3D/InteractRay
 @onready var flashlight: SpotLight3D = $Head/Camera3D/Flashlight
-@onready var body_mesh: MeshInstance3D = $Body
 @onready var status_label: Label3D = $StatusLabel
 @onready var view_model: Node3D = $Head/Camera3D/ViewModel
 @onready var view_model_rest: Vector3 = view_model.position
@@ -75,9 +75,12 @@ func _ready() -> void:
 	health.damage_modifier = _modify_damage
 	interact_ray.add_exception(self)
 	status_label.visible = false
-	# Own copy of the body material so each character can have its colour.
-	_body_material = body_mesh.get_active_material(0).duplicate()
-	body_mesh.material_override = _body_material
+	model = HumanoidModel.new()
+	model.name = "Model"
+	add_child(model)
+	items.equipped_changed.connect(func(_slot: int):
+		var held := items.get_equipped()
+		model.hold(held.data if held != null else null))
 
 
 ## Gives this character a controller. `first_person` = true when the local
@@ -94,12 +97,15 @@ func possess(source: InputSource, first_person: bool) -> void:
 		# Put our own body on render layer 3 and hide that layer from our
 		# camera, so it doesn't block the view. Other characters stay on
 		# layer 2 and remain visible.
-		body_mesh.layers = 4
+		model.set_layers(4)
 		status_label.layers = 4
 		camera.set_cull_mask_value(3, false)
 
 
 func _process(delta: float) -> void:
+	if is_alive and model != null:
+		var local_velocity := global_basis.inverse() * velocity
+		model.animate(delta, local_velocity, is_on_floor(), head.rotation.x, is_disarmed(), items.aiming)
 	if input_source == null or not is_alive:
 		return
 	# Apply the view every frame for smooth mouse look.
@@ -142,7 +148,9 @@ func apply_class(new_class: CharacterClass, keep_items := false) -> void:
 	inventory.extra_limits = new_class.limit_bonuses.duplicate()
 	_class_speed = new_class.speed_multiplier
 	inventory.ammo_multiplier = 2.0 if new_class.perks.has(&"heavy") else 1.0
-	_body_material.albedo_color = new_class.color
+	model.dress(new_class)
+	var held := items.get_equipped()
+	model.hold(held.data if held != null else null)
 	if not keep_items:
 		items.equip(-1)
 		for slot in Inventory.SLOT_COUNT:
@@ -387,6 +395,7 @@ func _on_died(source: Node) -> void:
 	_reset_hold()
 	velocity.x = 0.0
 	velocity.z = 0.0
+	model.die()
 	# Simple death "animation": the camera drops to the floor and tilts.
 	var tween := create_tween().set_parallel().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.tween_property(head, "position:y", 0.25, 0.6)

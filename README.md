@@ -31,7 +31,8 @@ noir look. Built with **Godot 4** and **GDScript**.
 | E | Interact: doors, card readers, pick up items |
 | Hold E | Disarm someone (while holding a firearm) / release them |
 | Tab | Inventory wheel (left click = hold item, right click = drop) |
-| Left click | Use held item (shoot, heal, throw grenade) |
+| Left click | Use held item (shoot, heal, throw grenade); hold to keep firing automatic guns |
+| Right click (hold) | Aim down the sights (zoom; the sniper rifle uses its scope) |
 | R | Reload |
 | Q | Drop held item |
 | T | Throw held item |
@@ -119,16 +120,50 @@ the minor roles instead. Minor roles escape like Scientists.
   (then the side with more escapes wins). The round-end screen shows the
   winner and stats, then the next round starts.
 
-### Warheads (Surface, Warhead Control building)
+### Warheads
 
-| | Delta Warhead | Gamma Warhead |
+| | Alpha Warhead | Delta Warhead | Gamma Warhead |
+|---|---|---|---|
+| Where | **Heavy Containment**, the Alpha Warhead silo (console at the shaft) | Surface, Warhead Control building | Surface, the **Gamma reactor** |
+| Needs (held keycard) | Admin level 2 | Admin level 2 | Admin level 3 |
+| Countdown | 100 s, can be cancelled until 15 s are left | 90 s, can be cancelled until 10 s are left | 120 s, can't be cancelled |
+| Effect | Everyone **underground** dies; the lifts stop | Everyone **underground** dies; the lifts stop | The **whole site** is destroyed; the round ends (more escapes wins) |
+
+- **Alpha Warhead silo:** a missile stands in a 14 m deep shaft, held by
+  gantry arms and lit by floodlights; its status lights glow green. When
+  armed, the arms swing away, red beacons start spinning, steam pours out,
+  the status lights blink red and the warhead slowly rises out of the
+  shaft while the screen counts down.
+- **Gamma reactor:** a fusion core hanging between four pylons inside
+  spinning gyroscope rings, with two pulsar beams sweeping around. When the
+  Gamma Warhead is activated it spins up faster and faster, until it spins
+  so fast that the **colours come back** around it (the closer you are and
+  the faster it spins, the more colour you see).
+
+During a countdown the facility lights turn red, an alarm sounds and a
+warning shows at the top of the screen.
+
+### SCP-914
+
+The clockwork machine in Light Containment works:
+
+1. Put items in the **Intake** booth (the left one when you face the
+   machine) — drop them (Q) or throw them (T). You can step in yourself too…
+2. **Turn the dial** (E on the round dial on the console): Rough → Coarse →
+   1:1 → Fine → Very Fine.
+3. **Turn the key** (E on the key next to the dial). The booth doors close,
+   the gears spin up, and after a few seconds the refined items (and anyone
+   who was inside) come out of the **Output** booth.
+
+| Setting | Items | People inside |
 |---|---|---|
-| Needs (held keycard) | Admin level 2 | Admin level 3 |
-| Countdown | 90 s, can be cancelled until 10 s are left | 120 s, can't be cancelled |
-| Effect | Everyone **underground** dies; the elevators stop working | The **whole site** is destroyed; the round ends (more escapes wins) |
+| Rough | destroyed (guns turn into ammo) | badly hurt |
+| Coarse | a worse version (e.g. Scientist card → Janitor card) | hurt |
+| 1:1 | something similar (Janitor ↔ Zone Manager card, M4 ↔ AK-47, ammo types...) | just moved |
+| Fine | a better version (Janitor → Scientist card, Painkillers → First Aid Kit, Pistol → SMG) | healed and faster for a while |
+| Very Fine | much better (up to the O5 card, sniper rifle...) — but 1 in 5 items is destroyed | a big shield and speed… or hurt |
 
-During a countdown the facility lights turn red and a warning shows at the
-top of the screen.
+All recipes are in `RECIPES` in `scripts/props/scp_914.gd`.
 
 ### Reinforcements, subclasses and influence
 
@@ -194,6 +229,24 @@ carries the pistol.
 
 ## Items
 
+### Firearms
+
+| Gun | Ammo | Fire | Notes | Who starts with it |
+|---|---|---|---|---|
+| Pistol | 9×19 mm | semi-auto | light, accurate | Recruits, officers (sidearm) |
+| Submachine Gun | 9×19 mm | automatic | fast, light recoil | Facility Guards, MTF Cadet / Medic / Explosives, Chaos Saboteur / Medic |
+| Vector | 9×19 mm | automatic | very fast, suppressed, red-dot sight | Containment Captain, Breachers, MTF Omega |
+| M4 Carbine | 5.56×45 mm | automatic | accurate, magnified optic | MTF Rifleman / Sergeant / Commander / Engineer |
+| AK-47 | 7.62×39 mm | automatic | hard-hitting, more recoil | Chaos Rifleman / Vanguard / Director / Engineer / Explosives |
+| Light Machine Gun | 7.62×39 mm | automatic, 75-round box | heavy, slows you a bit | Chaos Heavy, MTF Heavy / Suppressor |
+| MG-60 | 7.62×39 mm | automatic, 100-round belt | the heaviest gun, slows you | MTF & Chaos Heavy Gunners |
+| Sniper Rifle | 7.62×39 mm | bolt action, 5 rounds | strong single shots, scope zoom; inaccurate from the hip | MTF Omega, Chaos Infiltrator |
+
+Hold the right mouse button to aim (less spread, zoom). Every gun's numbers
+(damage, fire rate, magazine, spread, recoil, zoom) are in its `.tres` file
+in `resources/items/` — double-click to tweak.
+
+
 ### Keycards and doors
 
 Doors have an access type (**Containment**, **Armory** or **Admin**) and a
@@ -257,6 +310,17 @@ matter for special places later.
 
 ## Classes
 
+Every character has a body dressed for its role, animated in code (walking,
+running, aiming, breathing, hands on the head when disarmed, falling when
+killed): orange jumpsuits with D-numbers for Class-D, lab coats, ties and
+glasses for Scientists, overalls and caps for Janitors, suits for Zone
+Managers, hazmat suits with respirators for Containment Specialists, helmets
+and vests for Guards, an officer's cap for the Captain, helmets with visors,
+balaclavas, plate carriers and pouches for the MTF, goggles or beanies and
+backpacks for Chaos, armbands for medics and heavy plates for heavy units.
+You see the guns other people hold. (`scripts/player/humanoid_model.gd`)
+
+
 Each class is a `.tres` file in `resources/classes/` — double-click one to
 change its health, colour, starting items, ammo or what it becomes after
 escaping. Spawn rooms are the markers under `SpawnPoints/<group>` in the
@@ -297,6 +361,20 @@ a carry limit (shown on the Tab screen):
   See `gameplay_config.example.cfg`. The built-in defaults are in
   `resources/gameplay_config.tres`; the armor carry bonuses are on each
   armor's `.tres` file in `resources/items/`.
+
+## Music and sounds
+
+- **Menu music:** put your track in the project as
+  `assets/audio/music/menu.ogg` (or `menu.mp3` / `menu.wav`) and open the
+  project in Godot once so it gets imported. Or, without opening Godot,
+  put it in `%APPDATA%\SCP-Noirverse\music\menu.ogg`. It loops
+  automatically. Until then a placeholder track plays
+  (`assets/audio/music/menu_placeholder.wav`).
+- **Sound effects** are in `assets/audio/sfx/` (gunshots, doors, keycard
+  beeps, footsteps, lifts, explosions, alarm, SCP-914, the reactor hum,
+  ambience…). They are our own, generated by `tools/make_sounds.py`. To
+  replace one, drop a `.wav` or `.ogg` with the **same name** in that
+  folder (numbered ones like `footstep_1`… are picked at random).
 
 ## Handy Godot tips for beginners
 

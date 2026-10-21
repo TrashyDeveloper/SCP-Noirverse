@@ -243,9 +243,14 @@ static func _mg60(r: Node3D) -> Vector3:
 	_cyl(r, 0.017, 0.06, Vector3(0, 0.035, -0.82), BLACK, 0.5, Vector3.ZERO, 16, 0.012)
 	# Bipod legs unfolded, with feet.
 	for side: float in [-1.0, 1.0]:
-		var leg := _pivot(r, Vector3(side * 0.012, 0.0, -0.6), Vector3(0.35, 0, side * 0.3))
-		_cyl(leg, 0.006, 0.22, Vector3(0, -0.11, 0), STEEL, 0.7, Vector3(PI / 2, 0, 0))
-		_sphere(leg, 0.012, Vector3(0, -0.22, 0), BLACK)
+		var leg := _pivot(r, Vector3(side * 0.012, 0.02, -0.62), Vector3(0.45, 0, side * 0.3))
+		var mesh := CylinderMesh.new()
+		mesh.top_radius = 0.006
+		mesh.bottom_radius = 0.006
+		mesh.height = 0.24
+		mesh.radial_segments = 8
+		_add(leg, mesh, Vector3(0, -0.12, 0), STEEL, 0.7, 0.4)
+		_sphere(leg, 0.012, Vector3(0, -0.24, 0), BLACK)
 	# Ammo belt hanging from the left side.
 	for i in 9:
 		var t := float(i) / 8.0
@@ -300,14 +305,14 @@ static func _grip(r: Node3D, pos: Vector3, color: Color) -> void:
 	_box(g, Vector3(0.032, 0.05, 0.03), Vector3(0, -0.05, 0.004), color.darkened(0.25), 0.0, 0.95)
 
 
-## A magazine made of `segments` blocks that curve forward.
+## A magazine made of `segments` blocks that curve forward, each hanging
+## from the bottom of the one above (so the curve is smooth).
 static func _curved_mag(r: Node3D, top: Vector3, segments: int, size: Vector3, curve: float, color: Color) -> void:
-	var pos := top
+	var joint := _pivot(r, top, Vector3.ZERO)
 	for k in segments:
-		var angle := -curve * k
-		_box(r, size, pos + Vector3(0, -size.y / 2, 0), color, 0.2, 0.6, Vector3(angle, 0, 0))
-		pos += Vector3(0, -cos(angle) * size.y * 0.95, -sin(-angle) * size.y * 0.95)
-	_box(r, Vector3(size.x * 1.15, 0.008, size.z * 1.05), pos + Vector3(0, 0.002, 0), color.darkened(0.4), 0.2, 0.6, Vector3(-curve * segments, 0, 0))
+		joint = _pivot(joint, Vector3(0, -size.y * 0.92 if k > 0 else 0.0, 0), Vector3(curve if k > 0 else 0.0, 0, 0))
+		_box(joint, size, Vector3(0, -size.y / 2, 0), color, 0.2, 0.6)
+	_box(joint, Vector3(size.x * 1.15, 0.01, size.z * 1.06), Vector3(0, -size.y, 0), color.darkened(0.4), 0.2, 0.6)
 
 
 static func _material(color: Color, metallic: float, roughness: float) -> StandardMaterial3D:

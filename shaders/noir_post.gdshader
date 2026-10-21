@@ -15,6 +15,11 @@ uniform float grain_amount : hint_range(0.0, 0.5) = 0.09;
 uniform float vignette_strength : hint_range(0.0, 1.0) = 0.65;
 uniform float flicker_amount : hint_range(0.0, 0.3) = 0.04;
 uniform float scratch_amount : hint_range(0.0, 1.0) = 0.35;
+// A round area of the screen where colour comes back (e.g. around the
+// Gamma reactor). Centre in screen UV, radius in screen heights.
+uniform vec2 color_center = vec2(0.5, 0.5);
+uniform float color_radius = 0.0;
+uniform float color_strength : hint_range(0.0, 1.0) = 0.0;
 
 float hash(vec2 p) {
 	p = fract(p * vec2(123.34, 456.21));
@@ -27,7 +32,16 @@ void fragment() {
 
 	// Desaturate.
 	float luma = dot(color, vec3(0.299, 0.587, 0.114));
-	color = mix(vec3(luma), color, saturation);
+	float sat = saturation;
+	if (color_strength > 0.0 && color_radius > 0.0) {
+		float aspect = SCREEN_PIXEL_SIZE.y / SCREEN_PIXEL_SIZE.x;
+		float d = length((SCREEN_UV - color_center) * vec2(aspect, 1.0));
+		float zone = 1.0 - smoothstep(color_radius * 0.3, color_radius, d);
+		// A shimmering edge, like light bending around the reactor.
+		zone *= 0.9 + 0.1 * sin(d * 60.0 - TIME * 8.0);
+		sat = mix(sat, 1.15, clamp(zone * color_strength, 0.0, 1.0));
+	}
+	color = mix(vec3(luma), color, sat);
 
 	// Contrast around mid-grey, then brightness.
 	color = (color - 0.5) * contrast + 0.5 + brightness;

@@ -38,6 +38,15 @@ func set_base_saturation(value: float) -> void:
 		_set_saturation(value)
 
 
+## Brings colour back inside a circle on screen (`center` in screen UV,
+## `radius` in screen heights, `strength` 0..1). strength 0 turns it off.
+func set_color_zone(center: Vector2, radius: float, strength: float) -> void:
+	var m := _material()
+	m.set_shader_parameter("color_center", center)
+	m.set_shader_parameter("color_radius", radius)
+	m.set_shader_parameter("color_strength", strength)
+
+
 func _material() -> ShaderMaterial:
 	return filter.material as ShaderMaterial
 

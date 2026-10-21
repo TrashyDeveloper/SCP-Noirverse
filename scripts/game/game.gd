@@ -18,6 +18,7 @@ var _light_colors := {}
 var _alarm_on := false
 var _alarm_sound: AudioStreamPlayer
 
+var _reactor: GammaReactor
 var config: GameplayConfig
 var level: Node3D
 var local_character: CharacterController
@@ -41,6 +42,8 @@ func _ready() -> void:
 	level = FacilityGenerator.new().generate(map_seed)
 	level_root.add_child(level)
 	print("Map seed: %d" % map_seed)
+	var reactors := level.find_children("*", "GammaReactor", true, false)
+	_reactor = reactors[0] if not reactors.is_empty() else null
 	actors.child_entered_tree.connect(_on_actor_added)
 
 	pause_menu.resume_requested.connect(set_paused.bind(false))
@@ -124,6 +127,35 @@ func _process(_delta: float) -> void:
 			lines.append("%s - DETONATION IN %d:%02d" % [
 				String(RoundManager.WARHEADS[warhead].name).to_upper(), int(t) / 60, int(t) % 60])
 	hud.show_warhead("\n".join(lines))
+	_update_reactor_colors()
+
+
+## Colour comes back on screen around the spinning Gamma reactor.
+func _update_reactor_colors() -> void:
+	var cam := get_viewport().get_camera_3d()
+	if _reactor == null or cam == null:
+		noir_overlay.set_color_zone(Vector2.ZERO, 0.0, 0.0)
+		return
+	var core := _reactor.get_core_position()
+	var reach := _reactor.get_color_radius()
+	var strength := _reactor.get_color_strength()
+	var distance := cam.global_position.distance_to(core)
+	var size := get_viewport().get_visible_rect().size
+	if distance < reach * 0.6:
+		# Standing inside the field: the whole screen gets its colour back.
+		noir_overlay.set_color_zone(Vector2(0.5, 0.5), 3.0, strength * (1.0 - distance / (reach * 0.6)) + strength * 0.3)
+		return
+	if cam.is_position_behind(core) or distance > reach * 4.0:
+		noir_overlay.set_color_zone(Vector2.ZERO, 0.0, 0.0)
+		return
+	var screen := cam.unproject_position(core)
+	var edge := cam.unproject_position(core + cam.global_basis.x * reach)
+	var radius := screen.distance_to(edge) / size.y
+	# Walls between you and the reactor block most of it.
+	var hit := get_world_3d().direct_space_state.intersect_ray(PhysicsRayQueryParameters3D.create(cam.global_position, core, 1))
+	if hit and hit.position.distance_to(core) > 2.5:
+		strength *= 0.2
+	noir_overlay.set_color_zone(screen / size, radius, strength * clampf(1.5 - distance / (reach * 4.0), 0.0, 1.0))
 
 
 ## Presentation only: alarm lights while a warhead counts down, and a white

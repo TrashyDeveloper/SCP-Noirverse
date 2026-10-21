@@ -6,7 +6,7 @@ extends StaticBody3D
 
 signal use_requested(console: WarheadConsole, actor: Node)
 
-enum Warhead { DELTA, GAMMA }
+enum Warhead { DELTA, GAMMA, ALPHA }
 
 @export var warhead := Warhead.DELTA
 
@@ -17,7 +17,7 @@ var prompt_provider: Callable
 
 
 func _ready() -> void:
-	$Title.text = "DELTA WARHEAD" if warhead == Warhead.DELTA else "GAMMA WARHEAD"
+	$Title.text = ["DELTA WARHEAD", "GAMMA WARHEAD", "ALPHA WARHEAD"][warhead]
 
 
 func get_interaction_prompt(actor: Node) -> String:
