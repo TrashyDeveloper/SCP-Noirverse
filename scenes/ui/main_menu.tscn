@@ -49,14 +49,14 @@ layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
 offset_left = 70.0
-offset_top = 70.0
+offset_top = 44.0
 offset_right = 640.0
-offset_bottom = -40.0
+offset_bottom = -24.0
 grow_vertical = 2
 theme_override_constants/separation = 4
 
 [node name="Emblem" type="TextureRect" parent="Side"]
-custom_minimum_size = Vector2(110, 110)
+custom_minimum_size = Vector2(84, 84)
 layout_mode = 2
 size_flags_horizontal = 0
 texture = ExtResource("6_emblem")
@@ -81,12 +81,12 @@ layout_mode = 2
 color = Color(0.9, 0.88, 0.82, 0.35)
 
 [node name="Spacer" type="Control" parent="Side"]
-custom_minimum_size = Vector2(0, 30)
+custom_minimum_size = Vector2(0, 18)
 layout_mode = 2
 
 [node name="Buttons" type="VBoxContainer" parent="Side"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 0
 
 [node name="Play" type="Button" parent="Side/Buttons"]
 unique_name_in_owner = true
@@ -110,6 +110,12 @@ alignment = 0
 unique_name_in_owner = true
 layout_mode = 2
 text = "WATCH"
+alignment = 0
+
+[node name="Switch" type="Button" parent="Side/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "FUSION MENU (TEST)"
 alignment = 0
 
 [node name="Quit" type="Button" parent="Side/Buttons"]

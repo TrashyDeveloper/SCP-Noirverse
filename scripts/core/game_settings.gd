@@ -23,9 +23,11 @@ var shadows := true
 ## Film grain and scratches (0 = off, 1 = normal, 2 = heavy).
 var film_grain := 1.0
 var brightness := 0.0
+## Which title screen to show: "classic" or "fusion" (the test menu).
+var menu_style := "classic"
 
 const _KEYS: Array[String] = ["mouse_sensitivity", "invert_mouse", "fov", "master_volume", "music_volume",
-	"sfx_volume", "announcer_volume", "fullscreen", "vsync", "shadows", "film_grain", "brightness"]
+	"sfx_volume", "announcer_volume", "fullscreen", "vsync", "shadows", "film_grain", "brightness", "menu_style"]
 
 
 static func load_settings() -> GameSettings:

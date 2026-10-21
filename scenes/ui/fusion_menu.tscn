@@ -1,0 +1,27 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/fusion_menu.gd" id="1_menu"]
+[ext_resource type="Theme" path="res://resources/noir_theme.tres" id="2_theme"]
+[ext_resource type="Script" path="res://scripts/ui/fusion_reactor_backdrop.gd" id="3_reactor"]
+[ext_resource type="PackedScene" path="res://scenes/effects/noir_overlay.tscn" id="5_noir"]
+
+[node name="FusionMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_menu")
+
+[node name="Backdrop" type="Node3D" parent="."]
+
+[node name="Reactor" type="Node3D" parent="Backdrop"]
+script = ExtResource("3_reactor")
+
+[node name="Camera3D" type="Camera3D" parent="Backdrop"]
+current = true
+fov = 62.0
+
+[node name="NoirOverlay" parent="." instance=ExtResource("5_noir")]

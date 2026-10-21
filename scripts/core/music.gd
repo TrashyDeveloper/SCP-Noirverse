@@ -6,12 +6,35 @@ extends RefCounted
 ##      the project folder; Godot imports it the next time you open the editor.
 ##   2. user://music/menu.ogg (or .mp3 / .wav) - on Windows that's
 ##      %APPDATA%\SCP-Noirverse\music\ - works without opening Godot.
-## Otherwise the built-in placeholder (assets/audio/music/menu_placeholder.wav)
-## plays.
+## Otherwise the built-in placeholders (assets/audio/music/*_placeholder*.wav,
+## made by tools/make_music.py) play.
 
 const PROJECT_DIR := "res://assets/audio/music/"
 const USER_DIR := "user://music/"
 const PLACEHOLDER := "res://assets/audio/music/menu_placeholder.wav"
+## The built-in tracks for each menu: [title, file name in PROJECT_DIR].
+const BUILT_IN := {
+	"menu": [["Last Light", "menu_placeholder"], ["Cold Storage", "menu_placeholder_2"],
+		["Night Shift", "menu_placeholder_3"], ["Event Horizon", "menu_placeholder_4"]],
+	"fusion": [["Reactor Hum", "fusion_placeholder"], ["Clean Energy", "fusion_placeholder_2"]],
+}
+
+
+## All the tracks a menu can play, as [{title, stream}]: your own track
+## first (if you added one), then the built-in ones.
+static func playlist(track_name: String) -> Array[Dictionary]:
+	var list: Array[Dictionary] = []
+	var own := load_track(track_name, false, false)
+	if own != null:
+		list.append({"title": "Your track", "stream": own})
+	for entry: Array in BUILT_IN.get(track_name, []):
+		var path: String = PROJECT_DIR + entry[1] + ".wav"
+		if ResourceLoader.exists(path):
+			var stream: AudioStream = load(path)
+			if stream is AudioStreamWAV:
+				stream.loop_mode = AudioStreamWAV.LOOP_DISABLED
+			list.append({"title": entry[0], "stream": stream})
+	return list
 
 
 ## Finds a track by name (e.g. "menu" or "warheads/GammaWarheadEnhancedAudio").

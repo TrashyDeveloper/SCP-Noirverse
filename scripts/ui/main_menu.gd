@@ -5,6 +5,7 @@ extends Control
 
 const GAME_PATH := "res://scenes/game/game.tscn"
 const CREDITS_PATH := "res://scenes/ui/credits.tscn"
+const FUSION_PATH := "res://scenes/ui/fusion_menu.tscn"
 ## Always the same backdrop map.
 const BACKDROP_SEED := 1947
 const TIPS: Array[String] = [
@@ -35,14 +36,24 @@ var _hint: Label
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	var settings := GameSettings.load_settings()
+	if settings.menu_style == "fusion":
+		# The player picked the alternative (test) menu last time.
+		set_process(false)
+		get_tree().change_scene_to_file.call_deferred(FUSION_PATH)
+		return
 	settings.apply_global()
 	settings.apply_overlay(overlay)
 	# Menu music: see scripts/core/music.gd for where to put your own track.
-	var music := AudioStreamPlayer.new()
-	music.stream = Music.load_track("menu")
-	music.bus = &"Music"
+	var music := MenuMusic.new()
 	add_child(music)
-	music.play()
+	music.setup("menu")
+	var music_button := music.make_button()
+	music_button.add_theme_color_override("font_color", Color(0.5, 0.5, 0.47))
+	music_button.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_MINSIZE, 24)
+	music_button.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	music_button.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	music_button.position.y -= 26
+	$Version.add_sibling(music_button)
 	var facility := FacilityGenerator.new().generate(BACKDROP_SEED)
 	$Backdrop.add_child(facility)
 	_start = facility.get_meta("showcase")
@@ -50,12 +61,15 @@ func _ready() -> void:
 	_ruin = MenuRuin.new()
 	$Backdrop.add_child(_ruin)
 	_ruin.build(facility, _start)
-	# Time has stopped here: cold, frozen picture.
-	overlay.set_stasis(0.75)
+	# Time has stopped here: a cold, frozen picture - but with a little of
+	# the real colour showing through.
+	overlay.set_stasis(0.45)
+	overlay.set_base_saturation(0.3)
 	%Play.pressed.connect(_on_play_pressed)
 	%Settings.pressed.connect(_on_settings_pressed)
 	%Credits.pressed.connect(_on_credits_pressed)
 	%Watch.pressed.connect(_set_watching.bind(true))
+	%Switch.pressed.connect(_on_switch_pressed)
 	%Quit.pressed.connect(get_tree().quit)
 	_hint = Label.new()
 	_hint.text = "Press any key to bring the menu back"
@@ -107,7 +121,7 @@ func _set_watching(on: bool) -> void:
 		_ui_fade.kill()
 	_ui_fade = create_tween().set_parallel()
 	var a := 0.0 if on else 1.0
-	for node: CanvasItem in [$Shade, $Side, $Version]:
+	for node: CanvasItem in _menu_parts():
 		if not on:
 			node.visible = true
 		_ui_fade.tween_property(node, "modulate:a", a, 1.2)
@@ -116,11 +130,19 @@ func _set_watching(on: bool) -> void:
 	if on:
 		_ui_fade.chain().tween_property(_hint, "modulate:a", 0.0, 1.5).set_delay(3.0)
 		_ui_fade.chain().tween_callback(func():
-			for node: CanvasItem in [$Shade, $Side, $Version]:
+			for node: CanvasItem in _menu_parts():
 				node.visible = false)
 		get_viewport().gui_release_focus()
 	else:
 		%Watch.grab_focus()
+
+
+func _menu_parts() -> Array[CanvasItem]:
+	var parts: Array[CanvasItem] = [$Shade, $Side, $Version]
+	for child in get_children():
+		if child is Button:
+			parts.append(child)
+	return parts
 
 
 func _input(event: InputEvent) -> void:
@@ -145,3 +167,10 @@ func _on_settings_pressed() -> void:
 
 func _on_credits_pressed() -> void:
 	get_tree().change_scene_to_file(CREDITS_PATH)
+
+
+func _on_switch_pressed() -> void:
+	var settings := GameSettings.load_settings()
+	settings.menu_style = "fusion"
+	settings.save()
+	get_tree().change_scene_to_file(FUSION_PATH)

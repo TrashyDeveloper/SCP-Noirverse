@@ -25,6 +25,10 @@ noir look. Built with **Godot 4** and **GDScript**.
    debris creeps towards it. Click **Watch** to hide the menu and just look;
    press any key or click to bring it back.
 
+   **Fusion Menu (test):** a second title screen, "Innovation Inc: Fusion
+   Reactor Complex", with a glowing fusion reactor behind it. The game
+   remembers which menu you picked; **Classic Menu** switches back.
+
 ### Controls
 
 | Key | Action |
@@ -444,9 +448,13 @@ A basic admin menu for testing and messing around (turn it off with
 - **Menu music:** put your track in the project as
   `assets/audio/music/menu.ogg` (or `menu.mp3` / `menu.wav`) and open the
   project in Godot once so it gets imported. Or, without opening Godot,
-  put it in `%APPDATA%\SCP-Noirverse\music\menu.ogg`. It loops
-  automatically. Until then a placeholder track plays
-  (`assets/audio/music/menu_placeholder.wav`).
+  put it in `%APPDATA%\SCP-Noirverse\music\menu.ogg`. Your track plays
+  together with the built-in ones: four for the classic menu (Last Light,
+  Cold Storage, Night Shift, Event Horizon) and two for the Fusion menu
+  (Reactor Hum, Clean Energy; your own file for that one is `fusion.ogg`).
+  The menu starts on a random track and moves on when it ends; click the
+  **♪ track name** button in the bottom-right corner to skip. The built-in
+  tracks are made by `tools/make_music.py`.
 - **Warhead music:** put `AlphaWarheadEnhancedAudio.ogg`,
   `DeltaWarheadEnhancedAudio.ogg` and `GammaWarheadEnhancedAudio.ogg` in
   `assets/audio/music/warheads/` (or `%APPDATA%\SCP-Noirverse\music\warheads\`).

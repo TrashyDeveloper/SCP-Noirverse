@@ -44,6 +44,10 @@ func build(facility: Node3D, start: Transform3D) -> void:
 			l.visible = false
 		else:
 			l.light_energy *= 0.5
+	# (Test) No "D-01" numbers over the cell doors.
+	for sign in facility.find_children("*", "Label3D", true, false):
+		if (sign as Label3D).text.begins_with("D-"):
+			sign.visible = false
 	# Cell doors: some blown open, some torn off and caught in the drift.
 	for door in facility.find_children("CellDoor*", "", true, false):
 		var d := door as Node3D
