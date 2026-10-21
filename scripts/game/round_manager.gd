@@ -126,6 +126,8 @@ var countdown_override := {}
 ## After a detonation the round keeps going a few seconds (so everyone sees
 ## the explosion) before it can end.
 var _blast_hold := 0.0
+## True once any warhead has detonated (the round then keeps going).
+var detonated_any := false
 
 var _consoles: Array[WarheadConsole] = []
 var _intercoms: Array[Intercom] = []
@@ -265,16 +267,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _check_round_end() -> void:
-	var alive_sides := {}
-	for character in characters:
-		if character.is_alive:
-			alive_sides[character.get_side()] = true
-	if alive_sides.is_empty():
-		_end_round(NO_WINNER, "Everyone is dead.")
-	elif _elimination_possible and alive_sides.size() == 1:
-		var winner: int = alive_sides.keys()[0]
-		_end_round(winner, "Only the %s are left alive." % CharacterClass.side_name(winner))
-	elif config.round_time_limit_minutes > 0.0 and get_time_left() <= 0.0:
+	if config.round_time_limit_minutes > 0.0 and get_time_left() <= 0.0:
 		var scores := get_escape_scores()
 		var foundation: int = scores[CharacterClass.Side.FOUNDATION]
 		var insurgency: int = scores[CharacterClass.Side.INSURGENCY]
@@ -284,6 +277,23 @@ func _check_round_end() -> void:
 			_end_round(CharacterClass.Side.FOUNDATION, "Time is up. More Scientists escaped.")
 		else:
 			_end_round(NO_WINNER, "Time is up. Nobody got ahead.")
+		return
+	var waves := config.respawn_wave_seconds > 0.0
+	# After a warhead has gone off the round goes on: the dead come back with
+	# the reinforcement waves, and only the time limit ends it.
+	if detonated_any and waves:
+		return
+	var alive_sides := {}
+	for character in characters:
+		if character.is_alive:
+			alive_sides[character.get_side()] = true
+	if alive_sides.is_empty():
+		# With respawn waves on, the next wave brings people back.
+		if not waves:
+			_end_round(NO_WINNER, "Everyone is dead.")
+	elif _elimination_possible and alive_sides.size() == 1:
+		var winner: int = alive_sides.keys()[0]
+		_end_round(winner, "Only the %s are left alive." % CharacterClass.side_name(winner))
 
 
 ## Escape points per side. A disarmed escapee counts for the side that
@@ -744,25 +754,7 @@ func _detonate(warhead: int) -> void:
 	warhead_changed.emit(warhead, WarheadState.DETONATED, 0.0)
 	_update_consoles()
 	_blast_hold = 9.0 if warhead == WarheadConsole.Warhead.GAMMA else 7.0
-	if warhead == WarheadConsole.Warhead.GAMMA:
-		get_tree().create_timer(8.0).timeout.connect(_end_after_gamma)
-
-
-## The round ends a few seconds after the Gamma Warhead (once the blast has
-## swept over the site).
-func _end_after_gamma() -> void:
-	if state == State.RUNNING:
-		var scores := get_escape_scores()
-		var foundation: int = scores[CharacterClass.Side.FOUNDATION]
-		var insurgency: int = scores[CharacterClass.Side.INSURGENCY]
-		var winner := NO_WINNER
-		if insurgency > foundation:
-			winner = CharacterClass.Side.INSURGENCY
-		elif foundation > insurgency:
-			winner = CharacterClass.Side.FOUNDATION
-		var reason := "The Gamma Warhead destroyed the site. "
-		reason += "Neither side had more escapes." if winner == NO_WINNER else "The side with more escapes wins."
-		_end_round(winner, reason)
+	detonated_any = true
 
 
 func _update_consoles() -> void:

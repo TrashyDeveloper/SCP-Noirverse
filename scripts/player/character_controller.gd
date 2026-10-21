@@ -50,6 +50,12 @@ var _hold_time := 0.0
 var _speed_multiplier := 1.0
 var _class_speed := 1.0
 var _step_distance := 0.0
+## Extra velocity this physics tick from outside forces (a black hole
+## pulling, a white hole pushing). Cleared after every move.
+var external_velocity := Vector3.ZERO
+## How fast time runs for this character (1 = normal, 0.1 = in a time-stop
+## field: everything you do is ten times slower).
+var time_dilation := 1.0
 ## Admin: takes no damage.
 var god_mode := false
 ## Admin: flies through walls (see _apply_noclip).
@@ -115,7 +121,7 @@ func possess(source: InputSource, first_person: bool) -> void:
 func _process(delta: float) -> void:
 	if is_alive and model != null:
 		var local_velocity := global_basis.inverse() * velocity
-		model.animate(delta, local_velocity, is_on_floor(), head.rotation.x, is_disarmed(), items.aiming)
+		model.animate(delta * time_dilation, local_velocity, is_on_floor(), head.rotation.x, is_disarmed(), items.aiming)
 	if input_source == null or not is_alive:
 		return
 	# Apply the view every frame for smooth mouse look.
@@ -333,12 +339,12 @@ func _apply_movement(input: CharacterInput, delta: float) -> void:
 		_apply_noclip(input, delta)
 		return
 	if not is_on_floor():
-		velocity.y -= _gravity * delta
+		velocity.y -= _gravity * delta * time_dilation
 	elif input.jump:
-		velocity.y = jump_velocity
+		velocity.y = jump_velocity * time_dilation
 
 	var speed := sprint_speed if input.sprint and input.move.y > 0.0 else walk_speed
-	speed *= _speed_multiplier * _class_speed
+	speed *= _speed_multiplier * _class_speed * time_dilation
 	var held := items.get_equipped()
 	if held != null and held.data.kind == ItemData.Kind.FIREARM:
 		speed *= held.data.move_speed
@@ -352,7 +358,10 @@ func _apply_movement(input: CharacterInput, delta: float) -> void:
 	horizontal = horizontal.lerp(target, clampf(accel * delta, 0.0, 1.0))
 	velocity.x = horizontal.x
 	velocity.z = horizontal.z
+	velocity += external_velocity
 	move_and_slide()
+	velocity -= external_velocity
+	external_velocity = Vector3.ZERO
 
 
 ## Noclip: fly where you look, straight through walls (Shift = faster).

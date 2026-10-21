@@ -6,6 +6,8 @@ extends Node
 
 var round_manager: RoundManager
 var level: Node3D
+## For the Gamma aftermath tools (black hole, white hole, pulsar, stasis).
+var director: WarheadDirector
 
 var _locations: Array[Dictionary] = []
 
@@ -152,6 +154,26 @@ func kill(c: CharacterController) -> void:
 
 func force_warhead(warhead: int, action: String) -> void:
 	round_manager.force_warhead(warhead, action)
+
+
+## What the next Gamma Warhead turns into: "", "black", "white" or "pulsar".
+func set_gamma_outcome(kind: String) -> void:
+	director.forced_outcome = kind
+
+
+## Makes a black hole / white hole / pulsar at the Gamma reactor right now.
+func spawn_singularity(kind: String) -> void:
+	director.spawn_singularity_at_reactor(kind)
+
+
+## Starts the time-stop protocol on the current hole right away.
+func start_stasis() -> void:
+	if director.singularity != null and is_instance_valid(director.singularity):
+		director.singularity.start_stasis()
+
+
+func remove_singularity() -> void:
+	director.remove_singularity()
 
 
 ## All item ids (file names in res://resources/items).

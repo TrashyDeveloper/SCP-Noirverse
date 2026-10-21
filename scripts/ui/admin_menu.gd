@@ -219,6 +219,38 @@ func _rebuild_warheads() -> void:
 		row.add_child(_small_button("Cancel", func(): tools.force_warhead(warhead, "cancel"); _rebuild_warheads()))
 		row.add_child(_small_button("Detonate now", func(): tools.force_warhead(warhead, "detonate"); _rebuild_warheads()))
 		_warheads.add_child(row)
+	if tools.director == null:
+		return
+	# Gamma aftermath: choose what the reactor becomes, or make it right now.
+	var title := Label.new()
+	title.text = "GAMMA AFTERMATH"
+	title.add_theme_font_size_override("font_size", 16)
+	title.add_theme_color_override("font_color", Color(0.6, 0.8, 1.0))
+	_warheads.add_child(title)
+	var outcome := HBoxContainer.new()
+	var forced: String = tools.director.forced_outcome
+	var l := Label.new()
+	l.text = "Next Gamma becomes:  %s" % ("random" if forced == "" else forced)
+	l.custom_minimum_size.x = 380
+	outcome.add_child(l)
+	for kind: String in ["", "black", "white", "pulsar"]:
+		outcome.add_child(_small_button(["Random", "Black hole", "White hole", "Pulsar"][["", "black", "white", "pulsar"].find(kind)],
+			func(): tools.set_gamma_outcome(kind); _rebuild_warheads()))
+	_warheads.add_child(outcome)
+	var spawn := HBoxContainer.new()
+	var hole: Singularity = tools.director.singularity
+	var l2 := Label.new()
+	l2.text = "Now:  %s" % ("nothing" if hole == null or not is_instance_valid(hole) else "%s%s" % [hole.kind, ", TIME STOPPED" if hole.stasis > 0.0 else ""])
+	l2.custom_minimum_size.x = 380
+	spawn.add_child(l2)
+	spawn.add_child(_small_button("Spawn black hole", func(): tools.spawn_singularity("black"); _rebuild_warheads()))
+	spawn.add_child(_small_button("Spawn white hole", func(): tools.spawn_singularity("white"); _rebuild_warheads()))
+	spawn.add_child(_small_button("Spawn pulsar", func(): tools.spawn_singularity("pulsar"); _rebuild_warheads()))
+	_warheads.add_child(spawn)
+	var more := HBoxContainer.new()
+	more.add_child(_small_button("Start time-stop protocol now", func(): tools.start_stasis(); _rebuild_warheads()))
+	more.add_child(_small_button("Remove hole / pulsar", func(): tools.remove_singularity(); _rebuild_warheads()))
+	_warheads.add_child(more)
 
 
 func _small_button(text: String, action: Callable) -> Button:

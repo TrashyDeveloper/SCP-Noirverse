@@ -28,6 +28,8 @@ uniform float glitch : hint_range(0.0, 1.0) = 0.0;
 uniform vec2 lens_center = vec2(0.5, 0.5);
 uniform float lens_radius = 0.0;
 uniform float lens_strength = 0.0;
+// Inside a time-stop field: cold blue picture, frozen film grain.
+uniform float stasis : hint_range(0.0, 1.0) = 0.0;
 
 float hash(vec2 p) {
 	p = fract(p * vec2(123.34, 456.21));
@@ -87,7 +89,9 @@ void fragment() {
 	color *= tint;
 
 	// Film runs at ~24 frames per second; noise changes per "film frame".
-	float seed = fract(frame * 0.6180339);
+	// (In a time-stop field the film stops too.)
+	float seed = fract(mix(frame, 7.0, step(0.5, stasis)) * 0.6180339);
+	color = mix(color, vec3(dot(color, vec3(0.299, 0.587, 0.114))) * vec3(0.72, 0.86, 1.15), stasis * 0.8);
 
 	// Grain.
 	float grain = hash(FRAGCOORD.xy + seed * 1000.0) - 0.5;

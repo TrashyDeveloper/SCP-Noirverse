@@ -33,8 +33,13 @@ var announcer: Announcer
 ## func() -> CharacterController: the local player (may be null).
 var get_player: Callable
 
-## The black (or white) hole left by the Gamma Warhead, once it exists.
+## The black hole / white hole / pulsar left by the Gamma Warhead.
 var singularity: Singularity
+## Admin: what the next Gamma Warhead turns into ("" = random).
+var forced_outcome := ""
+## What this round's Gamma reactor will turn into (decided when it is armed,
+## so a pulsar-to-be never glitches the screen).
+var gamma_outcome := "black"
 var _tracks := {}
 var _music: AudioStreamPlayer
 var _music_warhead := -1
@@ -76,6 +81,11 @@ func _on_warhead_changed(warhead: int, state: int, time_left: float) -> void:
 		RoundManager.WarheadState.COUNTDOWN:
 			_milestones[warhead] = {}
 			_play_music(warhead)
+			if warhead == WarheadConsole.Warhead.GAMMA:
+				gamma_outcome = forced_outcome if forced_outcome != "" else Singularity.roll_kind()
+				var reactor := level.find_child("GammaReactor", true, false) as GammaReactor
+				if reactor != null:
+					reactor.glitch_enabled = gamma_outcome != "pulsar"
 			announcer.say(LINES[warhead] % int(time_left), true)
 		RoundManager.WarheadState.IDLE:
 			if _music_warhead == warhead:
@@ -295,13 +305,8 @@ func _supernova() -> void:
 	hud.flash_white(6.0)
 	_fireball(c, 420.0, Color(0.75, 0.95, 1.0), 5.0)
 	_fireball(c, 140.0, Color(1.0, 0.9, 0.6), 2.5)
-	# What's left: a black hole - or, rarely, a white hole.
-	get_tree().create_timer(1.5).timeout.connect(func():
-		singularity = Singularity.new()
-		singularity.white = randf() < Singularity.WHITE_CHANCE
-		level.add_child(singularity)
-		singularity.global_position = c + Vector3(0, 4.0, 0)
-		announcer.say("Gravitational anomaly detected." if not singularity.white else "Unknown radiation source detected.", true))
+	# What's left: a black hole - or, rarely, a white hole or a pulsar.
+	get_tree().create_timer(1.5).timeout.connect(func(): spawn_singularity(gamma_outcome, c + Vector3(0, 4.0, 0)))
 	# Shockwave ring along the ground.
 	var ring := MeshInstance3D.new()
 	var torus := TorusMesh.new()
@@ -319,6 +324,39 @@ func _supernova() -> void:
 	t.tween_property(ring.material_override, "albedo_color:a", 0.0, 4.0)
 	t.chain().tween_callback(ring.queue_free)
 	_smoke_column(c + Vector3(0, 6, 0))
+
+
+## Creates a black hole, white hole or pulsar at `pos` (replacing any old
+## one). Also used by the admin menu.
+func spawn_singularity(kind: String, pos: Vector3) -> Singularity:
+	remove_singularity()
+	singularity = Singularity.new()
+	singularity.kind = kind
+	level.add_child(singularity)
+	singularity.global_position = pos
+	singularity.stasis_started.connect(func():
+		announcer.say("Anomaly containment protocol engaged. Temporal stasis field deploying around the anomaly. All personnel keep clear.", true))
+	match kind:
+		"white":
+			announcer.say("Unknown radiation source detected. Exotic matter is being expelled. Temporal stasis protocol in fifteen seconds.", true)
+		"pulsar":
+			announcer.say("Warning. The reactor core has collapsed into a rotating neutron star. Do not look directly at the beams.", true)
+		_:
+			announcer.say("Gravitational anomaly detected. A singularity has formed on the surface. Temporal stasis protocol in fifteen seconds.", true)
+	return singularity
+
+
+func remove_singularity() -> void:
+	if singularity != null and is_instance_valid(singularity):
+		singularity.queue_free()
+	singularity = null
+
+
+## Spawns a singularity where the Gamma reactor is (admin).
+func spawn_singularity_at_reactor(kind: String) -> void:
+	var reactor := level.find_child("GammaReactor", true, false) as Node3D
+	var c := reactor.global_position + Vector3(0, GammaReactor.CORE_HEIGHT + 4.0, 0) if reactor != null else Vector3(156, 9, 92)
+	spawn_singularity(kind, c)
 
 
 ## A glowing sphere that grows to `radius` and fades, with a bright light.

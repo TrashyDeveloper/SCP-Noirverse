@@ -49,6 +49,11 @@ func set_film(grain: float, bright: float) -> void:
 	m.set_shader_parameter("brightness", bright)
 
 
+## Time-stop field look (0 = off, 1 = fully inside).
+func set_stasis(amount: float) -> void:
+	_material().set_shader_parameter("stasis", clampf(amount, 0.0, 1.0))
+
+
 ## Reality glitching (0 = off, 1 = breaking apart).
 func set_glitch(amount: float) -> void:
 	_material().set_shader_parameter("glitch", clampf(amount, 0.0, 1.0))

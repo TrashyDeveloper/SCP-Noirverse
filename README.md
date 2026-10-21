@@ -142,7 +142,7 @@ the minor roles instead. Minor roles escape like Scientists.
 | Where | **Heavy Containment**, the Alpha Warhead silo (console at the shaft) | Surface, Warhead Control building | Surface, the **Gamma reactor** |
 | Needs (held keycard) | Admin level 2 | Admin level 2 | Admin level 3 |
 | Countdown | its music track (default 2:24), can be cancelled until 15 s are left | its music track (default 1:24), can be cancelled until 10 s are left | its music track (default 2:09), can't be cancelled |
-| Effect | Everyone **underground** dies; the lifts stop. The Surface survives. | Everyone **underground** dies; the lifts stop. The Surface survives. | The **whole site** is destroyed, Surface included; the round ends (more escapes wins) |
+| Effect | Everyone **underground** dies; the lifts stop. The Surface survives. | Everyone **underground** dies; the lifts stop. The Surface survives. | The **whole site** is destroyed, Surface included (the round goes on) |
 
 - **Alpha Warhead silo:** a missile stands in a 14 m deep shaft, held by
   gantry arms and lit by floodlights; its status lights glow green. When
@@ -156,9 +156,23 @@ the minor roles instead. Minor roles escape like Scientists.
   floods back around it and the music swells. Reality starts **glitching**
   for anyone near it (torn picture, split colours, static, flashes) — and in
   the last seconds for everyone. The rings **break off one by one** and
-  crash down, then the four **pylons snap and topple**. After the blast it
-  leaves a **black hole** that bends the light around it and swallows loose
-  objects — or, with a 5% chance, a blazing **white hole**.
+  crash down, then the four **pylons snap and topple**. After the blast the
+  core becomes:
+  - a **black hole** (usually): bends the light around it and slowly sucks
+    in everything — people, bodies, loose objects. Get too close and you're
+    torn apart;
+  - a **white hole** (5%): blazes with rays and slowly pushes everything
+    away;
+  - a giant **pulsar** (0.1%): a tiny blinding star with two enormous beams
+    sweeping the sky — and no screen glitching at all, even during the
+    meltdown.
+  15 seconds after a black or white hole forms, the **Temporal Stasis
+  Protocol** kicks in: a field spreads over it (70 m) in which time almost
+  stops — the hole stops pulling or pushing, objects freeze and people can
+  only crawl at a tenth of their speed (your picture turns cold blue).
+
+**The round does not end when a warhead goes off.** The dead come back with
+the next reinforcement wave and the round runs until its time limit.
 
 During a countdown:
 
@@ -416,7 +430,7 @@ A basic admin menu for testing and messing around (turn it off with
 | Items | Give any item to the target (dropped at their feet if it doesn't fit). |
 | Roles | Switch the target to any class — tick the box to also move them to that role's spawn. Works on dead players too (brings them back). |
 | God & Noclip | God mode (no damage at all), noclip, heal, kill. |
-| Warheads | Start, cancel or detonate the Alpha, Delta and Gamma warheads right away (no keycard needed, even Gamma can be cancelled). |
+| Warheads | Start, cancel or detonate the Alpha, Delta and Gamma warheads right away (no keycard needed, even Gamma can be cancelled). **Gamma aftermath:** choose what the next Gamma becomes (random / black hole / white hole / pulsar), spawn a black hole, white hole or pulsar at the reactor right now, start the time-stop protocol immediately, or remove it. |
 
 **Alt** toggles noclip any time without opening the menu.
 

@@ -19,6 +19,7 @@ var _alarm_on := false
 var _alarm_sound: AudioStreamPlayer
 
 var _reactor: GammaReactor
+var _stasis_look := 0.0
 var settings: GameSettings
 var admin_tools: AdminTools
 var admin_menu: AdminMenu
@@ -95,6 +96,7 @@ func _ready() -> void:
 	warhead_director.name = "WarheadDirector"
 	add_child(warhead_director)
 	warhead_director.setup(round_manager, level, hud, noir_overlay, announcer, func(): return local_character)
+	admin_tools.director = warhead_director
 	settings = GameSettings.load_settings()
 	var players: Array[InputSource] = [local_input]
 	round_manager.start_round(players)
@@ -220,6 +222,9 @@ func _update_reactor_colors() -> void:
 
 func _update_lens(cam: Camera3D) -> void:
 	var hole := warhead_director.singularity if warhead_director != null else null
+	var in_field := hole != null and is_instance_valid(hole) and hole.in_stasis(cam.global_position)
+	_stasis_look = move_toward(_stasis_look, 1.0 if in_field else 0.0, get_process_delta_time() * 2.0)
+	noir_overlay.set_stasis(_stasis_look)
 	if hole == null or not is_instance_valid(hole) or cam.is_position_behind(hole.global_position):
 		noir_overlay.set_lens(Vector2.ZERO, 0.0, 0.0)
 		return

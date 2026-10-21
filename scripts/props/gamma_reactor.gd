@@ -24,6 +24,8 @@ const PYLON_BREAKS: Array[float] = [0.82, 0.87, 0.92, 0.96]
 const CORE_GROWTH := 4.5
 
 var spin := IDLE_SPIN
+## False when the core will become a pulsar: then reality doesn't glitch.
+var glitch_enabled := true
 ## 0 = calm, 1 = about to go off (follows the countdown, i.e. the music).
 var progress := 0.0
 var _state := 0
@@ -76,7 +78,7 @@ func get_color_radius() -> float:
 
 ## Screen glitching for people near the reactor (0..1).
 func get_glitch() -> float:
-	if _state == RoundManager.WarheadState.DETONATED:
+	if _state == RoundManager.WarheadState.DETONATED or not glitch_enabled:
 		return 0.0
 	return pow(clampf((progress - 0.3) / 0.7, 0.0, 1.0), 1.5)
 
@@ -84,6 +86,8 @@ func get_glitch() -> float:
 ## Screen glitching for everyone, wherever they are (the very end, fading
 ## away a few seconds after the blast).
 func get_global_glitch() -> float:
+	if not glitch_enabled:
+		return 0.0
 	if _state == RoundManager.WarheadState.DETONATED:
 		return clampf(1.0 - (_time - _detonated_at) / 3.0, 0.0, 1.0)
 	return clampf((progress - 0.88) / 0.12, 0.0, 1.0)
