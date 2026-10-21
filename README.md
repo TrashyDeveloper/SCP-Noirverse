@@ -429,8 +429,10 @@ A basic admin menu for testing and messing around (turn it off with
   Each warhead's countdown is set from its track: it detonates **6 seconds
   before the track ends** (so a 2:15 track gives a 2:09 countdown).
 - **Gamma pulsar sound:** `GammaPulsar.ogg` in the same folder. It loops at
-  the reactor, quiet while idle and roaring (and a bit higher) as the
-  reactor spins up.
+  the reactor, quiet while idle and roaring as the reactor spins up. The
+  reactor follows the audio: every loop, at **20.05 s** into the track, it
+  stops dead, then a split second later spins on **3× faster** until the
+  track loops and it starts over.
 - **Announcer voice:** uses your computer's text-to-speech (on Windows it
   picks a female voice such as "Microsoft Zira"). Volume: Settings →
   Announcer voice (0 = off, subtitles still show).

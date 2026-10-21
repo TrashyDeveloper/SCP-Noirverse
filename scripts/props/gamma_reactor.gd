@@ -13,6 +13,14 @@ extends Node3D
 const CORE_HEIGHT := 4.6
 const IDLE_SPIN := 0.6
 const MAX_SPIN := 70.0
+## At this point in the pulsar audio (every loop) the reactor stops dead...
+const STOP_AT := 20.05
+## ...stays still this long...
+const STOP_TIME := 0.12
+## ...then spins this many times faster until the audio loops.
+const AFTER_STOP_SPEED := 3.0
+## Loop length used for the stop when there is no GammaPulsar audio file.
+const FALLBACK_LOOP := 40.0
 
 var spin := IDLE_SPIN
 var _state := 0
@@ -81,11 +89,12 @@ func _process(delta: float) -> void:
 	elif _state == RoundManager.WarheadState.DETONATED:
 		target = 0.0
 	spin = lerpf(spin, target, minf(delta * 0.8, 1.0))
+	var turn := spin * get_spin_multiplier()
 	# Gyroscope rings on different axes, the pulsar beams sweeping around.
 	for i in _rings.size():
 		var axis: Vector3 = _rings[i].get_meta("axis")
-		_rings[i].rotate_object_local(axis, delta * spin * (0.6 + i * 0.35) * (1.0 if i % 2 == 0 else -1.0))
-	_pulsar.rotate_y(delta * spin * 1.5)
+		_rings[i].rotate_object_local(axis, delta * turn * (0.6 + i * 0.35) * (1.0 if i % 2 == 0 else -1.0))
+	_pulsar.rotate_y(delta * turn * 1.5)
 	var pulse := 0.5 + 0.5 * sin(_time * (3.0 + spin * 0.6))
 	var heat := clampf(spin / MAX_SPIN, 0.0, 1.0)
 	_core.scale = Vector3.ONE * (1.0 + pulse * 0.08 + heat * 0.25)
@@ -99,7 +108,24 @@ func _process(delta: float) -> void:
 	if _pulsar_sound != null:
 		# Quiet while idle, roaring at full spin, a bit faster as it spins up.
 		_pulsar_sound.volume_db = lerpf(-30.0, 6.0, clampf(heat * 1.6, 0.0, 1.0))
-		_pulsar_sound.pitch_scale = 1.0 + heat * 0.5
+
+
+## Where we are in the pulsar loop (seconds), taken straight from the
+## pulsar audio so the stop always happens exactly with the sound.
+func get_loop_position() -> float:
+	if _pulsar_sound != null and _pulsar_sound.playing:
+		return _pulsar_sound.get_playback_position() + AudioServer.get_time_since_last_mix()
+	return fmod(_time, FALLBACK_LOOP)
+
+
+## 1 before the stop, 0 during the stop, 3 after it (until the audio loops).
+func get_spin_multiplier() -> float:
+	var pos := get_loop_position()
+	if pos < STOP_AT:
+		return 1.0
+	if pos < STOP_AT + STOP_TIME:
+		return 0.0
+	return AFTER_STOP_SPEED
 
 
 # --- Model ----------------------------------------------------------------------
