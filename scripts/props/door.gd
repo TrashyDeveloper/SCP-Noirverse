@@ -8,6 +8,8 @@ extends Node3D
 
 signal opened
 signal closed
+## Emitted instead of opening when a remote-controlled door is used.
+signal use_requested(actor: Node)
 
 enum Access { NONE, CONTAINMENT, ARMORY, ADMIN }
 
@@ -24,6 +26,11 @@ const ACCESS_NAMES := {
 ## Access level needed (1-3).
 @export_range(0, 3) var required_level := 1
 @export var start_open := false
+## Controlled by something else (e.g. an elevator): pressing E only asks
+## that system via `use_requested` instead of opening the door.
+@export var remote_controlled := false
+## Prompt shown for remote-controlled doors.
+@export var remote_prompt := "[E] Call elevator"
 ## How far the panel slides sideways when opening, in meters.
 @export var slide_distance := 2.1
 @export var open_time := 0.6
@@ -88,12 +95,18 @@ func get_access_text() -> String:
 func get_interaction_prompt(actor: Node) -> String:
 	if actor != null and actor.has_method("is_disarmed") and actor.is_disarmed():
 		return "You are disarmed"
+	if remote_controlled:
+		return remote_prompt
 	if not can_operate(actor):
 		return "Requires %s keycard  (hold a keycard: Ctrl)" % get_access_text()
 	return "[E] Close door" if is_open else "[E] Open door"
 
 
 func interact(actor: Node) -> void:
+	if remote_controlled:
+		if not (actor != null and actor.has_method("is_disarmed") and actor.is_disarmed()):
+			use_requested.emit(actor)
+		return
 	if can_operate(actor):
 		set_open(not is_open)
 	else:
@@ -102,6 +115,8 @@ func interact(actor: Node) -> void:
 
 ## Called by a card reader when a thrown keycard hits it.
 func on_card_swiped(card: ItemData) -> void:
+	if remote_controlled:
+		return
 	if card_opens(card):
 		set_open(not is_open)
 	else:

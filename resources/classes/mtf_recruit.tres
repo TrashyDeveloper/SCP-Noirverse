@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterClass" format=3]
+
+[ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_rqmxr"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_6qosu"]
+[ext_resource type="Resource" path="res://resources/items/keycard_mtf_private.tres" id="3_d5vbm"]
+[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_emv11"]
+[ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_eqelm"]
+[ext_resource type="Resource" path="res://resources/items/armor_light.tres" id="6_urq74"]
+
+[resource]
+script = ExtResource("1_rqmxr")
+id = &"mtf_recruit"
+display_name = "MTF Recruit"
+objective = "Newly deployed Foundation personnel. Help Scientists escape, stop the Class-D and the Chaos Insurgency."
+unit = 1
+color = Color(0.16, 0.2, 0.33, 1)
+spawn_group = "MTF"
+starting_items = Array[ExtResource("2_6qosu")]([ExtResource("3_d5vbm"), ExtResource("4_emv11"), ExtResource("5_eqelm"), ExtResource("6_urq74")])
+starting_ammo = Dictionary[StringName, int]({
+&"9x19mm": 70
+})

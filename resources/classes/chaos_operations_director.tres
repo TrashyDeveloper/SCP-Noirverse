@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CharacterClass" format=3]
+
+[ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_gjysy"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_1158r"]
+[ext_resource type="Resource" path="res://resources/items/keycard_chaos_device.tres" id="3_c6dow"]
+[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_irfpg"]
+[ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_1ipo2"]
+[ext_resource type="Resource" path="res://resources/items/adrenaline.tres" id="6_wyiav"]
+[ext_resource type="Resource" path="res://resources/items/grenade_he.tres" id="7_5xg5g"]
+[ext_resource type="Resource" path="res://resources/items/armor_combat.tres" id="8_m5aae"]
+
+[resource]
+script = ExtResource("1_gjysy")
+id = &"chaos_operations_director"
+display_name = "Chaos Operations Director"
+objective = "Senior authority over the deployed unit. Direct the raid."
+side = 1
+unit = 2
+color = Color(0.24, 0.29, 0.16, 1)
+max_health = 110.0
+spawn_group = "Chaos"
+notes = "Planned weapon: battle rifle."
+starting_items = Array[ExtResource("2_1158r")]([ExtResource("3_c6dow"), ExtResource("4_irfpg"), ExtResource("5_1ipo2"), ExtResource("6_wyiav"), ExtResource("7_5xg5g"), ExtResource("8_m5aae")])
+starting_ammo = Dictionary[StringName, int]({
+&"9x19mm": 170
+})

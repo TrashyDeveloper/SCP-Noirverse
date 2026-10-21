@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CharacterClass" format=3]
+
+[ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_bkyqr"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_2kthh"]
+[ext_resource type="Resource" path="res://resources/items/keycard_mtf_commander.tres" id="3_ljq08"]
+[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_xg1ki"]
+[ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_u6hpb"]
+[ext_resource type="Resource" path="res://resources/items/adrenaline.tres" id="6_6q0mj"]
+[ext_resource type="Resource" path="res://resources/items/grenade_he.tres" id="7_q6xnh"]
+[ext_resource type="Resource" path="res://resources/items/armor_combat.tres" id="8_wapri"]
+
+[resource]
+script = ExtResource("1_bkyqr")
+id = &"mtf_commander"
+display_name = "MTF Commander"
+objective = "Senior authority over the deployed unit. Lead the operation."
+unit = 1
+color = Color(0.16, 0.2, 0.33, 1)
+max_health = 110.0
+spawn_group = "MTF"
+notes = "Planned weapon: battle rifle."
+starting_items = Array[ExtResource("2_2kthh")]([ExtResource("3_ljq08"), ExtResource("4_xg1ki"), ExtResource("5_u6hpb"), ExtResource("6_6q0mj"), ExtResource("7_q6xnh"), ExtResource("8_wapri")])
+starting_ammo = Dictionary[StringName, int]({
+&"9x19mm": 170
+})

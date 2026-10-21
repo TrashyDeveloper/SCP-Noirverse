@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CharacterClass" format=3]
+
+[ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_8jbo3"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_rtmd1"]
+[ext_resource type="Resource" path="res://resources/items/keycard_chaos_device.tres" id="3_iljki"]
+[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_d6v6t"]
+[ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_r6tfj"]
+[ext_resource type="Resource" path="res://resources/items/adrenaline.tres" id="6_84kna"]
+[ext_resource type="Resource" path="res://resources/items/grenade_he.tres" id="7_4vuja"]
+[ext_resource type="Resource" path="res://resources/items/grenade_flashbang.tres" id="8_uff2x"]
+[ext_resource type="Resource" path="res://resources/items/armor_heavy.tres" id="9_cdyg6"]
+
+[resource]
+script = ExtResource("1_8jbo3")
+id = &"chaos_vanguard"
+display_name = "Chaos Vanguard"
+objective = "Elite frontline unit. Lead the assault."
+side = 1
+unit = 2
+color = Color(0.24, 0.29, 0.16, 1)
+max_health = 120.0
+spawn_group = "Chaos"
+notes = "Planned weapon: battle rifle."
+starting_items = Array[ExtResource("2_rtmd1")]([ExtResource("3_iljki"), ExtResource("4_d6v6t"), ExtResource("5_r6tfj"), ExtResource("6_84kna"), ExtResource("7_4vuja"), ExtResource("8_uff2x"), ExtResource("9_cdyg6")])
+starting_ammo = Dictionary[StringName, int]({
+&"9x19mm": 200
+})

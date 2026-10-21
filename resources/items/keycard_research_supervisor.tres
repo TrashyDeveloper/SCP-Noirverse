@@ -12,4 +12,4 @@ color = Color(0.9, 0.55, 0.25, 1)
 weight = 0.05
 containment_level = 2
 admin_level = 1
-priority = 5
+priority = 6

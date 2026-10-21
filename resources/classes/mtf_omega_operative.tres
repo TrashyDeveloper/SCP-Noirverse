@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CharacterClass" format=3]
+
+[ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_hu8a2"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_urjd4"]
+[ext_resource type="Resource" path="res://resources/items/keycard_mtf_commander.tres" id="3_wmixq"]
+[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_xt2bk"]
+[ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_t5y1v"]
+[ext_resource type="Resource" path="res://resources/items/adrenaline.tres" id="6_tjgpl"]
+[ext_resource type="Resource" path="res://resources/items/grenade_he.tres" id="7_jxy85"]
+[ext_resource type="Resource" path="res://resources/items/armor_heavy.tres" id="8_xxqrb"]
+
+[resource]
+script = ExtResource("1_hu8a2")
+id = &"mtf_omega_operative"
+display_name = "MTF Omega Operative"
+objective = "Rare, high-tier specialist. Handle what others can't."
+unit = 1
+color = Color(0.16, 0.2, 0.33, 1)
+max_health = 130.0
+spawn_group = "MTF"
+notes = "Rare spawn. Planned: special weapon."
+starting_items = Array[ExtResource("2_urjd4")]([ExtResource("3_wmixq"), ExtResource("4_xt2bk"), ExtResource("5_t5y1v"), ExtResource("6_tjgpl"), ExtResource("7_jxy85"), ExtResource("8_xxqrb")])
+starting_ammo = Dictionary[StringName, int]({
+&"9x19mm": 200
+})

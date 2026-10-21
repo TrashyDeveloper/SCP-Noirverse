@@ -1,11 +1,11 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_k3wjn"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_p42cp"]
 
 [resource]
-script = ExtResource("1_k3wjn")
-id = &"keycard_mtf_captain"
-display_name = "MTF Captain Keycard"
+script = ExtResource("1_p42cp")
+id = &"keycard_mtf_commander"
+display_name = "MTF Commander Keycard"
 category = 1
 tiers = 4
 color = Color(0.12, 0.18, 0.45, 1)
@@ -13,4 +13,4 @@ weight = 0.05
 containment_level = 2
 armory_level = 3
 admin_level = 2
-priority = 10
+priority = 11

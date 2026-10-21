@@ -32,6 +32,7 @@ var _hit_marker_time := 0.0
 @onready var role_objective: Label = $Role/Objective
 @onready var class_label: Label = $HealthPanel/ClassLabel
 @onready var timer_label: Label = $RoundTimer
+@onready var warhead_label: Label = $WarheadLabel
 
 
 func _ready() -> void:
@@ -42,6 +43,7 @@ func _ready() -> void:
 	flash_overlay.color.a = 0.0
 	role_panel.modulate.a = 0.0
 	timer_label.text = ""
+	warhead_label.visible = false
 
 
 func bind_character(character: CharacterController) -> void:
@@ -67,6 +69,9 @@ func bind_character(character: CharacterController) -> void:
 
 
 func _process(delta: float) -> void:
+	if warhead_label.visible:
+		# Blink.
+		warhead_label.modulate.a = 0.55 + 0.45 * absf(sin(Time.get_ticks_msec() / 300.0))
 	if _role_time > 0.0:
 		_role_time -= delta
 		role_panel.modulate.a = clampf(_role_time, 0.0, 1.0)
@@ -88,12 +93,25 @@ func _process(delta: float) -> void:
 
 
 ## Big "YOU ARE A ..." text shown for a few seconds at spawn (or escape).
-func show_role(character_class: CharacterClass, title := "YOU ARE") -> void:
+func show_role(character_class: CharacterClass, title := "YOU ARE", unit_name := "") -> void:
 	role_title.text = title
 	role_class.text = character_class.display_name.to_upper()
 	role_objective.text = character_class.objective
+	if unit_name != "":
+		role_objective.text = unit_name.to_upper() + "\n" + character_class.objective
 	class_label.text = character_class.display_name.to_upper()
 	_role_time = 6.0
+
+
+## Big warning at the top of the screen ("" hides it).
+func show_warhead(text: String) -> void:
+	warhead_label.text = text
+	warhead_label.visible = text != ""
+
+
+## A full-screen white flash that fades out (warhead detonation).
+func flash_white(duration: float) -> void:
+	_blind = maxf(_blind, duration)
 
 
 func _on_prompt_changed(text: String) -> void:

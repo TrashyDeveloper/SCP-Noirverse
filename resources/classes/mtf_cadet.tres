@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CharacterClass" format=3]
+
+[ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_d1027"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_p08dp"]
+[ext_resource type="Resource" path="res://resources/items/keycard_mtf_private.tres" id="3_2lr7y"]
+[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_oebuc"]
+[ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_3kuo2"]
+[ext_resource type="Resource" path="res://resources/items/painkillers.tres" id="6_71w5x"]
+[ext_resource type="Resource" path="res://resources/items/armor_light.tres" id="7_5hveu"]
+
+[resource]
+script = ExtResource("1_d1027")
+id = &"mtf_cadet"
+display_name = "MTF Cadet"
+objective = "Junior combat personnel. Secure the facility."
+unit = 1
+color = Color(0.16, 0.2, 0.33, 1)
+spawn_group = "MTF"
+notes = "Planned weapon: submachine gun."
+starting_items = Array[ExtResource("2_p08dp")]([ExtResource("3_2lr7y"), ExtResource("4_oebuc"), ExtResource("5_3kuo2"), ExtResource("6_71w5x"), ExtResource("7_5hveu")])
+starting_ammo = Dictionary[StringName, int]({
+&"9x19mm": 70
+})

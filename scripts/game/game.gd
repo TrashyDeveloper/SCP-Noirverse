@@ -14,6 +14,10 @@ const COLOR_BURST_RANGE := 30.0
 ## user://gameplay_config.cfg are applied on top when the match starts.
 @export var gameplay_config: GameplayConfig
 
+## Normal colour of every light, remembered while the alarm turns them red.
+var _light_colors := {}
+var _alarm_on := false
+
 var config: GameplayConfig
 var level: Node3D
 var local_character: CharacterController
@@ -51,6 +55,7 @@ func _ready() -> void:
 	round_manager.character_spawned.connect(_on_character_spawned)
 	round_manager.character_escaped.connect(_on_character_escaped)
 	round_manager.round_ended.connect(_on_round_ended)
+	round_manager.warhead_changed.connect(_on_warhead_changed)
 	round_manager.setup(level, actors, config)
 	var players: Array[InputSource] = [local_input]
 	round_manager.start_round(players)
@@ -68,12 +73,12 @@ func _on_character_spawned(character: CharacterController, is_player: bool) -> v
 			set_inventory_open(false))
 	hud.bind_character(character)
 	inventory_menu.bind_character(character)
-	hud.show_role(character.character_class)
+	hud.show_role(character.character_class, "YOU ARE", round_manager.get_unit_name(character.character_class))
 
 
 func _on_character_escaped(character: CharacterController, _old: CharacterClass, new_class: CharacterClass) -> void:
 	if character == local_character:
-		hud.show_role(new_class, "YOU ESCAPED!")
+		hud.show_role(new_class, "YOU ESCAPED!", round_manager.get_unit_name(new_class))
 
 
 func _on_round_ended(result: Dictionary) -> void:
@@ -86,6 +91,41 @@ func _on_round_ended(result: Dictionary) -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	var player_side := local_character.get_side() if local_character != null else -1
 	round_end_screen.show_result(result, player_side, config.restart_delay_seconds)
+
+
+func _process(_delta: float) -> void:
+	var lines := PackedStringArray()
+	for warhead in round_manager.warhead_state:
+		if round_manager.warhead_state[warhead] == RoundManager.WarheadState.COUNTDOWN:
+			var t: float = round_manager.warhead_time_left[warhead]
+			lines.append("%s - DETONATION IN %d:%02d" % [
+				String(RoundManager.WARHEADS[warhead].name).to_upper(), int(t) / 60, int(t) % 60])
+	hud.show_warhead("\n".join(lines))
+
+
+## Presentation only: alarm lights while a warhead counts down, and a white
+## flash when one goes off.
+func _on_warhead_changed(_warhead: int, _state: int, _time_left: float) -> void:
+	var counting := false
+	for warhead in round_manager.warhead_state:
+		counting = counting or round_manager.warhead_state[warhead] == RoundManager.WarheadState.COUNTDOWN
+	_set_alarm(counting)
+	if _state == RoundManager.WarheadState.DETONATED:
+		hud.flash_white(3.0)
+		noir_overlay.color_burst(1.0)
+
+
+func _set_alarm(on: bool) -> void:
+	if on == _alarm_on:
+		return
+	_alarm_on = on
+	for light: Light3D in get_tree().get_nodes_in_group("facility_lights"):
+		if on:
+			_light_colors[light] = light.light_color
+			light.light_color = Color(1.0, 0.18, 0.12)
+		elif _light_colors.has(light):
+			light.light_color = _light_colors[light]
+	noir_overlay.set_base_saturation(0.4 if on else 0.06)
 
 
 func _on_actor_added(node: Node) -> void:

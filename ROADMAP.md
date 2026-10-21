@@ -59,6 +59,17 @@ and is committed + pushed once it works. `[x]` = done.
 - [x] Round settings in the gameplay config (spawn queue, player count, time limit, friendly fire, restart delay)
 - [ ] Later: spectating after death, respawn waves (Step 7), per-class models
 
+## Step 3.5 — The site map & teams ✅
+- [x] Four zones: Light Containment, Heavy Containment, Entrance Zone, Surface (grid-built, ~216 × 60 m underground + a ~84 × 100 m surface yard)
+- [x] Zone looks (wall/floor styles, LCZ/HCZ/EZ door stencils), checkpoints between zones
+- [x] Rooms: Class-D cells, labs, offices, lockers, test chamber, armories, SCP-173/096/049 chambers (empty), generator & server rooms, security office, manager office, cafeteria
+- [x] Gates A, B and C with elevators to the Surface; Surface yard with helipad, Chaos trucks, Warhead Control and the EXIT road (escape zone)
+- [x] Spawns: Class-D & Scientists in LCZ, Guards & Containment Captain in EZ, MTF & Chaos on the Surface, SCP points in HCZ
+- [x] Containment Captain class and keycard; escapes turn into MTF Recruit / Chaos Insurgency Recruit
+- [x] All MTF ranks and Chaos ranks as classes; MTF units and CI cells (one of each per round)
+- [x] Delta Warhead (underground) and Gamma Warhead (whole site) with countdowns, alarm lights and detonation
+- [ ] Later: more weapons for the MTF/CI ranks, per-zone room variety, zone lockdowns/decontamination
+
 ## Step 4 — AI bots
 - [ ] `BotInput` (an `InputSource` driven by AI) using navigation meshes
 - [ ] Simple behaviours: wander, flee, follow, open doors
@@ -70,15 +81,14 @@ and is committed + pushed once it works. `[x]` = done.
 - [ ] SCP-049: slow, deadly touch
 - [ ] Containment chambers; playing as an SCP (and SCP bots)
 
-## Step 6 — The full facility
-- [ ] Zones: Light Containment, Heavy Containment, Entrance, Surface
-- [ ] Checkpoints between zones, elevators/gates
+## Step 6 — Facility variety
+- [x] Zones, checkpoints, gate elevators, surface escape (done early in Step 3.5)
 - [ ] Modular room pieces so the layout can vary each round
-- [ ] Surface escape area
 
 ## Step 7 — Reinforcements
-- [ ] Respawn waves: Nine-Tailed Fox (MTF Epsilon-11) and Chaos Insurgency
+- [ ] Respawn waves on the Surface using the MTF / Chaos ranks and the round's unit/cell
 - [ ] Their goals: MTF contain SCPs and escort scientists, Chaos help Class-D
+- [ ] New weapons for the ranks (SMG, rifles, shotgun, machine guns)
 
 ## Step 8 — Sound & polish
 - [ ] Original sound effects and ambience (footsteps, doors, alarms, SCP sounds)

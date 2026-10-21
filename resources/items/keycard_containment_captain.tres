@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="1_r7d77"]
+
+[resource]
+script = ExtResource("1_r7d77")
+id = &"keycard_containment_captain"
+display_name = "Containment Captain Keycard"
+category = 1
+tiers = 4
+color = Color(0.4, 0.4, 0.44, 1)
+weight = 0.05
+containment_level = 1
+armory_level = 2
+admin_level = 2
+priority = 5

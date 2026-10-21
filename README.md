@@ -42,44 +42,102 @@ noir look. Built with **Godot 4** and **GDScript**.
 | F | Flashlight |
 | Esc | Pause menu (frees the mouse) |
 
+### The map
+
+The site has four zones. Underground, from west to east:
+
+```
+      LIGHT CONTAINMENT       HEAVY CONTAINMENT       ENTRANCE ZONE
+   D # L . O .            . 1 . 2 . .            A # O . B .
+   D # # # # .            # # # # # .            # # # # # .
+   D # . K # =  checkpoint # # . G # = checkpoint # S . M # .
+   . # T . # .            . 3 # # # .            # # # # # .
+   . O # # A .            . . S H . .            C . O . F .
+```
+
+| | Light Containment (LCZ) | Heavy Containment (HCZ) | Entrance Zone (EZ) |
+|---|---|---|---|
+| Rooms | D Class-D cells, L labs, O offices, K locker room, T test chamber (dummies), A LCZ armory | 1/2/3 SCP-173, SCP-096, SCP-049 chambers (empty for now), G generators (careful: sparking wiring), S server room, H HCZ armory | A/B/C **Gates A, B, C** (elevators to the Surface), S security office, M facility manager, O offices, F cafeteria |
+| Who spawns here | Class-D, Scientists | SCPs (later) | Facility Guards, Containment Captain |
+
+`#` corridors, `=` checkpoints (need **Admin 1**). Each cell is 12 × 12 m; sprinting
+from the Class-D cells to Gate A takes about 40 seconds.
+
+**Surface** (reached by the Gate elevators, 20 m up): a night-time yard with
+the Gate A/B/C buildings, the **MTF helipad**, the **Chaos Insurgency trucks**,
+the **Warhead Control** building and, to the north, the **EXIT road — the
+escape zone**.
+
+**Elevators:** use the card reader next to an elevator door to call it, the
+UP / DOWN panel inside to ride.
+
+**Door access** (hold the keycard, Ctrl): Class-D cells start open; locker
+room Containment 1; test chamber Containment 2; SCP chambers Containment 3;
+LCZ armory Armory 1, HCZ armory Armory 2; generator room Admin 1, server
+room Admin 2; security office Armory 1; facility manager Admin 2;
+checkpoints Admin 1; **Gates A and B Admin 2, Gate C (emergency exit) Admin 1**.
+
 ### How a round works
 
-Every round you spawn as a **random class**; the other characters are bots.
-(For now the bots just stand still — they get a brain in Step 4.)
+Every round you spawn as a **random class**; the other characters are bots
+(they stand still until Step 4).
 
-| Class | Side | Spawns in | Starts with | Goal |
-|---|---|---|---|---|
-| Class-D | Class-D & Chaos | Class-D holding | nothing | Escape through Gate A |
-| Scientist | Foundation | Research Office | Scientist keycard, First Aid Kit | Escape through Gate A |
-| Facility Guard | Foundation | Storage | Guard keycard, pistol + 60 rounds, First Aid Kit, Flashbang, Light Armor | Protect scientists, contain Class-D |
-| MTF Private | Foundation | Gate A (after escaping) | MTF Private keycard, pistol + 120, First Aid Kit, Combat Armor | Help scientists, stop Class-D & Chaos |
-| Chaos Insurgency Conscript | Class-D & Chaos | Gate A (after escaping) | Chaos device, pistol + 120, First Aid Kit, Combat Armor | Free Class-D, eliminate the Foundation |
+| Class | Side | Spawns in | Starts with |
+|---|---|---|---|
+| Class-D | Class-D & Chaos | LCZ Class-D cells | nothing |
+| Scientist | Foundation | LCZ labs & offices | Scientist keycard, First Aid Kit |
+| Facility Guard | Foundation | EZ security office & offices | Guard keycard, pistol + 60, First Aid Kit, Flashbang, Light Armor |
+| Containment Captain | Foundation | EZ security office | Containment Captain keycard, pistol + 120, First Aid Kit, Adrenaline, Flashbang, Combat Armor |
 
-- **Escaping:** walk into the striped **escape zone** in front of the big
-  gate in **Gate A** (east of the Research Office, through the EXIT door,
-  which needs **Admin level 1**: Zone Manager, Guard or better).
-  A Class-D becomes a Chaos Insurgency Conscript, a Scientist becomes an MTF
-  Private. **Disarmed** escapees switch sides (Class-D → MTF, Scientist →
-  Chaos). You keep your items.
-- **Friendly fire** is off: you can't hurt your own side.
+- **Escaping:** reach the Surface and walk into the **EXIT road**. A Class-D
+  becomes a **Chaos Insurgency Recruit**, a Scientist an **MTF Recruit**;
+  **disarmed** escapees switch sides. You keep your items.
+- Each round has one **MTF unit** (e.g. Epsilon-11 "Nine-Tailed Fox") and one
+  **Chaos Insurgency cell** (e.g. CI-04 "Rogue Cell"); escapees join them.
+- **Friendly fire** is off.
 - **The round ends** when only one side is left alive, or when time runs out
-  (then the side with more escapes wins; a disarmed escapee counts for the
-  side that captured them). A summary screen shows the winner and stats,
-  then the next round starts.
+  (then the side with more escapes wins). The round-end screen shows the
+  winner and stats, then the next round starts.
+
+### Warheads (Surface, Warhead Control building)
+
+| | Delta Warhead | Gamma Warhead |
+|---|---|---|
+| Needs (held keycard) | Admin level 2 | Admin level 3 |
+| Countdown | 90 s, can be cancelled until 10 s are left | 120 s, can't be cancelled |
+| Effect | Everyone **underground** dies; the elevators stop working | The **whole site** is destroyed; the round ends (more escapes wins) |
+
+During a countdown the facility lights turn red and a warning shows at the
+top of the screen.
+
+### Teams (for reinforcements in Step 7)
+
+**Mobile Task Force:** MTF Recruit, Cadet, Rifleman, Breacher, Heavy,
+Sergeant, Suppressor, Omega Operative, Commander. Units: Epsilon-11
+"Nine-Tailed Fox", Nu-7 "Hammer Down", Beta-7 "Maz Hatters", Alpha-1 "Red
+Right Hand", Eta-10 "See No Evil", Delta-4 "Minutemen", Zeta-9 "Mole Rats".
+
+**Chaos Insurgency:** Chaos Recruit, Rifleman, Breacher, Heavy, Saboteur,
+Infiltrator, Vanguard, Operations Director. Groups: Military Cells, R&D
+Cells, Delta Command. Cells: CI-01 Iron Fist … CI-10 Black Crown (see
+`scripts/game/factions.gd`).
+
+All of them already exist as classes in `resources/classes/` with their own
+health, keycards, armor and grenades. Right now only the Recruits appear (by
+escaping); the others will arrive with respawn waves. Their planned weapons
+(rifles, shotguns, machine guns) are written in each class's **Notes** — for
+now everyone carries the pistol.
 
 ### What to try
 
-1. Press **Play** and read the "YOU ARE ..." text: that's your class.
-2. As **Class-D**: grab the Janitor keycard (middle bunk), open the east door
-   (Ctrl, then E), find a Zone Manager or Guard card in the Office and open
-   the EXIT door to Gate A. Step into the escape zone!
-3. As **Scientist**: you already have a card for the east door but need
-   Admin access for the EXIT; look around the Office.
-4. As **Facility Guard**: you start in Storage with a pistol. Disarm a
-   Class-D (hold E with the pistol out) and walk them to Gate A: they
-   become MTF on your side.
-5. Explore the rest: firing range (Containment level 2), grenades, armor,
-   the sparking wiring in the Office...
+1. **Class-D:** grab a Janitor or Zone Manager keycard in the LCZ offices /
+   locker room, pass the checkpoint (Admin 1), cross HCZ, reach Gate C
+   (Admin 1) in the south-west of the Entrance Zone, ride up and run to the
+   EXIT road.
+2. **Scientist:** same route; look for a Zone Manager card first.
+3. **Guard / Containment Captain:** start in the Entrance Zone; head into
+   the facility, or up to the Surface to try the Delta Warhead (the Captain's
+   card has Admin 2).
 
 ## Items
 
@@ -175,8 +233,9 @@ a carry limit (shown on the Tab screen):
   change the numbers and start a new match:
   - item limits: 0–8, **0 = that item type can't be picked up**;
   - ammo limits (one section per armor type): 0–65535, **0 = unlimited**;
-  - `[round]`: `spawn_queue` (D = Class-D, S = Scientist, G = Guard, e.g.
-    `"DSDGDSDD"`), `player_count` (you + bots), `round_time_limit_minutes`
+  - `[round]`: `spawn_queue` (D = Class-D, S = Scientist, G = Guard,
+    C = Containment Captain, e.g. `"DSDGDSCDGDSD"`), `player_count` (you +
+    bots, default 10), `round_time_limit_minutes`
     (0 = none), `friendly_fire`, `restart_delay_seconds`.
 
   See `gameplay_config.example.cfg`. The built-in defaults are in
@@ -204,6 +263,10 @@ a carry limit (shown on the Tab screen):
   (e.g. "HCZ" / "HEAVY CONTAINMENT ZONE").
 - **Wall look:** open `resources/materials/concrete_wall.tres` and change the
   shader parameters (panel width, colours, trim height…).
+- **The map** is `scenes/levels/facility.tscn`. It was generated from the
+  grid above, but it's a normal scene: open it and move, add or delete
+  anything. Each zone is a folder under `Zones/`; doors, lights, items,
+  signs, elevators, the Surface and spawn points have their own folders.
 - The facility is built from `CSGBox3D` blocks — select one and drag the
   orange handles to resize, or **Ctrl+D** to duplicate.
 - Errors show in the **Debugger** panel at the bottom while the game runs.

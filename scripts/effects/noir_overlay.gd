@@ -30,6 +30,14 @@ func color_burst(strength: float) -> void:
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 
+## Changes how much colour is always visible (e.g. raised during an alarm so
+## red emergency lights show).
+func set_base_saturation(value: float) -> void:
+	_base_saturation = value
+	if _tween == null or not _tween.is_running():
+		_set_saturation(value)
+
+
 func _material() -> ShaderMaterial:
 	return filter.material as ShaderMaterial
 

@@ -10,12 +10,23 @@ extends Node
 signal character_spawned(character: CharacterController, is_player: bool)
 signal character_escaped(character: CharacterController, old_class: CharacterClass, new_class: CharacterClass)
 signal round_ended(result: Dictionary)
+## A warhead started, was cancelled or detonated. `state` is a WarheadState.
+signal warhead_changed(warhead: int, state: int, time_left: float)
 
 enum State { WAITING, RUNNING, ENDED }
+enum WarheadState { IDLE, COUNTDOWN, DETONATED }
 
 const CHARACTER_SCENE := preload("res://scenes/player/character.tscn")
 ## Used for the "winner" field of the result when nobody wins.
 const NO_WINNER := -1
+## Anyone below this height is "underground" (inside the facility).
+const SURFACE_HEIGHT := 15.0
+## Warhead rules: keycard Admin level needed, countdown seconds, and until
+## how many seconds before detonation it can still be cancelled (-1 = never).
+const WARHEADS := {
+	WarheadConsole.Warhead.DELTA: {"name": "Delta Warhead", "admin": 2, "countdown": 90.0, "cancel_until": 10.0},
+	WarheadConsole.Warhead.GAMMA: {"name": "Gamma Warhead", "admin": 3, "countdown": 120.0, "cancel_until": -1.0},
+}
 
 ## Spawn queue letters and the class each one spawns.
 @export var queue_classes: Dictionary = {}
@@ -38,6 +49,13 @@ var stats := {
 	"deaths": 0,
 }
 
+## This round's Mobile Task Force unit and Chaos Insurgency cell (see Factions).
+var mtf_unit: Dictionary = {}
+var chaos_cell: Dictionary = {}
+var warhead_state := {WarheadConsole.Warhead.DELTA: WarheadState.IDLE, WarheadConsole.Warhead.GAMMA: WarheadState.IDLE}
+var warhead_time_left := {WarheadConsole.Warhead.DELTA: 0.0, WarheadConsole.Warhead.GAMMA: 0.0}
+
+var _consoles: Array[WarheadConsole] = []
 var _elimination_possible := false
 var _spawn_points := {}  # group name -> Array[Node3D] (shuffled)
 var _spawn_counters := {}  # group name -> how many used
@@ -49,11 +67,18 @@ func setup(level_node: Node3D, actors_node: Node3D, match_config: GameplayConfig
 	config = match_config
 	for zone in level.find_children("*", "EscapeZone", true, false):
 		zone.character_entered.connect(_on_escape_zone_entered)
+	for console in level.find_children("*", "WarheadConsole", true, false):
+		_consoles.append(console)
+		console.use_requested.connect(_on_warhead_console_used)
+		console.prompt_provider = _warhead_prompt
+	_update_consoles()
 
 
 ## Starts the round. `player_inputs` are the human players (here: just the
 ## local player); the remaining slots are filled with bots.
 func start_round(player_inputs: Array[InputSource]) -> void:
+	mtf_unit = Factions.MTF_UNITS.pick_random()
+	chaos_cell = Factions.CI_CELLS.pick_random()
 	var classes := build_class_list()
 	classes.shuffle()
 	for i in classes.size():
@@ -101,6 +126,17 @@ func spawn_character(character_class: CharacterClass, input: InputSource, is_pla
 	return character
 
 
+## The unit name a character of this class belongs to this round, e.g.
+## 'Epsilon-11 "Nine-Tailed Fox"' (empty for facility staff).
+func get_unit_name(character_class: CharacterClass) -> String:
+	match character_class.unit:
+		CharacterClass.Unit.MTF:
+			return Factions.unit_name(mtf_unit)
+		CharacterClass.Unit.CHAOS:
+			return Factions.unit_name(chaos_cell)
+	return ""
+
+
 func get_time_left() -> float:
 	if config.round_time_limit_minutes <= 0.0:
 		return -1.0
@@ -111,7 +147,9 @@ func _physics_process(delta: float) -> void:
 	if state != State.RUNNING:
 		return
 	elapsed += delta
-	_check_round_end()
+	_update_warheads(delta)
+	if state == State.RUNNING:
+		_check_round_end()
 
 
 func _check_round_end() -> void:
@@ -210,3 +248,117 @@ func _take_spawn_transform(group: String) -> Transform3D:
 	if index >= markers.size():
 		result.origin += Vector3(randf_range(-0.6, 0.6), 0.0, randf_range(-0.6, 0.6))
 	return result
+
+
+# --- Warheads ------------------------------------------------------------
+
+func _held_admin_level(actor: Node) -> int:
+	if not actor is CharacterController:
+		return 0
+	var held: ItemInstance = actor.get_held_item()
+	if held == null or held.data.kind != ItemData.Kind.KEYCARD:
+		return 0
+	return held.data.admin_level
+
+
+func _can_cancel(warhead: int) -> bool:
+	var rules: Dictionary = WARHEADS[warhead]
+	return rules.cancel_until >= 0.0 and warhead_time_left[warhead] > rules.cancel_until
+
+
+func _warhead_prompt(console: WarheadConsole, actor: Node) -> String:
+	var warhead := console.warhead
+	var rules: Dictionary = WARHEADS[warhead]
+	match warhead_state[warhead]:
+		WarheadState.DETONATED:
+			return "%s has detonated" % rules.name
+		WarheadState.COUNTDOWN:
+			if not _can_cancel(warhead):
+				return "Detonation can't be stopped"
+			if _held_admin_level(actor) < rules.admin:
+				return "Cancel needs an Admin level %d keycard (hold it)" % rules.admin
+			return "[E] CANCEL %s detonation" % rules.name
+	if state != State.RUNNING:
+		return ""
+	if _held_admin_level(actor) < rules.admin:
+		return "Activate: hold an Admin level %d keycard" % rules.admin
+	return "[E] ACTIVATE %s" % rules.name
+
+
+func _on_warhead_console_used(console: WarheadConsole, actor: Node) -> void:
+	if state != State.RUNNING:
+		return
+	var warhead := console.warhead
+	var rules: Dictionary = WARHEADS[warhead]
+	if _held_admin_level(actor) < rules.admin:
+		return
+	match warhead_state[warhead]:
+		WarheadState.IDLE:
+			warhead_state[warhead] = WarheadState.COUNTDOWN
+			warhead_time_left[warhead] = rules.countdown
+		WarheadState.COUNTDOWN:
+			if not _can_cancel(warhead):
+				return
+			warhead_state[warhead] = WarheadState.IDLE
+		_:
+			return
+	warhead_changed.emit(warhead, warhead_state[warhead], warhead_time_left[warhead])
+	_update_consoles()
+
+
+func _update_warheads(delta: float) -> void:
+	var any := false
+	for warhead in warhead_state:
+		if warhead_state[warhead] != WarheadState.COUNTDOWN:
+			continue
+		any = true
+		warhead_time_left[warhead] = maxf(warhead_time_left[warhead] - delta, 0.0)
+		if warhead_time_left[warhead] <= 0.0:
+			_detonate(warhead)
+	if any and Engine.get_physics_frames() % 15 == 0:
+		_update_consoles()
+
+
+func _detonate(warhead: int) -> void:
+	warhead_state[warhead] = WarheadState.DETONATED
+	var rules: Dictionary = WARHEADS[warhead]
+	var blast := WarheadBlast.new()
+	blast.cause_of_death = "Killed by the %s" % rules.name
+	add_child(blast)
+	for character in characters:
+		if not character.is_alive:
+			continue
+		var underground := character.global_position.y < SURFACE_HEIGHT
+		if warhead == WarheadConsole.Warhead.GAMMA or underground:
+			character.health.take_damage(100000.0, blast)
+	if warhead == WarheadConsole.Warhead.DELTA:
+		# The facility below is destroyed: the elevators stop working.
+		for elevator in level.find_children("*", "Elevator", true, false):
+			elevator.disabled = true
+	warhead_changed.emit(warhead, WarheadState.DETONATED, 0.0)
+	_update_consoles()
+	if warhead == WarheadConsole.Warhead.GAMMA and state == State.RUNNING:
+		var scores := get_escape_scores()
+		var foundation: int = scores[CharacterClass.Side.FOUNDATION]
+		var insurgency: int = scores[CharacterClass.Side.INSURGENCY]
+		var winner := NO_WINNER
+		if insurgency > foundation:
+			winner = CharacterClass.Side.INSURGENCY
+		elif foundation > insurgency:
+			winner = CharacterClass.Side.FOUNDATION
+		var reason := "The Gamma Warhead destroyed the site. "
+		reason += "Neither side had more escapes." if winner == NO_WINNER else "The side with more escapes wins."
+		_end_round(winner, reason)
+
+
+func _update_consoles() -> void:
+	for console in _consoles:
+		var rules: Dictionary = WARHEADS[console.warhead]
+		match warhead_state[console.warhead]:
+			WarheadState.IDLE:
+				console.set_status("STANDBY - ADMIN %d" % rules.admin)
+			WarheadState.COUNTDOWN:
+				var t: float = warhead_time_left[console.warhead]
+				console.set_status("DETONATION IN %d:%02d" % [int(t) / 60, int(t) % 60])
+			WarheadState.DETONATED:
+				console.set_status("DETONATED")

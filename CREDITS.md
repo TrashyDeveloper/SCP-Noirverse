@@ -14,7 +14,7 @@ SCP Foundation content is licensed under
 | SCP-173 | Moto42 | <https://scp-wiki.wikidot.com/scp-173> |
 | SCP-096 | Dr Dan | <https://scp-wiki.wikidot.com/scp-096> |
 | SCP-049 | Gabriel Jade | <https://scp-wiki.wikidot.com/scp-049> |
-| SCP Foundation, O5 Council, Class-D, Mobile Task Forces (MTF Epsilon-11 "Nine-Tailed Fox"), Chaos Insurgency | SCP Wiki contributors | <https://scp-wiki.wikidot.com> |
+| SCP Foundation, O5 Council, Class-D, Mobile Task Forces (Epsilon-11 "Nine-Tailed Fox", Nu-7 "Hammer Down", Beta-7 "Maz Hatters", Alpha-1 "Red Right Hand", Eta-10 "See No Evil", Zeta-9 "Mole Rats"), Chaos Insurgency, Delta Command | SCP Wiki contributors | <https://scp-wiki.wikidot.com> |
 
 - The SCP Foundation emblem on doors (`assets/textures/scp_emblem.svg`) is our
   own redrawing of the SCP Wiki logo, originally by Aelanna, CC BY-SA 3.0

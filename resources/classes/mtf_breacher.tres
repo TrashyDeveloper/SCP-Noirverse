@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CharacterClass" format=3]
+
+[ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_2bvew"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_qu1p4"]
+[ext_resource type="Resource" path="res://resources/items/keycard_mtf_private.tres" id="3_eylxk"]
+[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_ajkv8"]
+[ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_jkg10"]
+[ext_resource type="Resource" path="res://resources/items/grenade_he.tres" id="6_pg26p"]
+[ext_resource type="Resource" path="res://resources/items/armor_combat.tres" id="7_1v3a0"]
+
+[resource]
+script = ExtResource("1_2bvew")
+id = &"mtf_breacher"
+display_name = "MTF Breacher"
+objective = "Close-quarters combat specialist. Clear rooms and corridors."
+unit = 1
+color = Color(0.16, 0.2, 0.33, 1)
+spawn_group = "MTF"
+notes = "Planned weapon: shotgun."
+starting_items = Array[ExtResource("2_qu1p4")]([ExtResource("3_eylxk"), ExtResource("4_ajkv8"), ExtResource("5_jkg10"), ExtResource("6_pg26p"), ExtResource("7_1v3a0")])
+starting_ammo = Dictionary[StringName, int]({
+&"9x19mm": 120
+})

@@ -19,11 +19,12 @@ const MAX_AMMO_LIMIT := 65535
 const UNLIMITED_AMMO := 1 << 30
 
 @export_group("Round")
-## Who spawns, in order: D = Class-D, S = Scientist, G = Facility Guard.
-## The first `player_count` letters are used (the queue repeats if shorter).
-@export var spawn_queue := "DSDGDSDD"
+## Who spawns, in order: D = Class-D, S = Scientist, G = Facility Guard,
+## C = Containment Captain. The first `player_count` letters are used (the
+## queue repeats if shorter).
+@export var spawn_queue := "DSDGDSCDGDSD"
 ## Characters per round (you + bots).
-@export_range(1, 40) var player_count := 6
+@export_range(1, 40) var player_count := 10
 ## The round ends after this many minutes (0 = no time limit).
 @export var round_time_limit_minutes := 20.0
 ## Can characters on the same side hurt each other?

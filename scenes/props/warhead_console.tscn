@@ -1,0 +1,91 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/props/warhead_console.gd" id="1_console"]
+[ext_resource type="Texture2D" path="res://assets/textures/hazard_stripes.svg" id="2_stripes"]
+
+[sub_resource type="BoxShape3D" id="Shape_desk"]
+size = Vector3(1.8, 1.2, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="Mat_desk"]
+albedo_color = Color(0.16, 0.16, 0.17, 1)
+metallic = 0.3
+roughness = 0.5
+
+[sub_resource type="BoxMesh" id="Mesh_desk"]
+material = SubResource("Mat_desk")
+size = Vector3(1.8, 1.0, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="Mat_panel"]
+albedo_color = Color(0.08, 0.08, 0.09, 1)
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="Mesh_panel"]
+material = SubResource("Mat_panel")
+size = Vector3(1.6, 0.06, 0.7)
+
+[sub_resource type="StandardMaterial3D" id="Mat_button"]
+albedo_color = Color(0.85, 0.1, 0.08, 1)
+emission_enabled = true
+emission = Color(0.9, 0.1, 0.05, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="CylinderMesh" id="Mesh_button"]
+material = SubResource("Mat_button")
+top_radius = 0.11
+bottom_radius = 0.13
+height = 0.08
+
+[sub_resource type="StandardMaterial3D" id="Mat_stripes"]
+albedo_texture = ExtResource("2_stripes")
+uv1_scale = Vector3(5, 1, 1)
+texture_filter = 5
+
+[sub_resource type="QuadMesh" id="Mesh_stripes"]
+material = SubResource("Mat_stripes")
+size = Vector2(1.8, 0.15)
+
+[node name="WarheadConsole" type="StaticBody3D"]
+script = ExtResource("1_console")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+shape = SubResource("Shape_desk")
+
+[node name="Desk" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("Mesh_desk")
+
+[node name="Panel" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866, 0.5, 0, -0.5, 0.866, 0, 1.08, 0)
+mesh = SubResource("Mesh_panel")
+
+[node name="Button" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866, 0.5, 0, -0.5, 0.866, 0, 1.14, 0.05)
+mesh = SubResource("Mesh_button")
+
+[node name="Stripes" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0.452)
+mesh = SubResource("Mesh_stripes")
+
+[node name="Title" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, -0.2)
+pixel_size = 0.004
+shaded = true
+modulate = Color(0.92, 0.9, 0.85, 1)
+outline_size = 0
+text = "DELTA WARHEAD"
+font_size = 48
+
+[node name="StatusLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.72, -0.2)
+pixel_size = 0.003
+modulate = Color(0.85, 0.85, 0.8, 1)
+outline_size = 0
+text = "STANDBY"
+font_size = 40
+
+[node name="WarningLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0.4)
+light_color = Color(1, 0.2, 0.15, 1)
+light_energy = 0.6
+omni_range = 3.0

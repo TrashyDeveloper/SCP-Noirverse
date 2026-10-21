@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CharacterClass" format=3]
+
+[ext_resource type="Script" path="res://scripts/game/character_class.gd" id="1_qaqju"]
+[ext_resource type="Script" path="res://scripts/items/item_data.gd" id="2_711hj"]
+[ext_resource type="Resource" path="res://resources/items/keycard_mtf_private.tres" id="3_won54"]
+[ext_resource type="Resource" path="res://resources/items/pistol.tres" id="4_e717h"]
+[ext_resource type="Resource" path="res://resources/items/first_aid_kit.tres" id="5_v0o5q"]
+[ext_resource type="Resource" path="res://resources/items/grenade_he.tres" id="6_vlydu"]
+[ext_resource type="Resource" path="res://resources/items/armor_heavy.tres" id="7_lte4l"]
+
+[resource]
+script = ExtResource("1_qaqju")
+id = &"mtf_heavy"
+display_name = "MTF Heavy"
+objective = "Heavy combat support. Hold the line."
+unit = 1
+color = Color(0.16, 0.2, 0.33, 1)
+max_health = 120.0
+spawn_group = "MTF"
+notes = "Planned weapon: light machine gun."
+starting_items = Array[ExtResource("2_711hj")]([ExtResource("3_won54"), ExtResource("4_e717h"), ExtResource("5_v0o5q"), ExtResource("6_vlydu"), ExtResource("6_vlydu"), ExtResource("7_lte4l")])
+starting_ammo = Dictionary[StringName, int]({
+&"9x19mm": 180
+})
