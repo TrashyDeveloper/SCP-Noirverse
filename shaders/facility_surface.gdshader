@@ -13,6 +13,8 @@ uniform float panel_width = 1.5;
 uniform float seam_width = 0.022;
 uniform float kick_height = 0.32;
 uniform float trim_height = 2.35;
+// Half the height of the trim band (make it bigger for a wide stripe).
+uniform float trim_width = 0.03;
 uniform float tile_size = 1.0;
 uniform float metallic_amount : hint_range(0.0, 1.0) = 0.15;
 uniform float roughness_min : hint_range(0.0, 1.0) = 0.45;
@@ -64,7 +66,7 @@ void fragment() {
 		}
 		seam = max(seam, 1.0 - smoothstep(seam_width * 0.5, seam_width, abs(y - kick_height)));
 		// Horizontal trim strip.
-		float trim = 1.0 - smoothstep(0.03, 0.04, abs(y - trim_height));
+		float trim = 1.0 - smoothstep(trim_width, trim_width + 0.01, abs(y - trim_height));
 		col = mix(col, trim_color, trim);
 		grime_uv = vec2(along, y);
 	}

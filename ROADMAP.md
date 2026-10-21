@@ -77,6 +77,15 @@ and is committed + pushed once it works. `[x]` = done.
 - [x] Lockroom (double doors), computer room, restrooms, storage
 - [ ] Later: SCP-914 refining items, LCZ decontamination timer
 
+## Step 3.7 — Two floors, lifts and signature rooms ✅
+- [x] Light Containment on the upper floor; Heavy Containment + Entrance Zone 20 m below
+- [x] Checkpoint A and Checkpoint B with lifts — the only way between Light and Heavy Containment
+- [x] Lift redesign: enclosed cabin (walls, handrails, light, control panel with display), two-piece sliding doors, frames, CALL buttons, "lift at ..." indicators
+- [x] SCP-173 chamber moved to Light Containment (striped entrance, placard, white antechamber, viewing window, containment door)
+- [x] Tertiary Server Room replaces the computer room (glass-walled control room, server clusters, heat shafts, blue neon)
+- [x] SCP-914 room redesign (raised booths with ramps and railings, hazard zones, shelves)
+- [x] Blue-lit screens on card readers; HCZ archive and testing room
+
 ## Step 4 — AI bots
 - [ ] `BotInput` (an `InputSource` driven by AI) using navigation meshes
 - [ ] Simple behaviours: wander, flee, follow, open doors

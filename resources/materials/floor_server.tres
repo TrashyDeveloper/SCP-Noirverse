@@ -1,0 +1,29 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shaders/facility_surface.gdshader" id="1_irx0h"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_nashr"]
+frequency = 0.03
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_88wis"]
+noise = SubResource("FastNoiseLite_nashr")
+seamless = true
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_irx0h")
+shader_parameter/base_color = Color(0.5, 0.5, 0.52, 1)
+shader_parameter/seam_color = null
+shader_parameter/trim_color = null
+shader_parameter/panel_width = null
+shader_parameter/seam_width = 0.01
+shader_parameter/kick_height = null
+shader_parameter/trim_height = null
+shader_parameter/trim_width = null
+shader_parameter/tile_size = 0.6
+shader_parameter/metallic_amount = 0.2
+shader_parameter/roughness_min = 0.15
+shader_parameter/roughness_max = 0.4
+shader_parameter/grime = SubResource("NoiseTexture2D_88wis")
+shader_parameter/grime_scale = null
+shader_parameter/grime_strength = 0.1

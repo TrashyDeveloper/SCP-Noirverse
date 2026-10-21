@@ -1,8 +1,9 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://scripts/props/door.gd" id="1_door"]
 [ext_resource type="Script" path="res://scripts/props/door_reader.gd" id="2_reader"]
 [ext_resource type="PackedScene" path="res://scenes/props/door_face.tscn" id="3_face"]
+[ext_resource type="Material" path="res://resources/materials/screen_blue.tres" id="4_screen"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_panel"]
 size = Vector3(2.2, 2.6, 0.15)
@@ -48,6 +49,10 @@ albedo_color = Color(1, 0.85, 0.3, 1)
 emission_enabled = true
 emission = Color(1, 0.85, 0.3, 1)
 emission_energy_multiplier = 3.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_reader_screen"]
+material = ExtResource("4_screen")
+size = Vector3(0.11, 0.1, 0.02)
 
 [node name="Door" type="Node3D"]
 script = ExtResource("1_door")
@@ -104,6 +109,10 @@ shape = SubResource("BoxShape3D_reader")
 mesh = SubResource("BoxMesh_reader")
 surface_material_override/0 = SubResource("StandardMaterial3D_reader")
 
+[node name="Screen" type="MeshInstance3D" parent="ReaderFront"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.04, 0.04)
+mesh = SubResource("BoxMesh_reader_screen")
+
 [node name="Light" type="MeshInstance3D" parent="ReaderFront"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.07, 0.04)
 mesh = SubResource("BoxMesh_reader_light")
@@ -119,6 +128,10 @@ shape = SubResource("BoxShape3D_reader")
 [node name="Mesh" type="MeshInstance3D" parent="ReaderBack"]
 mesh = SubResource("BoxMesh_reader")
 surface_material_override/0 = SubResource("StandardMaterial3D_reader")
+
+[node name="Screen" type="MeshInstance3D" parent="ReaderBack"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.04, 0.04)
+mesh = SubResource("BoxMesh_reader_screen")
 
 [node name="Light" type="MeshInstance3D" parent="ReaderBack"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.07, 0.04)

@@ -44,49 +44,62 @@ noir look. Built with **Godot 4** and **GDScript**.
 
 ### The map
 
-The site has four zones. Underground, from west to east:
+The site has two underground floors and the Surface.
+
+**Upper floor — Light Containment (LCZ):**
 
 ```
-       LIGHT CONTAINMENT         HEAVY CONTAINMENT       ENTRANCE ZONE
-   D D D # L # P            . 1 . 2 . .            A # O . B .
-   W . O # . # .            # # # # # .            # # # # # .
-   # # # # X # =  checkpoint # # . G # = checkpoint # S . M # .
-   K Z # . . # .            . 3 # # # .            # # # # # .
-   A # # 9 9 # T            . . S H . .            C . O . F .
+   D D D # L # S S      D = Class-D cell block     L = laboratory
+   . W O # . # # a      S = Tertiary Server Room   W = restrooms   O = office
+   b # # # X # . .      a = CHECKPOINT A (lift)    b = CHECKPOINT B (lift)
+   K # Z # . # 7 7      X = lockroom   K = lockers  Z = storage    7 = SCP-173
+   A # # 9 9 # T .      A = LCZ armory  9 = SCP-914  T = test chamber
 ```
 
-| | Light Containment (LCZ) | Heavy Containment (HCZ) | Entrance Zone (EZ) |
-|---|---|---|---|
-| Rooms | **DDD Class-D cell block**, L lab, O office, P computer room, W restrooms, Z storage, K locker room, T test chamber (dummies), A LCZ armory, **99 SCP-914**, X **lockroom** | 1/2/3 SCP-173, SCP-096, SCP-049 chambers (empty for now), G generators (careful: sparking wiring), S server room, H HCZ armory | A/B/C **Gates A, B, C** (elevators to the Surface), S security office, M facility manager, O offices, F cafeteria |
-| Who spawns here | Class-D (in the cells), Scientists | SCPs (later) | Facility Guards, Containment Captain |
+**Lower floor (20 m below) — Heavy Containment (HCZ) and Entrance Zone (EZ):**
 
-`#` corridors, `=` checkpoints (need **Admin 1**). Each cell of the grid is
-12 × 12 m; sprinting from a Class-D cell to Gate A takes about 40 seconds.
+```
+   HEAVY CONTAINMENT              ENTRANCE ZONE
+   . 2 . . R . . . .            A # O . B .
+   . # # # # # # a .            # # # # # .
+   b # . G # . # . .            # S . M # .
+   . 3 # # # H # # =  checkpoint # # # # # .
+   . . . E # . . . .            C . O F . .
+   2/3 = SCP-096 / SCP-049, R = archive, G = generators, H = HCZ armory,
+   E = testing room, a/b = the lifts up to Light Containment.
+   A/B/C = Gates A, B, C (lifts up to the Surface), S = security office,
+   M = facility manager, O = offices, F = cafeteria
+```
 
-**The Class-D cell block** is a 36 m hall with 16 small numbered cells
-(D-01 … D-16), 8 on each side, each with a bunk, toilet and sink. Every
-Class-D starts locked in a cell; **6 seconds after the round starts the
-breach begins and all cell doors open**. The hall leads out east into
-Light Containment.
+- **Light → Heavy Containment only by lift:** Checkpoint A (east side) and
+  Checkpoint B (west side) each have a lift. The checkpoint doors need
+  **Admin 1**. HCZ → EZ is a normal checkpoint door (Admin 1).
+- **Lifts:** press **CALL** next to the lift doors to bring the cabin, step
+  in and use the panel on the cabin wall to go up or down. The sign above
+  the doors shows where the lift is.
+- **Class-D cell block:** 16 numbered cells (D-01 … D-16); Class-D start
+  locked in and the doors open 6 s into the round.
+- **SCP-173:** wide entrance with striped pillars and a "SCP-173 / EUCLID"
+  placard, white antechamber with a viewing window, then the containment
+  door (Containment 3) into the chamber (high observation window, vent fan).
+- **Tertiary Server Room:** lit control room behind a glass wall, dark
+  server clusters with frosted glass heat shafts and blue neon floor lights.
+- **SCP-914:** intake and output booths on raised platforms with ramps and
+  railings, hazard zones, the dial, shelves with supplies.
+- Sprinting from a Class-D cell to the Surface exit takes about a minute.
 
-**SCP-914** is the big clockwork machine with an INTAKE and an OUTPUT booth
-and its ROUGH / COARSE / 1:1 / FINE / VERY FINE dial (it doesn't refine
-items yet — that comes with the SCPs). The **lockroom** is a corridor with
-two doors one after another.
-
-**Surface** (reached by the Gate elevators, 20 m up): a night-time yard with
+**Surface** (reached by the Gate A/B/C lifts from the Entrance Zone): a night-time yard with
 the Gate A/B/C buildings, the **MTF helipad**, the **Chaos Insurgency trucks**,
 the **Warhead Control** building and, to the north, the **EXIT road — the
 escape zone**.
 
-**Elevators:** use the card reader next to an elevator door to call it, the
-UP / DOWN panel inside to ride.
-
-**Door access** (hold the keycard, Ctrl): Class-D cells start open; locker
-room Containment 1; test chamber Containment 2; SCP chambers Containment 3;
-LCZ armory Armory 1, HCZ armory Armory 2; generator room Admin 1, server
-room Admin 2; security office Armory 1; facility manager Admin 2;
-checkpoints Admin 1; **Gates A and B Admin 2, Gate C (emergency exit) Admin 1**.
+**Door access** (hold the keycard, Ctrl): Class-D cells open by themselves;
+locker room Containment 1; test chamber and SCP-914 Containment 2; SCP
+chamber doors Containment 3; LCZ armory Armory 1, HCZ armory Armory 2;
+archive and testing room Containment 2; generator room Admin 1; security
+office Armory 1; facility manager Admin 2; **Checkpoints A/B and the HCZ→EZ
+checkpoint Admin 1**; **Gates A and B Admin 2, Gate C (emergency exit)
+Admin 1**.
 
 ### How a round works
 

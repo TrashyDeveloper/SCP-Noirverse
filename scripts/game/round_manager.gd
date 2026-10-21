@@ -23,7 +23,8 @@ const CHARACTER_SCENE := preload("res://scenes/player/character.tscn")
 const NO_WINNER := -1
 ## Seconds after the round starts before the Class-D cell doors open.
 const CELL_DOORS_OPEN_AFTER := 6.0
-## Anyone below this height is "underground" (inside the facility).
+## Fallback if a level has no "SurfaceArea": anyone above this height counts
+## as being on the Surface.
 const SURFACE_HEIGHT := 15.0
 ## Warhead rules: keycard Admin level needed, countdown seconds, and until
 ## how many seconds before detonation it can still be cancelled (-1 = never).
@@ -266,6 +267,15 @@ func _open_class_d_cells() -> void:
 	announcement.emit("FACILITY ANNOUNCEMENT: Containment breach. Class-D cell doors are open.")
 
 
+## Is this character on the Surface (outside the facility)? Uses the level's
+## "SurfaceArea" volume.
+func is_on_surface(character: CharacterController) -> bool:
+	var area := level.get_node_or_null("SurfaceArea") as Area3D
+	if area == null:
+		return character.global_position.y > SURFACE_HEIGHT
+	return area.overlaps_body(character)
+
+
 # --- Warheads ------------------------------------------------------------
 
 func _held_admin_level(actor: Node) -> int:
@@ -344,8 +354,7 @@ func _detonate(warhead: int) -> void:
 	for character in characters:
 		if not character.is_alive:
 			continue
-		var underground := character.global_position.y < SURFACE_HEIGHT
-		if warhead == WarheadConsole.Warhead.GAMMA or underground:
+		if warhead == WarheadConsole.Warhead.GAMMA or not is_on_surface(character):
 			character.health.take_damage(100000.0, blast)
 	if warhead == WarheadConsole.Warhead.DELTA:
 		# The facility below is destroyed: the elevators stop working.
